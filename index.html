@@ -15,11 +15,13 @@ h1,h2 {color:red; text-align:center;}
 p {text-align:center; max-width:900px; margin:auto; line-height:1.6;}
 button {background:red; color:white; border:none; padding:6px 10px; margin:4px; cursor:pointer;}
 input[type="text"], input[type="number"] {padding:4px; margin:2px; width:80px; text-align:center; background:#111; color:white; border:1px solid red;}
-.box {background:#111; border-left:4px solid red; padding:10px; margin:10px 0;}
-.bracket-container {display:flex; justify-content:center; gap:40px; margin-top:20px;}
-.bracket-column {display:flex; flex-direction:column; gap:20px;}
-.bracket-match {background:#1a1a1a; border:2px solid red; padding:8px; text-align:center; min-width:150px;}
-.grand-final {background:#111; border:3px solid red; padding:10px; width:200px; margin:auto; text-align:center; margin-top:20px;}
+
+/* Tournament bracket style */
+.bracket {display:flex; justify-content:center; gap:40px; margin-top:20px; position:relative;}
+.bracket-column {display:flex; flex-direction:column; gap:40px; position:relative;}
+.match {background:#1a1a1a; border:2px solid red; padding:8px; min-width:150px; text-align:center; position:relative;}
+svg {position:absolute; top:0; left:0; width:100%; height:100%; pointer-events:none;}
+.grand-final {background:#111; border:3px solid red; padding:10px; width:220px; text-align:center; margin:auto; margin-top:20px;}
 </style>
 </head>
 <body>
@@ -45,12 +47,10 @@ input[type="text"], input[type="number"] {padding:4px; margin:2px; width:80px; t
 <section id="bracket">
 <h2>Tournament Bracket</h2>
 <button onclick="generateBracket()" id="genBtn" disabled>Generate Round of 32</button>
-<div class="bracket-container">
-  <div id="upper-column" class="bracket-column"></div>
-  <div id="lower-column" class="bracket-column"></div>
-</div>
+<div class="bracket" id="bracket-grid"></div>
 <h3 style="text-align:center;">Grand Final</h3>
 <div id="grand-final" class="grand-final"></div>
+<svg id="connections"></svg>
 </section>
 
 <section id="tournaments">
@@ -89,12 +89,11 @@ document.querySelectorAll("section").forEach(s=>s.classList.remove("active"));
 document.getElementById(id).classList.add("active");
 }
 
-// Admin
 let isAdmin = localStorage.isAdmin === "true";
 let rounds = {upper:[], lower:[], final:[]};
-let upperDiv = document.getElementById("upper-column");
-let lowerDiv = document.getElementById("lower-column");
+let bracketGrid = document.getElementById("bracket-grid");
 let grandFinal = document.getElementById("grand-final");
+let svg = document.getElementById("connections");
 
 if(isAdmin) document.getElementById("genBtn").disabled=false;
 
@@ -145,33 +144,33 @@ render();
 }
 
 function render(){
-upperDiv.innerHTML="";
-lowerDiv.innerHTML="";
-grandFinal.innerHTML="";
-
+bracketGrid.innerHTML="";
+svg.innerHTML="";
+let upperCol = document.createElement("div");
+upperCol.className="bracket-column";
 rounds.upper.forEach((m,i)=>{
-upperDiv.innerHTML+=`<div class="bracket-match">
-<input type="text" value="${m.a}" onchange="editTeam('upper',${i},'a')"> vs <input type="text" value="${m.b}" onchange="editTeam('upper',${i},'b')"><br>
-Score: ${m.scoreA}-${m.scoreB}<br>
-${isAdmin?'<button onclick="setScore(\'upper\','+i+')">Set Score</button>':''}
-</div>`;
+let div = document.createElement("div");
+div.className="match";
+div.innerHTML=`<input type="text" value="${m.a}" onchange="editTeam('upper',${i},'a')"> vs <input type="text" value="${m.b}" onchange="editTeam('upper',${i},'b')"><br>Score: ${m.scoreA}-${m.scoreB}<br>${isAdmin?'<button onclick="setScore(\'upper\','+i+')">Set Score</button>':''}`;
+upperCol.appendChild(div);
 });
-
+let lowerCol = document.createElement("div");
+lowerCol.className="bracket-column";
 rounds.lower.forEach((m,i)=>{
-lowerDiv.innerHTML+=`<div class="bracket-match">
-<input type="text" value="${m.a}" onchange="editTeam('lower',${i},'a')"> vs <input type="text" value="${m.b}" onchange="editTeam('lower',${i},'b')"><br>
-Score: ${m.scoreA}-${m.scoreB}<br>
-${isAdmin?'<button onclick="setScore(\'lower\','+i+')">Set Score</button>':''}
-</div>`;
+let div = document.createElement("div");
+div.className="match";
+div.innerHTML=`<input type="text" value="${m.a}" onchange="editTeam('lower',${i},'a')"> vs <input type="text" value="${m.b}" onchange="editTeam('lower',${i},'b')"><br>Score: ${m.scoreA}-${m.scoreB}<br>${isAdmin?'<button onclick="setScore(\'lower\','+i+')">Set Score</button>':''}`;
+lowerCol.appendChild(div);
 });
+bracketGrid.appendChild(upperCol);
+bracketGrid.appendChild(lowerCol);
 
-rounds.final.forEach(f=>{
-grandFinal.innerHTML+=`<div>${f}</div>`;
-});
+// Grand Final
+grandFinal.innerHTML="";
+rounds.final.forEach(f=>{ grandFinal.innerHTML+=`<div>${f}</div>`; });
 }
 
 render();
 </script>
-
 </body>
 </html>
