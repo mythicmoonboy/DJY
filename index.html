@@ -14,17 +14,17 @@ section.active {display:block;}
 h1,h2 {color:red; text-align:center;}
 p {text-align:center; max-width:800px; margin:auto; line-height:1.6;}
 button {background:red; color:white; border:none; padding:6px 10px; margin:4px; cursor:pointer;}
-input[type="text"], input[type="number"] {padding:4px; margin:2px; width:50px; text-align:center;}
+input[type="text"], input[type="number"] {padding:4px; margin:2px; width:60px; text-align:center; background:#111; color:white; border:1px solid red;}
 .box {background:#111; border-left:4px solid red; padding:10px; margin:10px 0;}
 .iframe-container iframe {border:2px solid red; margin:10px;}
 footer {background:black; border-top:2px solid red; text-align:center; padding:15px; margin-top:30px;}
 
 /* Bracket layout */
-.bracket-container {display:flex; justify-content:center; gap:50px; overflow-x:auto; margin-top:20px;}
+.bracket-container {display:flex; justify-content:center; gap:40px; overflow-x:auto; margin-top:20px; position:relative;}
 .bracket-column {display:flex; flex-direction:column; gap:20px; position:relative;}
-.bracket-match {background:#1a1a1a; border:2px solid red; padding:8px; text-align:center; min-width:140px; position:relative;}
-.bracket-match input {width:40px; margin-top:4px;}
-.bracket-line {position:absolute; width:2px; background:red;}
+.bracket-match {background:#1a1a1a; border:2px solid red; padding:8px; text-align:center; min-width:150px; position:relative;}
+.bracket-line {position:absolute; background:red;}
+.bracket-header {font-weight:bold; margin-bottom:8px; color:red;}
 </style>
 </head>
 <body>
@@ -52,7 +52,7 @@ footer {background:black; border-top:2px solid red; text-align:center; padding:1
 <!-- BRACKET -->
 <section id="bracket">
 <h2>Tournament Bracket</h2>
-<button onclick="generateRound32()" id="genBtn" disabled>Generate Round of 32</button>
+<button onclick="generateBracket()" id="genBtn" disabled>Generate Round of 32</button>
 <div class="bracket-container">
   <div id="upper-column" class="bracket-column"></div>
   <div id="lower-column" class="bracket-column"></div>
@@ -101,7 +101,7 @@ document.querySelectorAll("section").forEach(s=>s.classList.remove("active"));
 document.getElementById(id).classList.add("active");
 }
 
-// Admin state
+// Admin
 let isAdmin = localStorage.isAdmin === "true";
 
 // Bracket data
@@ -136,7 +136,7 @@ localStorage.final = JSON.stringify(final);
 }
 
 // Generate Round of 32
-function generateRound32(){
+function generateBracket(){
 upper=[];
 for(let i=1;i<=32;i+=2){
 upper.push({a:"Team "+i,b:"Team "+(i+1),scoreA:0,scoreB:0});
@@ -147,28 +147,28 @@ save();
 render();
 }
 
-// Admin edits team name
-function editTeam(round, index, teamKey){
+// Admin edit team name
+function editTeam(round,index,key){
 if(!isAdmin) return alert("Admin only");
-let newName = prompt("Enter new team name:", round[index][teamKey]);
-if(newName) round[index][teamKey]=newName;
+let name = prompt("Enter new team name:", round[index][key]);
+if(name) round[index][key]=name;
 save();
 render();
 }
 
-// Admin sets score and advances winner
-function setScore(round, index){
+// Admin set score
+function setScore(round,index){
 if(!isAdmin) return alert("Admin only");
 let match = round[index];
-let scoreA = parseInt(prompt(`Enter score for ${match.a}:`, match.scoreA));
-let scoreB = parseInt(prompt(`Enter score for ${match.b}:`, match.scoreB));
-match.scoreA = isNaN(scoreA)?0:scoreA;
-match.scoreB = isNaN(scoreB)?0:scoreB;
-let winner = scoreA>=scoreB?match.a:match.b;
-let loser = winner===match.a?match.b:match.a;
+let scoreA=parseInt(prompt("Score for "+match.a, match.scoreA));
+let scoreB=parseInt(prompt("Score for "+match.b, match.scoreB));
+match.scoreA=isNaN(scoreA)?0:scoreA;
+match.scoreB=isNaN(scoreB)?0:scoreB;
+let winner=match.scoreA>=match.scoreB?match.a:match.b;
+let loser=winner===match.a?match.b:match.a;
 
 if(round===upper){
-lower.push({a:loser,b:"TBD", scoreA:0, scoreB:0});
+lower.push({a:loser,b:"TBD",scoreA:0,scoreB:0});
 } else if(round===lower){
 final.push(winner);
 }
@@ -177,7 +177,7 @@ save();
 render();
 }
 
-// Render bracket visually
+// Render bracket
 function render(){
 upperDiv.innerHTML="";
 lowerDiv.innerHTML="";
@@ -208,6 +208,5 @@ finalDiv.innerHTML+=`<div class="bracket-match">${f}</div>`;
 
 render();
 </script>
-
 </body>
 </html>
