@@ -20,11 +20,11 @@ input {padding:6px; margin:4px; width:50px; text-align:center;}
 footer {background:black; border-top:2px solid red; text-align:center; padding:15px; margin-top:30px;}
 
 /* Bracket layout */
-.bracket-container {display:flex; justify-content:center; gap:50px; margin-top:20px;}
+.bracket-container {display:flex; justify-content:center; gap:50px; margin-top:20px; overflow-x:auto;}
 .bracket-column {display:flex; flex-direction:column; gap:20px; position:relative;}
 .bracket-match {background:#1a1a1a; border:2px solid red; padding:8px; text-align:center; min-width:140px; position:relative;}
-.bracket-match button {margin-top:5px; width:45%;}
-.line {position:absolute; width:2px; background:red;}
+.bracket-match input {width:40px; margin-top:4px;}
+.bracket-lines {position:absolute; width:2px; background:red;}
 </style>
 </head>
 <body>
@@ -147,12 +147,12 @@ save();
 render();
 }
 
-// Admin sets score and advances winner
+// Set score and advance winner (admin only)
 function setScore(round, index){
 if(!isAdmin) return alert("Admin only");
 let match = round[index];
-let scoreA = parseInt(prompt(`Enter score for ${match.a}:`,match.scoreA));
-let scoreB = parseInt(prompt(`Enter score for ${match.b}:`,match.scoreB));
+let scoreA = parseInt(prompt(`Enter score for ${match.a}:`, match.scoreA));
+let scoreB = parseInt(prompt(`Enter score for ${match.b}:`, match.scoreB));
 match.scoreA = isNaN(scoreA)?0:scoreA;
 match.scoreB = isNaN(scoreB)?0:scoreB;
 let winner = match.scoreA>=match.scoreB?match.a:match.b;
@@ -189,6 +189,5 @@ finalDiv.innerHTML+=`<div class="bracket-match">Grand Finalist: ${f}</div>`;
 
 render();
 </script>
-
 </body>
 </html>
