@@ -15,15 +15,10 @@ h1,h2 {color:red; text-align:center;}
 p {text-align:center; max-width:800px; margin:auto; line-height:1.6;}
 button {background:red; color:white; border:none; padding:6px 10px; margin:4px; cursor:pointer;}
 input[type="text"], input[type="number"] {padding:4px; margin:2px; width:80px; text-align:center; background:#111; color:white; border:1px solid red;}
-.box {background:#111; border-left:4px solid red; padding:10px; margin:10px 0;}
-.iframe-container iframe {border:2px solid red; margin:10px;}
-footer {background:black; border-top:2px solid red; text-align:center; padding:15px; margin-top:30px;}
-
-/* Bracket layout */
-.bracket-container {display:grid; grid-template-columns:repeat(6,180px); justify-content:center; position:relative; gap:20px; margin-top:20px;}
-.bracket-column {display:flex; flex-direction:column; gap:30px; position:relative;}
+.bracket-container {display:flex; justify-content:center; gap:40px; position:relative; margin-top:20px;}
+.bracket-column {display:flex; flex-direction:column; gap:20px; position:relative;}
 .bracket-match {background:#1a1a1a; border:2px solid red; padding:8px; text-align:center; min-width:150px; position:relative;}
-.bracket-line {position:absolute; width:2px; background:red; z-index:-1;}
+svg {position:absolute; top:0; left:0; width:100%; height:100%; pointer-events:none;}
 .grand-final {background:#111; border:3px solid red; padding:10px; width:200px; margin:auto; text-align:center;}
 </style>
 </head>
@@ -40,24 +35,20 @@ footer {background:black; border-top:2px solid red; text-align:center; padding:1
 </nav>
 </header>
 
-<!-- HOME -->
 <section id="home" class="active">
 <h2>Who is DJY?</h2>
 <p>DJY is a passionate Mobile Legends content creator and tournament host. His tournaments are designed to be intense, well-organized, and entertaining. Beyond tournaments, DJY connects players and fans through engaging content and events.</p>
 </section>
 
-<!-- BRACKET -->
 <section id="bracket">
 <h2>Tournament Bracket</h2>
 <button onclick="generateBracket()" id="genBtn" disabled>Generate Round of 32</button>
-<div class="bracket-container" id="bracket-grid">
-  <!-- Upper and Lower Bracket columns will be inserted here -->
-</div>
+<div class="bracket-container" id="bracket-grid"></div>
 <h3 style="text-align:center;">Grand Final</h3>
 <div id="grand-final" class="grand-final"></div>
+<svg id="connections"></svg>
 </section>
 
-<!-- TOURNAMENTS -->
 <section id="tournaments">
 <h2>Tournaments</h2>
 <h3>Upcoming</h3>
@@ -68,17 +59,15 @@ footer {background:black; border-top:2px solid red; text-align:center; padding:1
 <div class="box">DJY Invitational Cup</div>
 </section>
 
-<!-- VIDEOS -->
 <section id="videos">
 <h2>DJY Videos</h2>
-<div class="iframe-container" style="text-align:center;">
+<div style="text-align:center;">
 <iframe width="320" height="180" src="https://www.youtube.com/embed/VIDEO_ID"></iframe>
 <iframe width="320" height="180" src="https://www.youtube.com/embed/VIDEO_ID"></iframe>
 <p>Replace <b>VIDEO_ID</b> with DJY’s YouTube video ID.</p>
 </div>
 </section>
 
-<!-- ADMIN -->
 <section id="admin">
 <h2>Admin Login</h2>
 <input id="user" placeholder="Username">
@@ -99,15 +88,14 @@ document.getElementById(id).classList.add("active");
 
 // Admin
 let isAdmin = localStorage.isAdmin === "true";
-
-// Bracket Data
 let rounds = {upper:[], lower:[], final:[]};
 let bracketGrid = document.getElementById("bracket-grid");
 let grandFinal = document.getElementById("grand-final");
+let svg = document.getElementById("connections");
 
 if(isAdmin) document.getElementById("genBtn").disabled = false;
 
-// Login
+// Admin login
 function login(){
 if(user.value==="moonboi" && pass.value==="moonboi"){
 localStorage.isAdmin="true";
@@ -115,28 +103,24 @@ isAdmin=true;
 document.getElementById("genBtn").disabled=false;
 status.innerText="Admin logged in";
 show("bracket");
-}else{
-status.innerText="Wrong login";
-}
+}else{ status.innerText="Wrong login"; }
 }
 
-// Save/load bracket
+// Save/load
 function saveBracket(){ localStorage.setItem("bracket", JSON.stringify(rounds)); }
 function loadBracket(){ let saved=JSON.parse(localStorage.getItem("bracket")); if(saved) rounds=saved; }
 
-// Generate round of 32
+// Generate Round of 32
 function generateBracket(){
 rounds.upper=[];
-for(let i=1;i<=32;i+=2){
-rounds.upper.push({a:"Team "+i,b:"Team "+(i+1),scoreA:0,scoreB:0});
-}
+for(let i=1;i<=32;i+=2){ rounds.upper.push({a:"Team "+i,b:"Team "+(i+1),scoreA:0,scoreB:0}); }
 rounds.lower=[];
 rounds.final=[];
 saveBracket();
 renderBracket();
 }
 
-// Admin edit team name
+// Admin edit
 function editTeam(round,index,key){
 if(!isAdmin) return alert("Admin only");
 let name = prompt("Enter new team name:", rounds[round][index][key]);
@@ -155,19 +139,16 @@ match.scoreA=isNaN(scoreA)?0:scoreA;
 match.scoreB=isNaN(scoreB)?0:scoreB;
 let winner = scoreA>=scoreB?match.a:match.b;
 let loser = winner===match.a?match.b:match.a;
-
 if(round==="upper"){ rounds.lower.push({a:loser,b:"TBD",scoreA:0,scoreB:0}); }
 else if(round==="lower"){ rounds.final.push(winner); }
-rounds.upper.splice(index,1);
-rounds.lower.splice(index,1);
 saveBracket();
 renderBracket();
 }
 
-// Render bracket visually
+// Render Bracket + Draw Lines
 function renderBracket(){
 bracketGrid.innerHTML="";
-let totalColumns=6; // Adjust columns for upper and lower rounds
+svg.innerHTML="";
 let upperCol = document.createElement("div");
 upperCol.className="bracket-column";
 rounds.upper.forEach((m,i)=>{
@@ -187,6 +168,29 @@ lowerCol.appendChild(div);
 bracketGrid.appendChild(upperCol);
 bracketGrid.appendChild(lowerCol);
 
+// Draw SVG lines connecting matches
+function connect(el1,el2){
+let r1=el1.getBoundingClientRect();
+let r2=el2.getBoundingClientRect();
+let svgRect=svg.getBoundingClientRect();
+let x1=r1.right-svgRect.left;
+let y1=r1.top+ r1.height/2 - svgRect.top;
+let x2=r2.left-svgRect.left;
+let y2=r2.top + r2.height/2 - svgRect.top;
+let line=document.createElementNS("http://www.w3.org/2000/svg","line");
+line.setAttribute("x1",x1);
+line.setAttribute("y1",y1);
+line.setAttribute("x2",x2);
+line.setAttribute("y2",y2);
+line.setAttribute("stroke","red");
+line.setAttribute("stroke-width","2");
+svg.appendChild(line);
+}
+// Connect first upper matches to first lower matches
+for(let i=0;i<Math.min(upperCol.children.length, lowerCol.children.length); i++){
+connect(upperCol.children[i], lowerCol.children[i]);
+}
+
 // Render Grand Final
 grandFinal.innerHTML="";
 rounds.final.forEach(f=>{ grandFinal.innerHTML+=`<div>${f}</div>`; });
@@ -194,6 +198,5 @@ rounds.final.forEach(f=>{ grandFinal.innerHTML+=`<div>${f}</div>`; });
 
 renderBracket();
 </script>
-
 </body>
 </html>
