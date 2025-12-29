@@ -14,17 +14,17 @@ section.active {display:block;}
 h1,h2 {color:red; text-align:center;}
 p {text-align:center; max-width:800px; margin:auto; line-height:1.6;}
 button {background:red; color:white; border:none; padding:6px 10px; margin:4px; cursor:pointer;}
-input {padding:6px; margin:4px; width:50px; text-align:center;}
+input[type="text"], input[type="number"] {padding:4px; margin:2px; width:50px; text-align:center;}
 .box {background:#111; border-left:4px solid red; padding:10px; margin:10px 0;}
 .iframe-container iframe {border:2px solid red; margin:10px;}
 footer {background:black; border-top:2px solid red; text-align:center; padding:15px; margin-top:30px;}
 
 /* Bracket layout */
-.bracket-container {display:flex; justify-content:center; gap:50px; margin-top:20px; overflow-x:auto;}
+.bracket-container {display:flex; justify-content:center; gap:50px; overflow-x:auto; margin-top:20px;}
 .bracket-column {display:flex; flex-direction:column; gap:20px; position:relative;}
 .bracket-match {background:#1a1a1a; border:2px solid red; padding:8px; text-align:center; min-width:140px; position:relative;}
 .bracket-match input {width:40px; margin-top:4px;}
-.bracket-lines {position:absolute; width:2px; background:red;}
+.bracket-line {position:absolute; width:2px; background:red;}
 </style>
 </head>
 <body>
@@ -40,7 +40,7 @@ footer {background:black; border-top:2px solid red; text-align:center; padding:1
 </nav>
 </header>
 
-<!-- HOME PAGE -->
+<!-- HOME -->
 <section id="home" class="active">
 <h2>Who is DJY?</h2>
 <p>DJY is a passionate Mobile Legends: Bang Bang content creator and tournament host known for bringing high-energy, competitive action to the community. With a strong focus on fair play and exciting matchups, DJY creates a space where both rising talents and experienced players can showcase their skills.</p>
@@ -49,10 +49,10 @@ footer {background:black; border-top:2px solid red; text-align:center; padding:1
 <p>His platform isn’t just about winning—it’s about building a strong, united MLBB scene driven by passion and skill.</p>
 </section>
 
-<!-- BRACKET PAGE -->
+<!-- BRACKET -->
 <section id="bracket">
 <h2>Tournament Bracket</h2>
-<button onclick="generate()" id="genBtn" disabled>Generate Round of 32</button>
+<button onclick="generateRound32()" id="genBtn" disabled>Generate Round of 32</button>
 <div class="bracket-container">
   <div id="upper-column" class="bracket-column"></div>
   <div id="lower-column" class="bracket-column"></div>
@@ -61,7 +61,7 @@ footer {background:black; border-top:2px solid red; text-align:center; padding:1
 <div id="final" style="text-align:center;"></div>
 </section>
 
-<!-- TOURNAMENTS PAGE -->
+<!-- TOURNAMENTS -->
 <section id="tournaments">
 <h2>Tournaments</h2>
 <h3>Upcoming</h3>
@@ -72,7 +72,7 @@ footer {background:black; border-top:2px solid red; text-align:center; padding:1
 <div class="box">DJY Invitational Cup</div>
 </section>
 
-<!-- VIDEOS PAGE -->
+<!-- VIDEOS -->
 <section id="videos">
 <h2>DJY Videos</h2>
 <div class="iframe-container" style="text-align:center;">
@@ -82,7 +82,7 @@ footer {background:black; border-top:2px solid red; text-align:center; padding:1
 </div>
 </section>
 
-<!-- ADMIN PAGE -->
+<!-- ADMIN -->
 <section id="admin">
 <h2>Admin Login</h2>
 <input id="user" placeholder="Username">
@@ -101,7 +101,7 @@ document.querySelectorAll("section").forEach(s=>s.classList.remove("active"));
 document.getElementById(id).classList.add("active");
 }
 
-// Admin
+// Admin state
 let isAdmin = localStorage.isAdmin === "true";
 
 // Bracket data
@@ -136,10 +136,10 @@ localStorage.final = JSON.stringify(final);
 }
 
 // Generate Round of 32
-function generate(){
+function generateRound32(){
 upper=[];
 for(let i=1;i<=32;i+=2){
-upper.push({a:"Team "+i, b:"Team "+(i+1), scoreA:0, scoreB:0});
+upper.push({a:"Team "+i,b:"Team "+(i+1),scoreA:0,scoreB:0});
 }
 lower=[];
 final=[];
@@ -147,7 +147,16 @@ save();
 render();
 }
 
-// Set score and advance winner (admin only)
+// Admin edits team name
+function editTeam(round, index, teamKey){
+if(!isAdmin) return alert("Admin only");
+let newName = prompt("Enter new team name:", round[index][teamKey]);
+if(newName) round[index][teamKey]=newName;
+save();
+render();
+}
+
+// Admin sets score and advances winner
 function setScore(round, index){
 if(!isAdmin) return alert("Admin only");
 let match = round[index];
@@ -155,7 +164,7 @@ let scoreA = parseInt(prompt(`Enter score for ${match.a}:`, match.scoreA));
 let scoreB = parseInt(prompt(`Enter score for ${match.b}:`, match.scoreB));
 match.scoreA = isNaN(scoreA)?0:scoreA;
 match.scoreB = isNaN(scoreB)?0:scoreB;
-let winner = match.scoreA>=match.scoreB?match.a:match.b;
+let winner = scoreA>=scoreB?match.a:match.b;
 let loser = winner===match.a?match.b:match.a;
 
 if(round===upper){
@@ -175,19 +184,30 @@ lowerDiv.innerHTML="";
 finalDiv.innerHTML="";
 
 upper.forEach((m,i)=>{
-upperDiv.innerHTML+=`<div class="bracket-match">${m.a} vs ${m.b}<br>Score: ${m.scoreA}-${m.scoreB}<br><button onclick="setScore(upper,${i})">Set Score</button></div>`;
+upperDiv.innerHTML+=`<div class="bracket-match">
+<input type="text" value="${m.a}" onchange="editTeam(upper,${i},'a')"> vs 
+<input type="text" value="${m.b}" onchange="editTeam(upper,${i},'b')"><br>
+Score: ${m.scoreA}-${m.scoreB}<br>
+${isAdmin?'<button onclick="setScore(upper,'+i+')">Set Score</button>':''}
+</div>`;
 });
 
 lower.forEach((m,i)=>{
-lowerDiv.innerHTML+=`<div class="bracket-match">${m.a} vs ${m.b}<br>Score: ${m.scoreA}-${m.scoreB}<br>${isAdmin?'<button onclick="setScore(lower,'+i+')">Set Score</button>':''}</div>`;
+lowerDiv.innerHTML+=`<div class="bracket-match">
+<input type="text" value="${m.a}" onchange="editTeam(lower,${i},'a')"> vs 
+<input type="text" value="${m.b}" onchange="editTeam(lower,${i},'b')"><br>
+Score: ${m.scoreA}-${m.scoreB}<br>
+${isAdmin?'<button onclick="setScore(lower,'+i+')">Set Score</button>':''}
+</div>`;
 });
 
 final.forEach(f=>{
-finalDiv.innerHTML+=`<div class="bracket-match">Grand Finalist: ${f}</div>`;
+finalDiv.innerHTML+=`<div class="bracket-match">${f}</div>`;
 });
 }
 
 render();
 </script>
+
 </body>
 </html>
