@@ -19,9 +19,15 @@
 
         .announcement-bar { background: var(--red); color: black; padding: 10px; text-align: center; font-weight: 900; text-transform: uppercase; margin-bottom: 20px; border-radius: 4px; }
         
+        /* Home Profile */
+        .profile-pic { width: 120px; height: 120px; border-radius: 50%; border: 3px solid var(--red); margin-bottom: 15px; object-fit: cover; box-shadow: 0 0 15px var(--red); }
+        .description { font-style: italic; color: #bbb; max-width: 600px; margin: auto; line-height: 1.6; }
+
         /* Long Box UI */
-        .t-long-box { background: var(--card); border: 1px solid var(--border); padding: 20px 40px; margin-bottom: 15px; border-radius: 4px; cursor: pointer; display: flex; justify-content: space-between; align-items: center; }
+        .t-long-box { background: var(--card); border: 1px solid var(--border); padding: 20px 40px; margin-bottom: 15px; border-radius: 4px; cursor: pointer; display: flex; justify-content: space-between; align-items: center; position: relative; }
+        .t-long-box.finished { opacity: 0.5; filter: grayscale(1); border-color: #555; }
         .t-long-box:hover { border-color: var(--red); }
+        .status-tag { font-size: 10px; padding: 2px 6px; border-radius: 3px; background: #333; color: #fff; text-transform: uppercase; }
 
         /* Professional Bracket with Lines */
         .bracket-wrapper { position: relative; padding: 40px; min-width: 2000px; display: flex; gap: 80px; }
@@ -37,6 +43,7 @@
         .admin-box { width: 350px; margin: 40px auto; border: 1px solid var(--red); padding: 30px; background: #000; }
         .admin-box input { width: 100%; padding: 10px; margin-bottom: 15px; background: #111; border: 1px solid #333; color: white; box-sizing: border-box; }
         .admin-box button { width: 100%; padding: 12px; background: var(--red); border: none; font-weight: bold; cursor: pointer; margin-bottom: 8px; }
+        .manage-item { display: flex; justify-content: space-between; align-items: center; background: #111; padding: 10px; margin-top: 10px; border: 1px solid #333; border-radius: 4px; }
     </style>
 </head>
 <body>
@@ -53,8 +60,12 @@
 <section id="home" class="active">
     <div id="top-ann" class="announcement-bar">Welcome to DJY Arena</div>
     <div style="text-align:center; max-width:700px; margin:auto;">
-        <h2 style="color:var(--red)">Who is DJY?</h2>
-        <p>DJY is a leading MLBB YouTuber and tournament host. This site tracks his professional Round of 32 tournaments.</p>
+        <!-- Replace URL with real DJY PFP if needed -->
+        <img src="https://via.placeholder.com" alt="DJY PFP" class="profile-pic">
+        <h2 style="color:var(--red)">DJY: Professional MLBB YouTuber</h2>
+        <p class="description">
+            DJY is a premier Mobile Legends: Bang Bang YouTuber and digital host known for his high-tier strategy breakdowns and high-energy casting. As a dedicated content creator, he provides his audience with the latest meta shifts while organizing professional-grade tournaments for the community to test their skills in the Land of Dawn.
+        </p>
     </div>
 </section>
 
@@ -86,11 +97,18 @@
 
     <div id="dash-ui" class="admin-box" style="display:none; width:500px;">
         <h3 style="color:var(--red); text-align:center;">COMMAND CENTER</h3>
+        
         <div style="border:1px solid #222; padding:10px; margin-bottom:10px;">
             <h4>Post Update</h4>
             <input id="upd-txt" placeholder="Marquee text">
             <button onclick="postUpd()">Push Update</button>
         </div>
+
+        <div style="border:1px solid #222; padding:10px; margin-bottom:10px;">
+            <h4>Manage Active Tournaments</h4>
+            <div id="admin-tour-list"></div>
+        </div>
+
         <div id="head-admin-tools" style="display:none; border:1px solid #222; padding:10px; margin-bottom:10px;">
             <h4 style="color:var(--red)">Staff Manager (moonboi only)</h4>
             <input id="s-u" placeholder="New Staff User">
@@ -98,12 +116,14 @@
             <button onclick="addStaff()">Create Staff</button>
             <div id="s-list"></div>
         </div>
+
         <div style="border:1px solid #222; padding:10px;">
-            <h4>Generate Tournament</h4>
+            <h4>Generate New Tournament</h4>
             <input id="t-n" placeholder="Tournament Name">
             <input id="t-p" placeholder="Prize Pool">
             <button onclick="createTour()">Create R32 Bracket</button>
         </div>
+        
         <button onclick="location.reload()" style="background:#444; margin-top:10px;">Logout</button>
     </div>
 </section>
@@ -117,7 +137,7 @@ let activeIdx = null;
 function tab(id) {
     document.querySelectorAll('section').forEach(s => s.classList.remove('active'));
     document.getElementById(id).classList.add('active');
-    if(id === 'tour') renderTours();
+    if(id === 'tour' || id === 'admin') renderTours();
 }
 
 function login() {
@@ -130,6 +150,7 @@ function login() {
         document.getElementById('dash-ui').style.display = 'block';
         if(auth.role === 'head') document.getElementById('head-admin-tools').style.display = 'block';
         renderStaff();
+        renderAdminTours();
     }
 }
 
@@ -153,6 +174,7 @@ function createTour() {
     tours.push({
         name,
         prize: document.getElementById('t-p').value,
+        status: 'active',
         bracket: {
             R32: Array(16).fill().map((_,i)=>({t1:"Team "+(i*2+1), t2:"Team "+(i*2+2), s1:0, s2:0})),
             R16: Array(8).fill({t1:"TBD", t2:"TBD", s1:0, s2:0}),
@@ -163,11 +185,46 @@ function createTour() {
     });
     localStorage.setItem('djy_tours', JSON.stringify(tours));
     alert("Tournament Created!");
+    renderAdminTours();
 }
 
 function renderTours() {
     const v = document.getElementById('list-view'); v.innerHTML = "";
-    tours.forEach((t, i) => { v.innerHTML += `<div class="t-long-box" onclick="openDetail(${i})"><h3>${t.name}</h3><span>${t.prize}</span></div>`; });
+    tours.forEach((t, i) => { 
+        let finishedClass = t.status === 'finished' ? 'finished' : '';
+        let statusLabel = t.status === 'finished' ? '<span class="status-tag">Completed</span>' : '<span class="status-tag" style="background:green">Live</span>';
+        v.innerHTML += `<div class="t-long-box ${finishedClass}" onclick="openDetail(${i})"><h3>${t.name} ${statusLabel}</h3><span>${t.prize}</span></div>`; 
+    });
+}
+
+function renderAdminTours() {
+    const v = document.getElementById('admin-tour-list'); v.innerHTML = "";
+    tours.forEach((t, i) => {
+        v.innerHTML += `
+            <div class="manage-item">
+                <span style="font-size:12px;">${t.name}</span>
+                <div>
+                    <button onclick="finishTour(${i})" style="padding:4px 8px; font-size:10px; background:orange; color:black; border:none; cursor:pointer;">FINISH</button>
+                    <button onclick="deleteTour(${i})" style="padding:4px 8px; font-size:10px; background:red; color:white; border:none; cursor:pointer;">DELETE</button>
+                </div>
+            </div>`;
+    });
+}
+
+function deleteTour(i) {
+    if(confirm("Permanently delete this tournament?")) {
+        tours.splice(i, 1);
+        localStorage.setItem('djy_tours', JSON.stringify(tours));
+        renderAdminTours();
+        renderTours();
+    }
+}
+
+function finishTour(i) {
+    tours[i].status = 'finished';
+    localStorage.setItem('djy_tours', JSON.stringify(tours));
+    renderAdminTours();
+    renderTours();
 }
 
 function openDetail(i) {
@@ -201,7 +258,6 @@ function setS(r, i, tNum) {
     if(s !== null) {
         let b = tours[activeIdx].bracket;
         b[r][i]['s'+tNum] = s;
-        // Auto Advance
         let winner = parseInt(b[r][i].s1) > parseInt(b[r][i].s2) ? b[r][i].t1 : b[r][i].t2;
         let map = {R32:"R16", R16:"R8", R8:"R4", R4:"GF"};
         if(map[r]) {
