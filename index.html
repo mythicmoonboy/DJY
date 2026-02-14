@@ -5,171 +5,204 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>DJY MLBB Tournament</title>
 <style>
-body {margin:0;font-family:Arial;background:#0b0b0b;color:white;}
-header {background:black;border-bottom:3px solid red;padding:15px;display:flex;justify-content:space-between;align-items:center;}
-nav a {color:white;text-decoration:none;margin-left:15px;font-weight:bold;cursor:pointer;}
-nav a:hover {color:red;}
-section {display:none;padding:20px;}
-section.active {display:block;}
-h1,h2 {color:red;text-align:center;}
-p {text-align:center;max-width:900px;margin:auto;line-height:1.6;}
-button {background:red;color:white;border:none;padding:6px 10px;margin:4px;cursor:pointer;}
-input[type="text"] {padding:4px;margin:2px;width:80px;text-align:center;background:#111;color:white;border:1px solid red;}
-.bracket-container {display:flex;justify-content:center;gap:40px;margin-top:20px;position:relative;}
-.bracket-column {display:flex;flex-direction:column;gap:40px;position:relative;}
-.match {background:#1a1a1a;border:2px solid red;padding:8px;min-width:150px;text-align:center;position:relative;}
-svg {position:absolute;top:0;left:0;width:100%;height:100%;pointer-events:none;}
-.grand-final {background:#111;border:3px solid red;padding:10px;width:220px;text-align:center;margin:auto;margin-top:20px;}
+    body {margin:0;font-family:'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;background:#0b0b0b;color:white;overflow-x: auto;}
+    
+    /* Centralized Header */
+    header {
+        background: black;
+        border-bottom: 3px solid red;
+        padding: 20px;
+        display: flex;
+        flex-direction: column; /* Stack Title and Nav */
+        align-items: center;
+        gap: 15px;
+    }
+    header h1 { margin: 0; letter-spacing: 2px; text-transform: uppercase; }
+    nav { display: flex; gap: 20px; }
+    nav a {color:white;text-decoration:none;font-weight:bold;cursor:pointer; transition: 0.3s;}
+    nav a:hover {color:red;}
+
+    section {display:none;padding:20px; min-width: 1200px;}
+    section.active {display:block;}
+    h1,h2 {color:red;text-align:center;}
+    
+    /* Bracket Layout */
+    .bracket-wrapper {
+        display: flex;
+        padding: 40px;
+        gap: 50px;
+        justify-content: flex-start;
+        align-items: stretch;
+    }
+    .round {
+        display: flex;
+        flex-direction: column;
+        justify-content: space-around;
+        width: 200px;
+    }
+    .round-title {
+        text-align: center;
+        color: red;
+        font-weight: bold;
+        margin-bottom: 20px;
+        text-transform: uppercase;
+        font-size: 0.9em;
+    }
+    .matchup {
+        background: #1a1a1a;
+        border: 1px solid #333;
+        border-left: 4px solid red;
+        margin: 10px 0;
+        padding: 10px;
+        border-radius: 4px;
+        box-shadow: 0 4px 10px rgba(0,0,0,0.5);
+    }
+    .team {
+        display: flex;
+        justify-content: space-between;
+        padding: 5px 0;
+        font-size: 13px;
+    }
+    .team input {
+        background: transparent;
+        border: none;
+        color: white;
+        width: 120px;
+    }
+    .score {
+        background: #333;
+        color: red;
+        padding: 0 8px;
+        font-weight: bold;
+        border-radius: 2px;
+    }
+    
+    .admin-controls { text-align: center; margin-bottom: 20px; }
+    button {background: red;color: white;border: none;padding: 8px 16px;cursor: pointer;font-weight: bold;border-radius: 4px;}
+    button:disabled { background: #555; }
 </style>
 </head>
 <body>
 
 <header>
-<h1>DJY MLBB Tournament</h1>
-<nav>
-<a onclick="show('home')">Home</a>
-<a onclick="show('bracket')">Bracket</a>
-<a onclick="show('tournaments')">Tournaments</a>
-<a onclick="show('videos')">Videos</a>
-<a onclick="show('admin')">Admin</a>
-</nav>
+    <h1>DJY MLBB Tournament</h1>
+    <nav>
+        <a onclick="show('home')">Home</a>
+        <a onclick="show('bracket')">Bracket</a>
+        <a onclick="show('tournaments')">Tournaments</a>
+        <a onclick="show('videos')">Videos</a>
+        <a onclick="show('admin')">Admin</a>
+    </nav>
 </header>
 
-<section id="home" class="active">
-<h2>Who is DJY?</h2>
-<p>DJY is a passionate Mobile Legends: Bang Bang content creator and tournament host who has dedicated years to growing the competitive MLBB community. He hosts high-energy tournaments where rising stars and experienced players showcase their skills. DJY emphasizes strategy, teamwork, and sportsmanship, making his events highly respected in the MLBB esports scene.</p>
-<p>Beyond tournaments, DJY produces engaging content highlighting memorable plays, team strategies, and player spotlights. His mission is not only to entertain but also to educate and inspire the next generation of MLBB players. DJY strengthens the community and competitive spirit through professional, organized, and exciting events.</p>
+<section id="bracket" class="active">
+    <div class="admin-controls">
+        <button onclick="generateBracket()" id="genBtn" disabled>Reset Round of 32</button>
+    </div>
+    
+    <div class="bracket-wrapper" id="bracket-grid">
+        <!-- Rounds will be injected here -->
+    </div>
 </section>
 
-<section id="bracket">
-<h2>Tournament Bracket</h2>
-<button onclick="generateBracket()" id="genBtn" disabled>Generate Round of 32</button>
-<div class="bracket-container" id="bracket-grid"></div>
-<h3 style="text-align:center;">Grand Final</h3>
-<div id="grand-final" class="grand-final"></div>
-<svg id="connections"></svg>
-</section>
-
-<section id="tournaments">
-<h2>Tournaments</h2>
-<h3>Upcoming</h3>
-<div class="box">DJY MLBB Season 2 – RM500</div>
-<h3>Ongoing</h3>
-<div class="box">DJY MLBB Season 1</div>
-<h3>Completed</h3>
-<div class="box">DJY Invitational Cup</div>
-</section>
-
-<section id="videos">
-<h2>DJY Videos</h2>
-<div style="text-align:center;">
-<iframe width="320" height="180" src="https://www.youtube.com/embed/VIDEO_ID"></iframe>
-<iframe width="320" height="180" src="https://www.youtube.com/embed/VIDEO_ID"></iframe>
-<p>Replace <b>VIDEO_ID</b> with DJY’s YouTube video ID.</p>
-</div>
-</section>
-
+<!-- Other sections kept for functionality -->
+<section id="home"><h2>Who is DJY?</h2><p>Professional MLBB Host...</p></section>
 <section id="admin">
-<h2>Admin Login</h2>
-<input id="user" placeholder="Username">
-<input id="pass" type="password" placeholder="Password">
-<br>
-<button onclick="login()">Login</button>
-<p id="status"></p>
+    <h2>Admin Login</h2>
+    <div style="text-align: center;">
+        <input id="user" placeholder="Username" style="padding:8px">
+        <input id="pass" type="password" placeholder="Password" style="padding:8px">
+        <button onclick="login()">Login</button>
+        <p id="status"></p>
+    </div>
 </section>
-
-<footer>© 2025 DJY MLBB Tournament</footer>
 
 <script>
 function show(id){
-document.querySelectorAll("section").forEach(s=>s.classList.remove("active"));
-document.getElementById(id).classList.add("active");
+    document.querySelectorAll("section").forEach(s=>s.classList.remove("active"));
+    document.getElementById(id).classList.add("active");
 }
 
-let isAdmin = localStorage.isAdmin==="true";
-let rounds={upper:[],lower:[],final:[]};
-let bracketGrid=document.getElementById("bracket-grid");
-let grandFinal=document.getElementById("grand-final");
-let svg=document.getElementById("connections");
+let isAdmin = localStorage.isAdmin === "true";
+if(isAdmin) document.getElementById("genBtn").disabled = false;
 
-if(isAdmin) document.getElementById("genBtn").disabled=false;
+let tournamentData = JSON.parse(localStorage.getItem("tournamentData")) || {
+    r32: Array(16).fill().map((_, i) => ({ t1: "Team " + (i*2+1), t2: "Team " + (i*2+2), s1: 0, s2: 0 })),
+    r16: Array(8).fill({ t1: "TBD", t2: "TBD", s1: 0, s2: 0 }),
+    r8: Array(4).fill({ t1: "TBD", t2: "TBD", s1: 0, s2: 0 }),
+    r4: Array(2).fill({ t1: "TBD", t2: "TBD", s1: 0, s2: 0 }),
+    r2: [{ t1: "TBD", t2: "TBD", s1: 0, s2: 0 }]
+};
 
 function login(){
-if(user.value==="moonboi" && pass.value==="moonboi"){
-localStorage.isAdmin="true";
-isAdmin=true;
-document.getElementById("genBtn").disabled=false;
-status.innerText="Admin logged in";
-show("bracket");
-}else{status.innerText="Wrong login";}
+    if(document.getElementById("user").value==="moonboi" && document.getElementById("pass").value==="moonboi"){
+        localStorage.isAdmin="true";
+        isAdmin=true;
+        document.getElementById("genBtn").disabled=false;
+        show("bracket");
+    }
 }
 
-function save(){localStorage.setItem("bracket",JSON.stringify(rounds));}
-function load(){let saved=JSON.parse(localStorage.getItem("bracket")); if(saved) rounds=saved;}
-
-function generateBracket(){
-rounds.upper=[];
-for(let i=1;i<=32;i+=2){
-rounds.upper.push({a:"Team "+i,b:"Team "+(i+1),scoreA:0,scoreB:0});
-}
-rounds.lower=[];
-rounds.final=[];
-save();
-render();
+function generateBracket() {
+    if(!confirm("Reset entire bracket?")) return;
+    tournamentData.r32 = Array(16).fill().map((_, i) => ({ t1: "Team " + (i*2+1), t2: "Team " + (i*2+2), s1: 0, s2: 0 }));
+    save();
+    render();
 }
 
-function editTeam(round,index,key){
-if(!isAdmin) return alert("Admin only");
-let name=prompt("Enter new team name:",rounds[round][index][key]);
-if(name) rounds[round][index][key]=name;
-save();
-render();
+function save() { localStorage.setItem("tournamentData", JSON.stringify(tournamentData)); }
+
+function updateMatch(roundKey, index, field, value) {
+    tournamentData[roundKey][index][field] = value;
+    save();
 }
 
-function setScore(round,index){
-if(!isAdmin) return alert("Admin only");
-let match=rounds[round][index];
-let scoreA=parseInt(prompt("Score for "+match.a, match.scoreA));
-let scoreB=parseInt(prompt("Score for "+match.b, match.scoreB));
-match.scoreA=isNaN(scoreA)?0:scoreA;
-match.scoreB=isNaN(scoreB)?0:scoreB;
-let winner=scoreA>=scoreB?match.a:match.b;
-let loser=winner===match.a?match.b:match.a;
-if(round==="upper"){ rounds.lower.push({a:loser,b:"TBD",scoreA:0,scoreB:0}); }
-else if(round==="lower"){ rounds.final.push(winner); }
-save();
-render();
+function render() {
+    const grid = document.getElementById("bracket-grid");
+    grid.innerHTML = "";
+
+    const rounds = [
+        { name: "Round of 32", key: "r32" },
+        { name: "Round of 16", key: "r16" },
+        { name: "Quarter Finals", key: "r8" },
+        { name: "Semi Finals", key: "r4" },
+        { name: "Grand Final", key: "r2" }
+    ];
+
+    rounds.forEach(round => {
+        let roundDiv = document.createElement("div");
+        roundDiv.className = "round";
+        roundDiv.innerHTML = `<div class="round-title">${round.name}</div>`;
+
+        tournamentData[round.key].forEach((match, i) => {
+            let matchDiv = document.createElement("div");
+            matchDiv.className = "matchup";
+            matchDiv.innerHTML = `
+                <div class="team">
+                    <input value="${match.t1}" onchange="updateMatch('${round.key}',${i},'t1',this.value)" ${!isAdmin?'disabled':''}>
+                    <span class="score" onclick="setScore('${round.key}',${i},1)">${match.s1}</span>
+                </div>
+                <div class="team">
+                    <input value="${match.t2}" onchange="updateMatch('${round.key}',${i},'t2',this.value)" ${!isAdmin?'disabled':''}>
+                    <span class="score" onclick="setScore('${round.key}',${i},2)">${match.s2}</span>
+                </div>
+            `;
+            roundDiv.appendChild(matchDiv);
+        });
+        grid.appendChild(roundDiv);
+    });
 }
 
-function render(){
-bracketGrid.innerHTML="";
-svg.innerHTML="";
-let upperCol=document.createElement("div");
-upperCol.className="bracket-column";
-rounds.upper.forEach((m,i)=>{
-let div=document.createElement("div");
-div.className="match";
-div.innerHTML=`<input type="text" value="${m.a}" onchange="editTeam('upper',${i},'a')"> vs <input type="text" value="${m.b}" onchange="editTeam('upper',${i},'b')"><br>Score: ${m.scoreA}-${m.scoreB}<br>${isAdmin?'<button onclick="setScore(\'upper\','+i+')">Set Score</button>':''}`;
-upperCol.appendChild(div);
-});
-let lowerCol=document.createElement("div");
-lowerCol.className="bracket-column";
-rounds.lower.forEach((m,i)=>{
-let div=document.createElement("div");
-div.className="match";
-div.innerHTML=`<input type="text" value="${m.a}" onchange="editTeam('lower',${i},'a')"> vs <input type="text" value="${m.b}" onchange="editTeam('lower',${i},'b')"><br>Score: ${m.scoreA}-${m.scoreB}<br>${isAdmin?'<button onclick="setScore(\'lower\','+i+')">Set Score</button>':''}`;
-lowerCol.appendChild(div);
-});
-bracketGrid.appendChild(upperCol);
-bracketGrid.appendChild(lowerCol);
-
-// Grand Final
-grandFinal.innerHTML="";
-rounds.final.forEach(f=>{ grandFinal.innerHTML+=`<div>${f}</div>`; });
+function setScore(roundKey, index, teamNum) {
+    if(!isAdmin) return;
+    let score = prompt("Enter Score:");
+    if(score === null) return;
+    tournamentData[roundKey][index]['s' + teamNum] = parseInt(score);
+    save();
+    render();
 }
 
 render();
 </script>
-
 </body>
 </html>
