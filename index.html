@@ -3,192 +3,220 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>DJY MLBB Tournament</title>
+    <title>DJY MLBB Tournament Pro</title>
     <style>
-        :root { --red: #ff0000; --dark: #0b0b0b; --gray: #1a1a1a; }
-        body { margin:0; font-family: 'Segoe UI', sans-serif; background: var(--dark); color: white; }
+        :root { --red: #ff0000; --dark: #0b0b0b; --gray: #1a1a1a; --border: #333; }
+        body { margin:0; font-family: 'Segoe UI', sans-serif; background: var(--dark); color: white; overflow-x: auto; }
         
-        /* Centralized Header */
-        header { background: black; border-bottom: 3px solid var(--red); padding: 20px; text-align: center; }
-        header h1 { margin: 0 0 15px 0; color: var(--red); text-transform: uppercase; letter-spacing: 2px; }
+        header { background: black; border-bottom: 3px solid var(--red); padding: 20px; text-align: center; position: sticky; top: 0; z-index: 100; }
+        header h1 { margin: 0 0 10px 0; color: var(--red); text-transform: uppercase; letter-spacing: 2px; font-size: 1.5rem; }
         nav { display: flex; justify-content: center; gap: 20px; }
-        nav a { color: white; text-decoration: none; font-weight: bold; cursor: pointer; transition: 0.3s; }
+        nav a { color: white; text-decoration: none; font-weight: bold; cursor: pointer; font-size: 0.9rem; }
         nav a:hover { color: var(--red); }
 
-        section { display: none; padding: 40px 20px; max-width: 1400px; margin: auto; }
+        section { display: none; padding: 20px; min-width: 1400px; }
         section.active { display: block; }
         
-        /* Home Section */
-        .home-content { text-align: center; max-width: 800px; margin: auto; line-height: 1.8; }
-
-        /* Professional Split Bracket */
-        .bracket-container { display: flex; justify-content: center; align-items: center; gap: 20px; overflow-x: auto; padding: 20px; }
-        .bracket-side { display: flex; gap: 20px; align-items: stretch; }
-        .round { display: flex; flex-direction: column; justify-content: space-around; width: 160px; }
-        .match { background: var(--gray); border-left: 3px solid var(--red); padding: 10px; margin: 10px 0; border-radius: 4px; font-size: 12px; }
-        .match input { background: transparent; border: none; color: white; width: 80%; }
+        /* Bracket UI */
+        .bracket-container { display: flex; justify-content: center; align-items: center; gap: 30px; padding: 40px 0; }
+        .round { display: flex; flex-direction: column; justify-content: space-around; gap: 20px; width: 180px; }
+        .round-title { text-align: center; color: var(--red); font-size: 0.7rem; font-weight: bold; margin-bottom: 10px; text-transform: uppercase; }
         
-        .center-final { display: flex; flex-direction: column; align-items: center; gap: 20px; width: 250px; }
-        .grand-final-box { border: 3px solid var(--red); padding: 20px; background: black; text-align: center; width: 100%; border-radius: 8px; }
+        .match { background: var(--gray); border: 1px solid var(--border); border-radius: 4px; overflow: hidden; box-shadow: 0 4px 15px rgba(0,0,0,0.5); }
+        .team-row { display: flex; align-items: center; padding: 5px 10px; border-bottom: 1px solid #222; }
+        .team-row:last-child { border-bottom: none; }
+        .team-row input { background: transparent; border: none; color: white; flex-grow: 1; font-size: 0.8rem; padding: 5px; }
+        .score-input { width: 30px; background: #222 !important; border: 1px solid var(--red) !important; color: var(--red) !important; text-align: center; font-weight: bold; border-radius: 2px; }
 
-        /* Admin Panels */
-        .admin-box { background: var(--gray); padding: 20px; border-radius: 8px; max-width: 400px; margin: 20px auto; border: 1px solid var(--red); }
-        input { width: 100%; padding: 10px; margin: 10px 0; background: #222; border: 1px solid #444; color: white; box-sizing: border-box; }
-        button { width: 100%; padding: 10px; background: var(--red); color: white; border: none; font-weight: bold; cursor: pointer; border-radius: 4px; }
-        
-        .tournament-card { background: var(--gray); padding: 20px; border-radius: 8px; border-left: 5px solid var(--red); margin-bottom: 20px; }
+        .center-final { display: flex; flex-direction: column; align-items: center; width: 260px; }
+        .trophy { font-size: 3rem; margin-bottom: 10px; text-shadow: 0 0 10px var(--red); }
+        .gf-box { border: 2px solid gold; width: 100%; }
+
+        /* Admin Styles */
+        .admin-panel { background: var(--gray); padding: 25px; border-radius: 8px; max-width: 400px; margin: 40px auto; border: 1px solid var(--red); }
+        .admin-panel h3 { margin-top: 0; color: var(--red); }
+        input[type="text"], input[type="password"] { width: 100%; padding: 10px; margin: 10px 0; background: #222; border: 1px solid #444; color: white; box-sizing: border-box; }
+        button { width: 100%; padding: 12px; background: var(--red); color: white; border: none; font-weight: bold; cursor: pointer; margin-top: 10px; }
+        .btn-reset { background: #444; margin-top: 20px; font-size: 0.7rem; }
     </style>
 </head>
 <body>
 
 <header>
-    <h1>DJY MLBB Tournament</h1>
+    <h1>DJY MLBB TOURNAMENT</h1>
     <nav>
-        <a onclick="show('home')">Home</a>
-        <a onclick="show('bracket')">Bracket</a>
-        <a onclick="show('tournaments')">Tournaments</a>
-        <a onclick="show('admin')">Admin</a>
+        <a onclick="show('home')">HOME</a>
+        <a onclick="show('bracket')">BRACKET</a>
+        <a onclick="show('tournaments')">TOURNAMENTS</a>
+        <a onclick="show('admin')">ADMIN</a>
     </nav>
 </header>
 
 <section id="home" class="active">
-    <div class="home-content">
-        <h2>About DJY</h2>
-        <p>DJY is a prominent Mobile Legends: Bang Bang (MLBB) YouTuber and content creator known for his high-energy commentary and community-driven spirit. With years of experience in the Land of Dawn, DJY focuses on bridging the gap between casual players and the professional scene.</p>
-        <p>Through his channel, he provides top-tier analysis, meta updates, and most importantly, a platform for aspiring players to showcase their talent through professionally organized tournaments. DJY is not just a creator; he is a pillar of the MLBB esports community.</p>
+    <div style="text-align: center; max-width: 800px; margin: auto;">
+        <h2 style="color: var(--red);">Who is DJY?</h2>
+        <p>DJY is a premier Mobile Legends: Bang Bang content creator and YouTuber, legendary for his high-stakes tournament hosting and analytical gameplay. He bridges the gap between grassroots players and the pro scene by providing a professional stage for every aspiring player.</p>
     </div>
 </section>
 
 <section id="bracket">
-    <h2 style="text-align: center;">Round of 32 Professional Bracket</h2>
-    <div class="bracket-container" id="bracket-ui">
-        <!-- LEFT WING -->
-        <div class="bracket-side" id="left-wing"></div>
-        
-        <!-- CENTER -->
+    <div class="bracket-container">
+        <!-- LEFT SIDE (16 teams) -->
+        <div class="round" id="L-R16"><div class="round-title">Left R16</div></div>
+        <div class="round" id="L-R8"><div class="round-title">Left QF</div></div>
+        <div class="round" id="L-R4"><div class="round-title">Left SF</div></div>
+
+        <!-- CENTER GRAND FINAL -->
         <div class="center-final">
-            <h3 style="color: gold;">🏆 GRAND FINAL</h3>
-            <div class="grand-final-box" id="final-match">
-                <div class="match"><input type="text" placeholder="Finalist 1"></div>
-                <span>VS</span>
-                <div class="match"><input type="text" placeholder="Finalist 2"></div>
-            </div>
+            <div class="trophy">🏆</div>
+            <div class="round-title" style="color:gold">Grand Final</div>
+            <div class="match gf-box" id="GF-MATCH"></div>
         </div>
 
-        <!-- RIGHT WING -->
-        <div class="bracket-side" id="right-wing" style="flex-direction: row-reverse;"></div>
+        <!-- RIGHT SIDE (16 teams) -->
+        <div class="round" id="R-R4"><div class="round-title">Right SF</div></div>
+        <div class="round" id="R-R8"><div class="round-title">Right QF</div></div>
+        <div class="round" id="R-R16"><div class="round-title">Right R16</div></div>
     </div>
+    <div style="text-align:center" id="reset-zone"></div>
 </section>
 
 <section id="tournaments">
-    <h2>Tournaments</h2>
-    <div class="tournament-card">
-        <h3>DJY Community Tournament Season 2</h3>
-        <p><strong>Prize Pool:</strong> RM 500 + Stream Donations</p>
-        <p>Join the most anticipated community clash of the season. Showcase your skills live on stream!</p>
+    <div style="max-width: 600px; margin: auto; border-left: 4px solid var(--red); background: var(--gray); padding: 20px;">
+        <h3 style="color: var(--red); margin: 0;">DJY Community Tournament Season 2</h3>
+        <p><strong>Prize Pool:</strong> RM 500 + Stream Donation</p>
+        <p>A professional platform for community teams to shine. Matches are broadcast live with professional casting.</p>
     </div>
 </section>
 
 <section id="admin">
-    <div id="login-panel" class="admin-box">
-        <h3>Staff Login</h3>
+    <div id="login-form" class="admin-panel">
+        <h3>Admin Access</h3>
         <input id="user" placeholder="Username">
         <input id="pass" type="password" placeholder="Password">
         <button onclick="login()">Login</button>
-        <p id="login-msg" style="text-align:center; color:red;"></p>
     </div>
-
-    <div id="admin-panel" class="admin-box" style="display:none;">
-        <h3>Welcome, Admin</h3>
-        <p>You can now edit the bracket directly.</p>
-        <div id="master-only" style="display:none; border-top: 1px solid #444; padding-top: 10px;">
+    <div id="admin-dashboard" class="admin-panel" style="display:none">
+        <h3>Admin Dashboard</h3>
+        <p>Logged in as: <b id="current-user"></b></p>
+        <div id="master-tools" style="display:none; border-top: 1px solid #444; padding-top: 15px;">
             <h4>Create Staff Account</h4>
-            <input id="new-user" placeholder="New Username">
-            <input id="new-pass" placeholder="New Password">
-            <button onclick="createUser()" style="background: green;">Add Staff</button>
+            <input id="new-user" placeholder="Staff Username">
+            <input id="new-pass" placeholder="Staff Password">
+            <button onclick="addStaff()" style="background: green;">Add Staff Account</button>
         </div>
-        <button onclick="logout()" style="margin-top:10px; background:#444;">Logout</button>
+        <button onclick="logout()" class="btn-reset">Logout</button>
     </div>
 </section>
 
 <script>
-// --- DATA INITIALIZATION ---
-let users = JSON.parse(localStorage.getItem('djy_users')) || [{u: "moonboi", p: "123", role: "master"}];
+// --- CONFIG & STATE ---
 let currentUser = null;
+let accounts = JSON.parse(localStorage.getItem('djy_accs')) || [{u:"moonboi", p:"123", role:"master"}];
 
-function show(id) {
-    document.querySelectorAll("section").forEach(s => s.classList.remove("active"));
-    document.getElementById(id).classList.add("active");
-}
+// Bracket Structure: side-round-index
+let bracketData = JSON.parse(localStorage.getItem('djy_bracket_v2')) || {
+    "L-R16": Array(8).fill().map((_,i)=>({t1:`Team ${i*2+1}`, t2:`Team ${i*2+2}`, s1:0, s2:0})),
+    "L-R8": Array(4).fill().map(()=>({t1:"TBD", t2:"TBD", s1:0, s2:0})),
+    "L-R4": Array(2).fill().map(()=>({t1:"TBD", t2:"TBD", s1:0, s2:0})),
+    "R-R16": Array(8).fill().map((_,i)=>({t1:`Team ${i*2+17}`, t2:`Team ${i*2+18}`, s1:0, s2:0})),
+    "R-R8": Array(4).fill().map(()=>({t1:"TBD", t2:"TBD", s1:0, s2:0})),
+    "R-R4": Array(2).fill().map(()=>({t1:"TBD", t2:"TBD", s1:0, s2:0})),
+    "GF": [{t1:"TBD", t2:"TBD", s1:0, s2:0}]
+};
 
-// --- AUTH SYSTEM ---
+// --- AUTH ---
 function login() {
-    const u = document.getElementById("user").value;
-    const p = document.getElementById("pass").value;
-    const user = users.find(x => x.u === u && x.p === p);
-
-    if(user) {
-        currentUser = user;
-        document.getElementById("login-panel").style.display = "none";
-        document.getElementById("admin-panel").style.display = "block";
-        if(user.role === "master") document.getElementById("master-only").style.display = "block";
-        renderBracket();
-    } else {
-        document.getElementById("login-msg").innerText = "Invalid Credentials";
-    }
-}
-
-function createUser() {
-    const u = document.getElementById("new-user").value;
-    const p = document.getElementById("new-pass").value;
-    if(u && p) {
-        users.push({u, p, role: "staff"});
-        localStorage.setItem('djy_users', JSON.stringify(users));
-        alert("Staff account created: " + u);
-    }
-}
-
-function logout() {
-    currentUser = null;
-    location.reload();
-}
-
-// --- BRACKET SYSTEM ---
-function renderBracket() {
-    const leftWing = document.getElementById("left-wing");
-    const rightWing = document.getElementById("right-wing");
-    
-    leftWing.innerHTML = "";
-    rightWing.innerHTML = "";
-
-    // Helper to build rounds
-    function createRound(count, side) {
-        const round = document.createElement("div");
-        round.className = "round";
-        for(let i=0; i<count; i++) {
-            const m = document.createElement("div");
-            m.className = "match";
-            m.innerHTML = `<input type="text" placeholder="Team" ${!currentUser?'disabled':''}>
-                           <hr style="border:0; border-top:1px solid #444">
-                           <input type="text" placeholder="Team" ${!currentUser?'disabled':''}>`;
-            round.appendChild(m);
+    let u = document.getElementById('user').value;
+    let p = document.getElementById('pass').value;
+    let acc = accounts.find(a => a.u === u && a.p === p);
+    if(acc) {
+        currentUser = acc;
+        document.getElementById('login-form').style.display = 'none';
+        document.getElementById('admin-dashboard').style.display = 'block';
+        document.getElementById('current-user').innerText = u;
+        if(acc.role === 'master') {
+            document.getElementById('master-tools').style.display = 'block';
+            document.getElementById('reset-zone').innerHTML = `<button class="btn-reset" onclick="resetBracket()">Full Bracket Reset</button>`;
         }
-        return round;
+        render();
     }
-
-    // Build Left (8 matches -> 4 -> 2)
-    leftWing.appendChild(createRound(8, "left"));
-    leftWing.appendChild(createRound(4, "left"));
-    leftWing.appendChild(createRound(2, "left"));
-
-    // Build Right (8 matches -> 4 -> 2)
-    rightWing.appendChild(createRound(8, "right"));
-    rightWing.appendChild(createRound(4, "right"));
-    rightWing.appendChild(createRound(2, "right"));
 }
 
-// Initial render for viewers
-renderBracket();
-</script>
+function addStaff() {
+    let u = document.getElementById('new-user').value;
+    let p = document.getElementById('new-pass').value;
+    if(u && p) {
+        accounts.push({u, p, role:"staff"});
+        localStorage.setItem('djy_accs', JSON.stringify(accounts));
+        alert('Staff account created!');
+    }
+}
 
+function logout() { location.reload(); }
+
+// --- CORE BRACKET LOGIC ---
+function updateVal(round, idx, field, val) {
+    bracketData[round][idx][field] = val;
+    
+    // Auto-Winner Progression Logic
+    if(field === 's1' || field === 's2') {
+        let match = bracketData[round][idx];
+        let winner = "TBD";
+        if(parseInt(match.s1) > parseInt(match.s2)) winner = match.t1;
+        else if(parseInt(match.s2) > parseInt(match.s1)) winner = match.t2;
+
+        advanceWinner(round, idx, winner);
+    }
+    save();
+    render();
+}
+
+function advanceWinner(currentRound, matchIdx, winnerName) {
+    let nextRound = "";
+    let nextMatchIdx = Math.floor(matchIdx / 2);
+    let teamPos = (matchIdx % 2 === 0) ? 't1' : 't2';
+
+    if(currentRound === "L-R16") nextRound = "L-R8";
+    else if(currentRound === "L-R8") nextRound = "L-R4";
+    else if(currentRound === "L-R4") { nextRound = "GF"; nextMatchIdx = 0; teamPos = 't1'; }
+    else if(currentRound === "R-R16") nextRound = "R-R8";
+    else if(currentRound === "R-R8") nextRound = "R-R4";
+    else if(currentRound === "R-R4") { nextRound = "GF"; nextMatchIdx = 0; teamPos = 't2'; }
+
+    if(nextRound) bracketData[nextRound][nextMatchIdx][teamPos] = winnerName;
+}
+
+function render() {
+    const rounds = ["L-R16", "L-R8", "L-R4", "R-R4", "R-R8", "R-R16", "GF"];
+    rounds.forEach(r => {
+        let container = r === "GF" ? document.getElementById("GF-MATCH") : document.getElementById(r);
+        let title = container.querySelector('.round-title')?.outerHTML || "";
+        container.innerHTML = title;
+
+        bracketData[r].forEach((m, i) => {
+            let div = document.createElement('div');
+            div.className = "match";
+            div.innerHTML = `
+                <div class="team-row">
+                    <input type="text" value="${m.t1}" onchange="updateVal('${r}',${i},'t1',this.value)" ${!currentUser?'disabled':''}>
+                    <input type="text" class="score-input" value="${m.s1}" onchange="updateVal('${r}',${i},'s1',this.value)" ${!currentUser?'disabled':''}>
+                </div>
+                <div class="team-row">
+                    <input type="text" value="${m.t2}" onchange="updateVal('${r}',${i},'t2',this.value)" ${!currentUser?'disabled':''}>
+                    <input type="text" class="score-input" value="${m.s2}" onchange="updateVal('${r}',${i},'s2',this.value)" ${!currentUser?'disabled':''}>
+                </div>
+            `;
+            container.appendChild(div);
+        });
+    });
+}
+
+function save() { localStorage.setItem('djy_bracket_v2', JSON.stringify(bracketData)); }
+function show(id) { document.querySelectorAll('section').forEach(s => s.classList.remove('active')); document.getElementById(id).classList.add('active'); }
+function resetBracket() { if(confirm("Reset all scores and teams?")) { localStorage.removeItem('djy_bracket_v2'); location.reload(); } }
+
+render();
+</script>
 </body>
+</html>
