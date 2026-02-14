@@ -1,43 +1,50 @@
+html
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>DJY MLBB Tournament Pro</title>
+    <title>DJY MLBB Tournament</title>
     <style>
-        :root { --red: #ff0000; --dark: #0b0b0b; --gray: #1a1a1a; --border: #333; }
+        :root { --red: #ff0000; --dark: #0b0b0b; --gray: #151515; --border: #333; }
         body { margin:0; font-family: 'Segoe UI', sans-serif; background: var(--dark); color: white; overflow-x: auto; }
         
-        header { background: black; border-bottom: 3px solid var(--red); padding: 20px; text-align: center; position: sticky; top: 0; z-index: 100; }
-        header h1 { margin: 0 0 10px 0; color: var(--red); text-transform: uppercase; letter-spacing: 2px; font-size: 1.5rem; }
-        nav { display: flex; justify-content: center; gap: 20px; }
-        nav a { color: white; text-decoration: none; font-weight: bold; cursor: pointer; font-size: 0.9rem; }
+        header { background: black; border-bottom: 2px solid var(--red); padding: 15px; text-align: center; }
+        header h1 { margin: 0 0 10px 0; color: var(--red); text-transform: uppercase; letter-spacing: 2px; font-size: 1.2rem; }
+        nav { display: flex; justify-content: center; gap: 15px; }
+        nav a { color: white; text-decoration: none; font-weight: bold; cursor: pointer; font-size: 0.8rem; }
         nav a:hover { color: var(--red); }
 
-        section { display: none; padding: 20px; min-width: 1400px; }
+        section { display: none; padding: 20px; min-width: 1200px; }
         section.active { display: block; }
         
-        /* Bracket UI */
-        .bracket-container { display: flex; justify-content: center; align-items: center; gap: 30px; padding: 40px 0; }
-        .round { display: flex; flex-direction: column; justify-content: space-around; gap: 20px; width: 180px; }
-        .round-title { text-align: center; color: var(--red); font-size: 0.7rem; font-weight: bold; margin-bottom: 10px; text-transform: uppercase; }
+        /* Compact Bracket UI */
+        .bracket-container { display: flex; justify-content: center; align-items: center; gap: 15px; padding: 20px 0; }
+        .round { display: flex; flex-direction: column; justify-content: space-around; gap: 10px; width: 140px; }
+        .round-title { text-align: center; color: var(--red); font-size: 0.6rem; font-weight: bold; margin-bottom: 5px; text-transform: uppercase; }
         
-        .match { background: var(--gray); border: 1px solid var(--border); border-radius: 4px; overflow: hidden; box-shadow: 0 4px 15px rgba(0,0,0,0.5); }
-        .team-row { display: flex; align-items: center; padding: 5px 10px; border-bottom: 1px solid #222; }
+        .match { background: var(--gray); border: 1px solid var(--border); border-radius: 3px; position: relative; }
+        .team-row { display: flex; align-items: center; padding: 2px 5px; border-bottom: 1px solid #222; height: 25px; }
         .team-row:last-child { border-bottom: none; }
-        .team-row input { background: transparent; border: none; color: white; flex-grow: 1; font-size: 0.8rem; padding: 5px; }
-        .score-input { width: 30px; background: #222 !important; border: 1px solid var(--red) !important; color: var(--red) !important; text-align: center; font-weight: bold; border-radius: 2px; }
+        .team-row input { background: transparent; border: none; color: white; flex-grow: 1; font-size: 0.75rem; }
+        .score-input { width: 22px; background: #222 !important; border: 1px solid var(--red) !important; color: var(--red) !important; text-align: center; font-size: 0.7rem; font-weight: bold; }
 
-        .center-final { display: flex; flex-direction: column; align-items: center; width: 260px; }
-        .trophy { font-size: 3rem; margin-bottom: 10px; text-shadow: 0 0 10px var(--red); }
-        .gf-box { border: 2px solid gold; width: 100%; }
+        /* Progression Arrows */
+        .arrow-right::after { content: "→"; position: absolute; right: -18px; top: 50%; transform: translateY(-50%); color: var(--red); font-weight: bold; font-size: 14px; }
+        .arrow-left::after { content: "←"; position: absolute; left: -18px; top: 50%; transform: translateY(-50%); color: var(--red); font-weight: bold; font-size: 14px; }
 
-        /* Admin Styles */
-        .admin-panel { background: var(--gray); padding: 25px; border-radius: 8px; max-width: 400px; margin: 40px auto; border: 1px solid var(--red); }
-        .admin-panel h3 { margin-top: 0; color: var(--red); }
-        input[type="text"], input[type="password"] { width: 100%; padding: 10px; margin: 10px 0; background: #222; border: 1px solid #444; color: white; box-sizing: border-box; }
-        button { width: 100%; padding: 12px; background: var(--red); color: white; border: none; font-weight: bold; cursor: pointer; margin-top: 10px; }
-        .btn-reset { background: #444; margin-top: 20px; font-size: 0.7rem; }
+        .center-final { display: flex; flex-direction: column; align-items: center; width: 200px; }
+        .gf-box { border: 2px solid gold; width: 100%; box-shadow: 0 0 10px rgba(255, 215, 0, 0.2); }
+
+        /* Reverted Red Admin Style */
+        .admin-panel { max-width: 300px; margin: 50px auto; text-align: center; }
+        .admin-panel h2 { color: var(--red); text-transform: uppercase; margin-bottom: 20px; }
+        .login-label { display: block; text-align: left; font-size: 0.8rem; margin-bottom: 5px; color: #aaa; }
+        .admin-panel input { width: 100%; padding: 10px; margin-bottom: 15px; background: #111; border: 1px solid var(--red); color: white; box-sizing: border-box; }
+        .admin-panel button { width: 100%; padding: 10px; background: var(--red); color: white; border: none; font-weight: bold; cursor: pointer; text-transform: uppercase; }
+        .admin-panel button:hover { background: #b30000; }
+        
+        .box { background: var(--gray); padding: 15px; border-left: 3px solid var(--red); max-width: 500px; margin: auto; }
     </style>
 </head>
 <body>
@@ -53,69 +60,72 @@
 </header>
 
 <section id="home" class="active">
-    <div style="text-align: center; max-width: 800px; margin: auto;">
+    <div style="text-align: center; max-width: 700px; margin: auto;">
         <h2 style="color: var(--red);">Who is DJY?</h2>
-        <p>DJY is a premier Mobile Legends: Bang Bang content creator and YouTuber, legendary for his high-stakes tournament hosting and analytical gameplay. He bridges the gap between grassroots players and the pro scene by providing a professional stage for every aspiring player.</p>
+        <p style="font-size: 0.9rem; line-height: 1.6;">DJY is a leading Mobile Legends: Bang Bang content creator and YouTuber, specialized in high-tier analysis and community tournament management. He provides a professional platform for aspiring MLBB players to showcase their skills to a global audience.</p>
     </div>
 </section>
 
 <section id="bracket">
     <div class="bracket-container">
-        <!-- LEFT SIDE (16 teams) -->
-        <div class="round" id="L-R16"><div class="round-title">Left R16</div></div>
-        <div class="round" id="L-R8"><div class="round-title">Left QF</div></div>
-        <div class="round" id="L-R4"><div class="round-title">Left SF</div></div>
+        <!-- LEFT SIDE -->
+        <div class="round" id="L-R16"><div class="round-title">R32 Left</div></div>
+        <div class="round" id="L-R8"><div class="round-title">R16 Left</div></div>
+        <div class="round" id="L-R4"><div class="round-title">Quarter Left</div></div>
 
-        <!-- CENTER GRAND FINAL -->
+        <!-- CENTER -->
         <div class="center-final">
-            <div class="trophy">🏆</div>
-            <div class="round-title" style="color:gold">Grand Final</div>
+            <div style="font-size: 1.5rem; margin-bottom: 5px;">🏆</div>
+            <div class="round-title" style="color:gold">GRAND FINAL</div>
             <div class="match gf-box" id="GF-MATCH"></div>
         </div>
 
-        <!-- RIGHT SIDE (16 teams) -->
-        <div class="round" id="R-R4"><div class="round-title">Right SF</div></div>
-        <div class="round" id="R-R8"><div class="round-title">Right QF</div></div>
-        <div class="round" id="R-R16"><div class="round-title">Right R16</div></div>
+        <!-- RIGHT SIDE -->
+        <div class="round" id="R-R4"><div class="round-title">Quarter Right</div></div>
+        <div class="round" id="R-R8"><div class="round-title">R16 Right</div></div>
+        <div class="round" id="R-R16"><div class="round-title">R32 Right</div></div>
     </div>
-    <div style="text-align:center" id="reset-zone"></div>
 </section>
 
 <section id="tournaments">
-    <div style="max-width: 600px; margin: auto; border-left: 4px solid var(--red); background: var(--gray); padding: 20px;">
+    <div class="box">
         <h3 style="color: var(--red); margin: 0;">DJY Community Tournament Season 2</h3>
-        <p><strong>Prize Pool:</strong> RM 500 + Stream Donation</p>
-        <p>A professional platform for community teams to shine. Matches are broadcast live with professional casting.</p>
+        <p style="font-size: 0.85rem;"><b>Prize:</b> RM 500 + Stream Donation</p>
+        <p style="font-size: 0.85rem;">Experience the heat of professional MLBB competition. Register now!</p>
     </div>
 </section>
 
 <section id="admin">
     <div id="login-form" class="admin-panel">
-        <h3>Admin Access</h3>
-        <input id="user" placeholder="Username">
-        <input id="pass" type="password" placeholder="Password">
+        <h2>Admin Login</h2>
+        <span class="login-label">username:</span>
+        <input id="user" type="text">
+        <span class="login-label">password:</span>
+        <input id="pass" type="password">
         <button onclick="login()">Login</button>
+        <p id="err" style="color: var(--red); font-size: 0.8rem; margin-top: 10px;"></p>
     </div>
-    <div id="admin-dashboard" class="admin-panel" style="display:none">
-        <h3>Admin Dashboard</h3>
-        <p>Logged in as: <b id="current-user"></b></p>
-        <div id="master-tools" style="display:none; border-top: 1px solid #444; padding-top: 15px;">
-            <h4>Create Staff Account</h4>
-            <input id="new-user" placeholder="Staff Username">
-            <input id="new-pass" placeholder="Staff Password">
-            <button onclick="addStaff()" style="background: green;">Add Staff Account</button>
+
+    <div id="admin-dashboard" class="admin-panel" style="display:none; max-width: 400px;">
+        <h2>Admin Panel</h2>
+        <p style="font-size:0.8rem">Logged in as: <b id="current-user"></b></p>
+        <div id="master-tools" style="display:none; border-top: 1px solid #333; padding-top: 15px; margin-top: 15px;">
+            <span class="login-label">new username:</span>
+            <input id="new-user" type="text">
+            <span class="login-label">new password:</span>
+            <input id="new-pass" type="password">
+            <button onclick="addStaff()" style="background: #333; border: 1px solid var(--red);">Create Account</button>
         </div>
-        <button onclick="logout()" class="btn-reset">Logout</button>
+        <button onclick="resetBracket()" style="background: #444; margin-top: 20px; font-size: 0.7rem;">Reset All Data</button>
+        <button onclick="location.reload()" style="margin-top: 10px; background: #222;">Logout</button>
     </div>
 </section>
 
 <script>
-// --- CONFIG & STATE ---
 let currentUser = null;
 let accounts = JSON.parse(localStorage.getItem('djy_accs')) || [{u:"moonboi", p:"123", role:"master"}];
 
-// Bracket Structure: side-round-index
-let bracketData = JSON.parse(localStorage.getItem('djy_bracket_v2')) || {
+let bracketData = JSON.parse(localStorage.getItem('djy_bracket_v3')) || {
     "L-R16": Array(8).fill().map((_,i)=>({t1:`Team ${i*2+1}`, t2:`Team ${i*2+2}`, s1:0, s2:0})),
     "L-R8": Array(4).fill().map(()=>({t1:"TBD", t2:"TBD", s1:0, s2:0})),
     "L-R4": Array(2).fill().map(()=>({t1:"TBD", t2:"TBD", s1:0, s2:0})),
@@ -125,7 +135,6 @@ let bracketData = JSON.parse(localStorage.getItem('djy_bracket_v2')) || {
     "GF": [{t1:"TBD", t2:"TBD", s1:0, s2:0}]
 };
 
-// --- AUTH ---
 function login() {
     let u = document.getElementById('user').value;
     let p = document.getElementById('pass').value;
@@ -135,11 +144,10 @@ function login() {
         document.getElementById('login-form').style.display = 'none';
         document.getElementById('admin-dashboard').style.display = 'block';
         document.getElementById('current-user').innerText = u;
-        if(acc.role === 'master') {
-            document.getElementById('master-tools').style.display = 'block';
-            document.getElementById('reset-zone').innerHTML = `<button class="btn-reset" onclick="resetBracket()">Full Bracket Reset</button>`;
-        }
+        if(acc.role === 'master') document.getElementById('master-tools').style.display = 'block';
         render();
+    } else {
+        document.getElementById('err').innerText = "Wrong username or password";
     }
 }
 
@@ -153,38 +161,28 @@ function addStaff() {
     }
 }
 
-function logout() { location.reload(); }
-
-// --- CORE BRACKET LOGIC ---
 function updateVal(round, idx, field, val) {
     bracketData[round][idx][field] = val;
-    
-    // Auto-Winner Progression Logic
     if(field === 's1' || field === 's2') {
         let match = bracketData[round][idx];
         let winner = "TBD";
         if(parseInt(match.s1) > parseInt(match.s2)) winner = match.t1;
         else if(parseInt(match.s2) > parseInt(match.s1)) winner = match.t2;
-
         advanceWinner(round, idx, winner);
     }
-    save();
+    localStorage.setItem('djy_bracket_v3', JSON.stringify(bracketData));
     render();
 }
 
 function advanceWinner(currentRound, matchIdx, winnerName) {
-    let nextRound = "";
-    let nextMatchIdx = Math.floor(matchIdx / 2);
-    let teamPos = (matchIdx % 2 === 0) ? 't1' : 't2';
-
+    let nextRound = ""; let nextIdx = Math.floor(matchIdx / 2); let pos = (matchIdx % 2 === 0) ? 't1' : 't2';
     if(currentRound === "L-R16") nextRound = "L-R8";
     else if(currentRound === "L-R8") nextRound = "L-R4";
-    else if(currentRound === "L-R4") { nextRound = "GF"; nextMatchIdx = 0; teamPos = 't1'; }
+    else if(currentRound === "L-R4") { nextRound = "GF"; nextIdx = 0; pos = 't1'; }
     else if(currentRound === "R-R16") nextRound = "R-R8";
     else if(currentRound === "R-R8") nextRound = "R-R4";
-    else if(currentRound === "R-R4") { nextRound = "GF"; nextMatchIdx = 0; teamPos = 't2'; }
-
-    if(nextRound) bracketData[nextRound][nextMatchIdx][teamPos] = winnerName;
+    else if(currentRound === "R-R4") { nextRound = "GF"; nextIdx = 0; pos = 't2'; }
+    if(nextRound) bracketData[nextRound][nextIdx][pos] = winnerName;
 }
 
 function render() {
@@ -193,10 +191,14 @@ function render() {
         let container = r === "GF" ? document.getElementById("GF-MATCH") : document.getElementById(r);
         let title = container.querySelector('.round-title')?.outerHTML || "";
         container.innerHTML = title;
-
         bracketData[r].forEach((m, i) => {
             let div = document.createElement('div');
             div.className = "match";
+            if(r.startsWith('L') && r !== 'L-R4') div.classList.add('arrow-right');
+            if(r.startsWith('R') && r !== 'R-R4') div.classList.add('arrow-left');
+            if(r === 'L-R4') div.classList.add('arrow-right'); // Final left arrow
+            if(r === 'R-R4') div.classList.add('arrow-left');  // Final right arrow
+
             div.innerHTML = `
                 <div class="team-row">
                     <input type="text" value="${m.t1}" onchange="updateVal('${r}',${i},'t1',this.value)" ${!currentUser?'disabled':''}>
@@ -205,17 +207,14 @@ function render() {
                 <div class="team-row">
                     <input type="text" value="${m.t2}" onchange="updateVal('${r}',${i},'t2',this.value)" ${!currentUser?'disabled':''}>
                     <input type="text" class="score-input" value="${m.s2}" onchange="updateVal('${r}',${i},'s2',this.value)" ${!currentUser?'disabled':''}>
-                </div>
-            `;
+                </div>`;
             container.appendChild(div);
         });
     });
 }
 
-function save() { localStorage.setItem('djy_bracket_v2', JSON.stringify(bracketData)); }
 function show(id) { document.querySelectorAll('section').forEach(s => s.classList.remove('active')); document.getElementById(id).classList.add('active'); }
-function resetBracket() { if(confirm("Reset all scores and teams?")) { localStorage.removeItem('djy_bracket_v2'); location.reload(); } }
-
+function resetBracket() { if(confirm("Clear all?")) { localStorage.removeItem('djy_bracket_v3'); location.reload(); } }
 render();
 </script>
 </body>
