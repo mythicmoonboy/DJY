@@ -63,7 +63,7 @@
 <section id="home" class="active">
     <div id="top-ann" class="announcement-bar">Welcome to DJY Arena</div>
     <div style="text-align:center; max-width:700px; margin:auto;">
-        <img src="https://yt3.googleusercontent.com/gZXFj6MbYXQ55Fj2IwrK6RCMWAffTt5XHtWwZSlySzMx_f25G31Tk-7z06z3xGdmsRgXUu-s=s160-c-k-c0x00ffffff-no-rj" alt="DJY Official PFP" class="profile-pic">
+        <img src="https://yt3.googleusercontent.com" alt="DJY Official PFP" class="profile-pic">
         <h2 style="color:var(--red)">DJY: Professional MLBB YouTuber</h2>
         <p class="description">
             DJY is a premier Mobile Legends: Bang Bang YouTuber and digital host known for his high-tier strategy breakdowns and high-energy casting. As a dedicated content creator, he provides his audience with the latest meta shifts while organizing professional-grade tournaments for the community.
@@ -75,10 +75,8 @@
     <div id="list-view">
         <div class="division-title">🔴 LIVE TOURNAMENTS</div>
         <div id="live-list"></div>
-        
         <div class="division-title">📅 UPCOMING EVENTS</div>
         <div id="upcoming-list"></div>
-        
         <div class="division-title">🏁 FINISHED TOURNAMENTS</div>
         <div id="finished-list"></div>
     </div>
@@ -109,35 +107,31 @@
 
     <div id="dash-ui" class="admin-box" style="display:none; width:500px;">
         <h3 style="color:var(--red); text-align:center;">COMMAND CENTER</h3>
-        
         <div id="head-admin-tools" style="display:none; border:1px solid #222; padding:10px; margin-bottom:15px;">
             <h4 style="color:var(--red)">Staff Manager (moonboi only)</h4>
             <input id="s-u" placeholder="New Staff User">
-            <input id="s-p" placeholder="New Staff Pass">
+            <input id="s-p" placeholder="New Staff Password">
             <button onclick="addStaff()">Create Staff</button>
             <div id="s-list"></div>
         </div>
-
         <div style="border:1px solid #222; padding:10px; margin-bottom:15px;">
             <h4>Tournament Status Control</h4>
             <div id="admin-tour-manager"></div>
         </div>
-
         <div style="border:1px solid #222; padding:10px;">
             <h4>Create New Tournament</h4>
             <input id="t-n" placeholder="Tournament Name">
             <input id="t-p" placeholder="Prize Pool">
             <button onclick="createTour()">Generate R32</button>
         </div>
-        
-        <button onclick="location.reload()" style="background:#444; margin-top:10px;">Logout</button>
+        <button onclick="logout()" style="background:#444; margin-top:10px;">Logout</button>
     </div>
 </section>
 
 <script>
 let accounts = JSON.parse(localStorage.getItem('djy_accs')) || [{u:"moonboi", p:"123", role:"head"}];
 let tours = JSON.parse(localStorage.getItem('djy_tours')) || [];
-let currentUser = null;
+let currentUser = JSON.parse(localStorage.getItem('djy_session')) || null;
 let activeIdx = null;
 
 function tab(id) {
@@ -148,18 +142,30 @@ function tab(id) {
     if(id === 'tour' || id === 'admin') renderTours();
 }
 
+function checkSession() {
+    if (currentUser) {
+        document.getElementById('login-ui').style.display = 'none';
+        document.getElementById('dash-ui').style.display = 'block';
+        if(currentUser.role === 'head') document.getElementById('head-admin-tools').style.display = 'block';
+        renderStaff();
+        renderAdminManager();
+    }
+}
+
 function login() {
     let u = document.getElementById('user').value;
     let p = document.getElementById('pass').value;
     let auth = accounts.find(a => a.u === u && a.p === p);
     if(auth) {
         currentUser = auth;
-        document.getElementById('login-ui').style.display = 'none';
-        document.getElementById('dash-ui').style.display = 'block';
-        if(auth.role === 'head') document.getElementById('head-admin-tools').style.display = 'block';
-        renderStaff();
-        renderAdminManager();
+        localStorage.setItem('djy_session', JSON.stringify(auth));
+        checkSession();
     }
+}
+
+function logout() {
+    localStorage.removeItem('djy_session');
+    location.reload();
 }
 
 function createTour() {
@@ -173,7 +179,7 @@ function createTour() {
             R4: Array(2).fill({t1:"TBD", t2:"TBD", s1:0, s2:0}), GF: [{t1:"TBD", t2:"TBD", s1:0, s2:0}]
         }
     });
-    save(); renderAdminManager();
+    save(); renderAdminManager(); renderTours();
 }
 
 function updateStatus(idx, status) {
@@ -187,15 +193,18 @@ function deleteTour(idx) {
 
 function renderTours() {
     const lists = { LIVE: document.getElementById('live-list'), UPCOMING: document.getElementById('upcoming-list'), FINISHED: document.getElementById('finished-list') };
-    Object.values(lists).forEach(l => l.innerHTML = "");
+    Object.values(lists).forEach(l => { if(l) l.innerHTML = ""; });
     
     tours.forEach((t, i) => {
         let tagColor = t.status === 'LIVE' ? 'green' : (t.status === 'UPCOMING' ? 'orange' : '#555');
-        lists[t.status].innerHTML += `
-            <div class="t-long-box" onclick="openDetail(${i})">
-                <h3>${t.name} <span class="status-tag" style="background:${tagColor}">${t.status}</span></h3>
-                <span>${t.prize}</span>
-            </div>`;
+        const container = lists[t.status];
+        if(container) {
+            container.innerHTML += `
+                <div class="t-long-box" onclick="openDetail(${i})">
+                    <h3>${t.name} <span class="status-tag" style="background:${tagColor}">${t.status}</span></h3>
+                    <span>${t.prize}</span>
+                </div>`;
+        }
     });
 }
 
@@ -290,6 +299,9 @@ function drawLines() {
         });
     }
 }
+
+// Initial Session and Tour render
+checkSession();
 renderTours();
 </script>
 </body>
