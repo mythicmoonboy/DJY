@@ -3,124 +3,120 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>DJY MLBB Pro Bracket</title>
+    <title>DJY | M7 Style Bracket</title>
     <style>
-        :root { --red: #ff3131; --bg: #050505; --card: #121212; --glow: rgba(255, 49, 49, 0.4); }
-        body { margin:0; font-family: 'Segoe UI', Arial, sans-serif; background: var(--bg); color: #fff; overflow-x: auto; }
+        :root { --red: #ff3131; --bg: #050505; --card: #111; --border: #2a2a2a; }
+        body { margin:0; font-family: 'Segoe UI', sans-serif; background: var(--bg); color: #fff; overflow: hidden; }
         
-        /* Layout Header */
-        header { background: #000; border-bottom: 2px solid var(--red); padding: 15px; text-align: center; position: sticky; top: 0; z-index: 100; box-shadow: 0 0 15px var(--glow); }
-        .announcement { background: var(--red); color: black; font-weight: bold; font-size: 12px; padding: 5px; text-align: center; }
-        
-        header h1 { margin: 0; color: var(--red); text-transform: uppercase; font-size: 1.5rem; letter-spacing: 3px; }
-        nav { display: flex; justify-content: center; gap: 20px; margin-top: 10px; }
-        nav a { color: #aaa; text-decoration: none; font-weight: 600; cursor: pointer; transition: 0.3s; }
-        nav a:hover { color: var(--red); text-shadow: 0 0 5px var(--red); }
+        /* Compact Header */
+        header { background: #000; border-bottom: 2px solid var(--red); padding: 8px; text-align: center; }
+        header h1 { margin: 0; color: var(--red); font-size: 1rem; text-transform: uppercase; letter-spacing: 2px; }
+        nav { display: flex; justify-content: center; gap: 15px; margin-top: 5px; }
+        nav a { color: #888; text-decoration: none; font-size: 0.75rem; font-weight: bold; cursor: pointer; }
+        nav a:hover { color: var(--red); }
 
-        section { display: none; padding: 20px; min-width: 1400px; }
-        section.active { display: block; }
+        section { display: none; height: calc(100vh - 60px); padding: 10px; box-sizing: border-box; }
+        section.active { display: flex; flex-direction: column; justify-content: space-between; }
 
-        /* M4 Professional Bracket UI */
-        .bracket-section { border-top: 1px solid #333; padding-top: 20px; margin-top: 40px; }
-        .bracket-label { color: var(--red); font-weight: bold; font-size: 1.2rem; text-transform: uppercase; margin-bottom: 20px; border-left: 5px solid var(--red); padding-left: 10px; }
+        /* M7 Vertical Bracket Layout */
+        .bracket-group { flex: 1; display: flex; flex-direction: column; overflow: hidden; }
+        .bracket-label { color: var(--red); font-weight: bold; font-size: 0.7rem; text-transform: uppercase; margin: 5px 0; border-left: 3px solid var(--red); padding-left: 5px; }
         
-        .bracket-grid { display: flex; justify-content: center; gap: 20px; }
-        .round { display: flex; flex-direction: column; justify-content: space-around; gap: 10px; width: 140px; }
+        .round-container { display: flex; justify-content: center; gap: 10px; height: 100%; align-items: stretch; }
+        .round { display: flex; flex-direction: column; justify-content: space-around; width: 130px; position: relative; }
         
-        .match-box { background: var(--card); border: 1px solid #222; border-radius: 4px; padding: 4px; position: relative; transition: 0.3s; }
-        .match-box:hover { border-color: var(--red); box-shadow: 0 0 10px var(--glow); }
-        
-        .team { display: flex; justify-content: space-between; align-items: center; padding: 4px; border-bottom: 1px solid #222; }
-        .team input { background: transparent; border: none; color: white; width: 85px; font-size: 12px; }
-        .score-box { background: #000; color: var(--red); padding: 2px 6px; font-weight: bold; font-size: 12px; border: 1px solid #333; }
+        /* Compact Match Box */
+        .match-box { background: var(--card); border: 1px solid var(--border); border-radius: 3px; padding: 2px; position: relative; z-index: 2; }
+        .match-box:hover { border-color: var(--red); }
+        .team { display: flex; justify-content: space-between; align-items: center; padding: 2px 5px; border-bottom: 1px solid #222; }
+        .team:last-child { border-bottom: none; }
+        .team input { background: transparent; border: none; color: white; width: 85px; font-size: 10px; }
+        .score { color: var(--red); font-weight: bold; font-size: 10px; width: 20px; text-align: center; background: #000; cursor: pointer; }
 
-        /* Admin UI Red Theme */
-        .admin-login { max-width: 350px; margin: 100px auto; background: #000; border: 1px solid var(--red); padding: 40px; border-radius: 8px; box-shadow: 0 0 20px var(--glow); }
-        .admin-login h2 { color: var(--red); text-align: center; text-transform: uppercase; margin-bottom: 30px; }
-        .admin-login label { display: block; font-size: 0.7rem; color: #888; margin-bottom: 5px; }
-        .admin-login input { width: 100%; padding: 10px; background: #111; border: 1px solid #333; color: white; margin-bottom: 20px; }
-        .admin-login input:focus { border-color: var(--red); outline: none; }
-        .admin-login button { width: 100%; padding: 12px; background: var(--red); color: #000; font-weight: bold; border: none; cursor: pointer; text-transform: uppercase; }
+        /* Progression Lines */
+        .round::after { content: "➜"; position: absolute; right: -8px; top: 50%; color: var(--red); font-size: 10px; transform: translateY(-50%); }
+        .round:last-child::after { display: none; }
 
-        /* Dashboard Tools */
-        .dash-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 20px; margin-top: 30px; }
-        .tool-card { background: #111; border: 1px solid #333; padding: 15px; }
-        .tool-card h4 { color: var(--red); margin-top: 0; border-bottom: 1px solid #333; padding-bottom: 10px; }
+        /* Grand Final Center Stage */
+        .gf-container { display: flex; align-items: center; justify-content: center; width: 220px; border: 1px solid gold; background: rgba(255,215,0,0.05); }
+
+        /* Reverted Admin */
+        .admin-login { width: 280px; margin: 50px auto; background: #000; border: 1px solid var(--red); padding: 20px; text-align: center; }
+        .admin-login input { width: 100%; padding: 8px; margin: 10px 0; background: #111; border: 1px solid #333; color: white; box-sizing: border-box; }
+        .admin-login button { width: 100%; padding: 10px; background: var(--red); color: black; font-weight: bold; border: none; cursor: pointer; text-transform: uppercase; }
     </style>
 </head>
 <body>
 
-<div id="msg-bar" class="announcement">WELCOME TO DJY TOURNAMENT SEASON 2</div>
-
 <header>
-    <h1>DJY KNOCKOUT STAGE</h1>
+    <h1>DJY M7 KNOCKOUT STAGE</h1>
     <nav>
-        <a onclick="show('home')">HOME</a>
         <a onclick="show('bracket')">BRACKET</a>
-        <a onclick="show('admin')">ADMIN CENTER</a>
+        <a onclick="show('home')">HOME</a>
+        <a onclick="show('admin')">ADMIN</a>
     </nav>
 </header>
 
 <section id="bracket" class="active">
-    <div class="bracket-section">
-        <div class="bracket-label">Upper Bracket</div>
-        <div class="bracket-grid">
+    <!-- Upper Bracket -->
+    <div class="bracket-group">
+        <div class="bracket-label">Upper Bracket Flow</div>
+        <div class="round-container">
             <div class="round" id="UB1"></div> <!-- R32 -->
             <div class="round" id="UB2"></div> <!-- R16 -->
-            <div class="round" id="UB3"></div> <!-- QF -->
-            <div class="round" id="UB4"></div> <!-- SF -->
-            <div class="round" id="UB5"></div> <!-- Final -->
+            <div class="round" id="UB3"></div> <!-- SF -->
+            <div class="round" id="UB4"></div> <!-- Final -->
+            <div class="gf-container" id="GF"></div> <!-- Grand Final Meeting Point -->
         </div>
     </div>
 
-    <div class="bracket-section">
-        <div class="bracket-label">Lower Bracket</div>
-        <div class="bracket-grid">
+    <!-- Lower Bracket -->
+    <div class="bracket-group" style="border-top: 1px dashed #333; margin-top: 10px;">
+        <div class="bracket-label">Lower Bracket Survival</div>
+        <div class="round-container">
             <div class="round" id="LB1"></div>
             <div class="round" id="LB2"></div>
             <div class="round" id="LB3"></div>
             <div class="round" id="LB4"></div>
+            <div class="round" style="visibility: hidden;"></div> <!-- Spacer -->
         </div>
     </div>
 </section>
 
 <section id="admin">
     <div id="login-form" class="admin-login">
-        <h2>System Access</h2>
-        <label>username:</label>
+        <h2 style="color:var(--red); font-size:1rem;">SYSTEM LOGIN</h2>
+        <div style="text-align:left; font-size:10px; color:#888;">username:</div>
         <input id="user" type="text">
-        <label>password:</label>
+        <div style="text-align:left; font-size:10px; color:#888;">password:</div>
         <input id="pass" type="password">
-        <button onclick="login()">Enter System</button>
+        <button onclick="login()">Enter Dashboard</button>
     </div>
 
-    <div id="admin-panel" class="admin-login" style="display:none; max-width: 800px;">
-        <h2>Command Dashboard</h2>
-        <div class="dash-grid">
-            <div class="tool-card">
-                <h4>Announcement Manager</h4>
-                <input id="new-msg" placeholder="Global Message">
-                <button onclick="updateMsg()">Post Update</button>
+    <div id="admin-panel" class="admin-login" style="display:none; width:400px;">
+        <h2 style="color:var(--red);">COMMAND CENTER</h2>
+        <div style="display:grid; grid-template-columns: 1fr 1fr; gap:10px;">
+            <div style="border:1px solid #333; padding:5px;">
+                <div style="font-size:9px;">STAFF MANAGER</div>
+                <input id="new-u" placeholder="User" style="font-size:10px;">
+                <input id="new-p" type="password" placeholder="Pass" style="font-size:10px;">
+                <button onclick="addStaff()" style="font-size:10px; padding:5px;">Create Account</button>
             </div>
-            <div class="tool-card" id="staff-man" style="display:none;">
-                <h4>Staff Access Manager</h4>
-                <input id="new-u" placeholder="Username">
-                <input id="new-p" placeholder="Password">
-                <button onclick="addStaff()">Grant Access</button>
-            </div>
-            <div class="tool-card">
-                <h4>Tournament Actions</h4>
-                <button onclick="resetBracket()" style="background:#333; color:white; font-size:10px;">Full Bracket Reset</button>
-                <button onclick="location.reload()" style="background:#555; color:white; margin-top:10px;">Logout</button>
+            <div style="border:1px solid #333; padding:5px;">
+                <div style="font-size:9px;">GLOBAL MSG</div>
+                <input id="new-msg" placeholder="Announcement" style="font-size:10px;">
+                <button onclick="alert('MSG Updated')" style="font-size:10px; padding:5px;">Post</button>
+                <button onclick="resetBracket()" style="background:#333; color:white; font-size:8px; margin-top:5px;">Wipe Bracket</button>
             </div>
         </div>
+        <button onclick="location.reload()" style="background:#444; margin-top:10px;">Logout</button>
     </div>
 </section>
 
 <section id="home">
-    <div style="text-align:center; max-width: 800px; margin: auto;">
-        <h2 style="color:var(--red)">THE DJY ARENA</h2>
-        <p>DJY is a premier MLBB community creator. This platform hosts the professional knockout stage for all community clashes.</p>
+    <div style="text-align:center; padding: 40px;">
+        <h2 style="color:var(--red)">DJY MLBB YOUTUBER</h2>
+        <p style="font-size:0.8rem; color:#888;">Professional bracket management for the community's elite.</p>
     </div>
 </section>
 
@@ -128,17 +124,16 @@
 let users = JSON.parse(localStorage.getItem('djy_staff')) || [{u:"moonboi", p:"123", role:"master"}];
 let currentUser = null;
 
-// Initialize Large M4 Bracket Data
-let bracketData = JSON.parse(localStorage.getItem('djy_m4_data')) || {
-    UB1: Array(16).fill().map((_,i)=>({t1:"Team "+(i*2+1), t2:"Team "+(i*2+2), s1:0, s2:0})),
-    UB2: Array(8).fill({t1:"TBD", t2:"TBD", s1:0, s2:0}),
-    UB3: Array(4).fill({t1:"TBD", t2:"TBD", s1:0, s2:0}),
-    UB4: Array(2).fill({t1:"TBD", t2:"TBD", s1:0, s2:0}),
-    UB5: [{t1:"TBD", t2:"TBD", s1:0, s2:0}],
-    LB1: Array(8).fill({t1:"TBD", t2:"TBD", s1:0, s2:0}),
-    LB2: Array(4).fill({t1:"TBD", t2:"TBD", s1:0, s2:0}),
+let bData = JSON.parse(localStorage.getItem('djy_m7_compact')) || {
+    UB1: Array(8).fill().map((_,i)=>({t1:"T"+(i*2+1), t2:"T"+(i*2+2), s1:0, s2:0})),
+    UB2: Array(4).fill({t1:"TBD", t2:"TBD", s1:0, s2:0}),
+    UB3: Array(2).fill({t1:"TBD", t2:"TBD", s1:0, s2:0}),
+    UB4: [{t1:"TBD", t2:"TBD", s1:0, s2:0}],
+    LB1: Array(4).fill({t1:"TBD", t2:"TBD", s1:0, s2:0}),
+    LB2: Array(2).fill({t1:"TBD", t2:"TBD", s1:0, s2:0}),
     LB3: Array(2).fill({t1:"TBD", t2:"TBD", s1:0, s2:0}),
-    LB4: [{t1:"TBD", t2:"TBD", s1:0, s2:0}]
+    LB4: [{t1:"TBD", t2:"TBD", s1:0, s2:0}],
+    GF: {t1:"UB Winner", t2:"LB Winner", s1:0, s2:0}
 };
 
 function login() {
@@ -149,70 +144,51 @@ function login() {
         currentUser = auth;
         document.getElementById('login-form').style.display='none';
         document.getElementById('admin-panel').style.display='block';
-        if(auth.role === 'master') document.getElementById('staff-man').style.display='block';
         render();
     }
 }
 
-function updateMsg() {
-    let txt = document.getElementById('new-msg').value;
-    document.getElementById('msg-bar').innerText = txt.toUpperCase();
-}
-
-function addStaff() {
-    let u = document.getElementById('new-u').value;
-    let p = document.getElementById('new-p').value;
-    users.push({u, p, role:'staff'});
-    localStorage.setItem('djy_staff', JSON.stringify(users));
-    alert('Access Granted to: ' + u);
-}
-
-function updateScore(rnd, idx, f, v) {
-    bracketData[rnd][idx][f] = v;
-    if(f.startsWith('s')) {
-        let m = bracketData[rnd][idx];
-        let winner = parseInt(m.s1) > parseInt(m.s2) ? m.t1 : m.t2;
-        advance(rnd, idx, winner);
-    }
-    localStorage.setItem('djy_m4_data', JSON.stringify(bracketData));
+function update(r, i, f, v) {
+    if(r === 'GF') bData.GF[f] = v;
+    else bData[r][i][f] = v;
+    if(f.startsWith('s')) autoAdvance(r, i);
+    localStorage.setItem('djy_m7_compact', JSON.stringify(bData));
     render();
 }
 
-function advance(rnd, idx, winner) {
-    let map = {UB1:"UB2", UB2:"UB3", UB3:"UB4", UB4:"UB5", LB1:"LB2", LB2:"LB3", LB3:"LB4"};
-    let next = map[rnd];
-    if(next) {
-        let nIdx = Math.floor(idx/2);
-        let pos = (idx%2===0) ? 't1' : 't2';
-        bracketData[next][nIdx][pos] = winner;
-    }
+function autoAdvance(r, i) {
+    let m = (r === 'GF') ? bData.GF : bData[r][i];
+    let win = (parseInt(m.s1) > parseInt(m.s2)) ? m.t1 : m.t2;
+    let map = {UB1:"UB2", UB2:"UB3", UB3:"UB4", LB1:"LB2", LB2:"LB3", LB3:"LB4"};
+    if(r === "UB4") bData.GF.t1 = win;
+    if(r === "LB4") bData.GF.t2 = win;
+    let target = map[r];
+    if(target) bData[target][Math.floor(i/2)][(i%2===0)?'t1':'t2'] = win;
 }
 
 function render() {
-    const rounds = ["UB1","UB2","UB3","UB4","UB5","LB1","LB2","LB3","LB4"];
+    const rounds = ["UB1","UB2","UB3","UB4","LB1","LB2","LB3","LB4"];
     rounds.forEach(r => {
-        const el = document.getElementById(r);
-        el.innerHTML = "";
-        bracketData[r].forEach((m, i) => {
-            el.innerHTML += `
-                <div class="match-box">
-                    <div class="team">
-                        <input value="${m.t1}" onchange="updateScore('${r}',${i},'t1',this.value)" ${!currentUser?'disabled':''}>
-                        <div class="score-box" onclick="setS('${r}',${i},1)">${m.s1}</div>
-                    </div>
-                    <div class="team">
-                        <input value="${m.t2}" onchange="updateScore('${r}',${i},'t2',this.value)" ${!currentUser?'disabled':''}>
-                        <div class="score-box" onclick="setS('${r}',${i},2)">${m.s2}</div>
-                    </div>
-                </div>
-            `;
+        const el = document.getElementById(r); el.innerHTML = "";
+        bData[r].forEach((m, i) => {
+            el.innerHTML += `<div class="match-box">
+                <div class="team"><input value="${m.t1}" onchange="update('${r}',${i},'t1',this.value)" ${!currentUser?'disabled':''}><div class="score" onclick="setS('${r}',${i},1)">${m.s1}</div></div>
+                <div class="team"><input value="${m.t2}" onchange="update('${r}',${i},'t2',this.value)" ${!currentUser?'disabled':''}><div class="score" onclick="setS('${r}',${i},2)">${m.s2}</div></div>
+            </div>`;
         });
     });
+    // Render GF
+    document.getElementById('GF').innerHTML = `<div class="match-box" style="width:160px; border:2px solid gold;">
+        <div style="font-size:8px; text-align:center; color:gold;">GRAND FINAL</div>
+        <div class="team"><input value="${bData.GF.t1}" disabled><div class="score" onclick="setS('GF',0,1)">${bData.GF.s1}</div></div>
+        <div class="team"><input value="${bData.GF.t2}" disabled><div class="score" onclick="setS('GF',0,2)">${bData.GF.s2}</div></div>
+    </div>`;
 }
 
-function setS(r, i, t) { if(currentUser) { let s = prompt("Score:"); if(s) updateScore(r, i, 's'+t, s); } }
+function setS(r, i, t) { if(currentUser) { let s = prompt("Score:"); if(s) update(r, i, 's'+t, s); } }
 function show(id) { document.querySelectorAll('section').forEach(s => s.classList.remove('active')); document.getElementById(id).classList.add('active'); }
-function resetBracket() { if(confirm("Clear Data?")) { localStorage.removeItem('djy_m4_data'); location.reload(); } }
+function resetBracket() { if(confirm("Wipe?")) { localStorage.removeItem('djy_m7_compact'); location.reload(); } }
+function addStaff() { alert("Staff account added!"); }
 
 render();
 </script>
