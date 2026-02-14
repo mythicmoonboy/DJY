@@ -5,45 +5,47 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>DJY COMMUNITY TOURNAMENT</title>
     <style>
-        :root { --red: #ff2b2b; --bg: #080808; --card: #121212; --border: #2a2a2a; }
+        :root { --red: #ff2b2b; --bg: #050505; --card: #121212; --border: #2a2a2a; }
         body { margin:0; font-family: 'Segoe UI', sans-serif; background: var(--bg); color: #fff; overflow-x: hidden; }
         
+        /* Navigation */
         header { background: #000; border-bottom: 2px solid var(--red); padding: 15px; text-align: center; position: sticky; top: 0; z-index: 1000; }
-        header h1 { margin: 0; color: var(--red); text-transform: uppercase; letter-spacing: 2px; font-size: 1.2rem; }
-        nav { display: flex; justify-content: center; gap: 30px; margin-top: 10px; }
-        nav a { color: #888; text-decoration: none; font-weight: bold; cursor: pointer; font-size: 0.85rem; }
-        nav a.active { color: var(--red); }
+        header h1 { margin: 0; color: var(--red); text-transform: uppercase; letter-spacing: 2px; font-size: 1.1rem; }
+        nav { display: flex; justify-content: center; gap: 25px; margin-top: 10px; }
+        nav a { color: #888; text-decoration: none; font-weight: bold; cursor: pointer; font-size: 0.8rem; }
+        nav a.active { color: var(--red); border-bottom: 1px solid var(--red); }
 
-        section { display: none; padding: 20px; min-height: calc(100vh - 100px); }
+        section { display: none; padding: 20px; min-height: 80vh; }
         section.active { display: block; }
 
-        /* Announcement & Home */
-        .announcement { background: var(--red); color: #000; padding: 12px; text-align: center; font-weight: 900; margin-bottom: 20px; border-radius: 4px; text-transform: uppercase; }
-        .home-content { max-width: 700px; margin: auto; text-align: center; line-height: 1.6; }
+        /* Home & Announcements */
+        .announcement-bar { background: var(--red); color: black; padding: 10px; text-align: center; font-weight: 900; text-transform: uppercase; margin-bottom: 20px; border-radius: 4px; }
+        .home-box { max-width: 800px; margin: auto; text-align: center; }
 
         /* Tournament List */
-        .t-card { background: var(--card); border: 1px solid var(--border); padding: 20px; border-radius: 6px; cursor: pointer; transition: 0.3s; margin-bottom: 15px; }
-        .t-card:hover { border-color: var(--red); transform: translateY(-3px); }
-        .t-card h3 { color: var(--red); margin: 0 0 5px 0; }
+        .t-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 20px; }
+        .t-card { background: var(--card); border: 1px solid var(--border); padding: 20px; border-radius: 4px; cursor: pointer; }
+        .t-card:hover { border-color: var(--red); }
+        .t-card h3 { color: var(--red); margin: 0; }
+
+        /* Professional Bracket View */
+        #detail-view { display: none; overflow-x: auto; padding-bottom: 50px; }
+        .bracket-scroll { display: flex; flex-direction: column; gap: 40px; min-width: 1600px; }
+        .bracket-row { display: flex; gap: 40px; align-items: stretch; position: relative; }
+        .round { display: flex; flex-direction: column; justify-content: space-around; width: 140px; gap: 10px; position: relative; }
         
-        /* Tournament Detail View */
-        #detail-view { display: none; }
-        .back-btn { background: #333; color: white; border: none; padding: 5px 15px; cursor: pointer; margin-bottom: 20px; }
+        .match { background: #000; border: 1px solid var(--border); border-radius: 2px; position: relative; }
+        .match::after { content: "➜"; position: absolute; right: -25px; top: 50%; transform: translateY(-50%); color: var(--red); font-size: 12px; }
+        .round:last-child .match::after { display: none; }
+        
+        .team { display: flex; justify-content: space-between; padding: 4px 8px; font-size: 11px; border-bottom: 1px solid #222; }
+        .team input { background: transparent; border: none; color: white; width: 90px; }
+        .score { color: var(--red); font-weight: bold; cursor: pointer; min-width: 15px; text-align: center; }
 
-        /* Compact M6 Style Bracket */
-        .bracket-container { display: flex; flex-direction: column; gap: 20px; align-items: center; scale: 0.9; }
-        .round-row { display: flex; gap: 15px; }
-        .round { display: flex; flex-direction: column; justify-content: space-around; width: 130px; gap: 10px; }
-        .match { background: #000; border: 1px solid var(--border); padding: 3px; border-radius: 2px; }
-        .team { display: flex; justify-content: space-between; padding: 2px 5px; font-size: 10px; border-bottom: 1px solid #222; }
-        .team input { background: transparent; border: none; color: white; width: 80px; font-size: 10px; }
-        .score { color: var(--red); font-weight: bold; width: 15px; text-align: center; cursor: pointer; }
-
-        /* Admin Panels */
-        .admin-login { width: 280px; margin: 40px auto; border: 1px solid var(--red); padding: 25px; background: #000; }
-        .admin-login label { display: block; font-size: 10px; color: #666; margin-bottom: 2px; }
-        .admin-login input { width: 100%; padding: 8px; margin-bottom: 15px; background: #111; border: 1px solid #333; color: white; box-sizing: border-box; }
-        .admin-login button { width: 100%; padding: 10px; background: var(--red); border: none; font-weight: bold; cursor: pointer; }
+        /* Admin UI */
+        .admin-box { width: 320px; margin: 40px auto; border: 1px solid var(--red); padding: 25px; background: #000; }
+        .admin-box input, .admin-box textarea { width: 100%; padding: 10px; margin-bottom: 10px; background: #111; border: 1px solid #333; color: white; box-sizing: border-box; }
+        .admin-box button { width: 100%; padding: 12px; background: var(--red); border: none; font-weight: bold; cursor: pointer; margin-bottom: 5px; }
     </style>
 </head>
 <body>
@@ -51,144 +53,192 @@
 <header>
     <h1>DJY COMMUNITY TOURNAMENT</h1>
     <nav>
-        <a id="nav-home" onclick="show('home')" class="active">HOME</a>
-        <a id="nav-tournaments" onclick="show('tournaments')">TOURNAMENT</a>
-        <a id="nav-admin" onclick="show('admin')">ADMIN</a>
+        <a id="n-home" onclick="tab('home')" class="active">HOME</a>
+        <a id="n-tour" onclick="tab('tour')">TOURNAMENT</a>
+        <a id="n-admin" onclick="tab('admin')">ADMIN</a>
     </nav>
 </header>
 
-<!-- HOME TAB -->
 <section id="home" class="active">
-    <div id="announcement-bar" class="announcement">Season 2 Registrations Now Open!</div>
-    <div class="home-content">
+    <div id="top-msg" class="announcement-bar">Welcome to DJY Community Arena</div>
+    <div class="home-box">
         <h2 style="color:var(--red)">Who is DJY?</h2>
-        <p>DJY is a premier MLBB YouTuber and professional community caster. Known for his tactical analysis and high-stakes tournament hosting, he has built a dedicated arena for community teams to compete at a professional level.</p>
-        <p>This platform serves as the official hub for all DJY-hosted events, bringing the intensity of the M6 World Championship to the community level.</p>
+        <p>DJY is a premier MLBB YouTuber and professional community caster. He hosts the most competitive grassroots tournaments, providing a professional stage for every aspiring player.</p>
     </div>
 </section>
 
-<!-- TOURNAMENT TAB -->
-<section id="tournaments">
-    <div id="tournament-list">
-        <div class="t-card" onclick="openTournament('Season 2')">
-            <h3>DJY Community Tournament Season 2</h3>
-            <p style="font-size: 0.8rem; color: #888;">Status: UPCOMING | Prize: RM 500 + Donations</p>
-        </div>
-        <div class="t-card" onclick="openTournament('Invitational')">
-            <h3>DJY Invitational Cup</h3>
-            <p style="font-size: 0.8rem; color: #888;">Status: COMPLETED</p>
-        </div>
+<section id="tour">
+    <div id="list-view">
+        <div id="tournament-container" class="t-grid"></div>
     </div>
-
-    <!-- Hidden Detail View -->
+    
     <div id="detail-view">
-        <button class="back-btn" onclick="closeTournament()">← Back to List</button>
-        <h2 id="detail-title" style="color:var(--red)"></h2>
-        
-        <div class="bracket-container">
-            <div style="color:var(--red); font-weight:bold; font-size:0.7rem; width:100%; text-align:left;">UPPER BRACKET</div>
-            <div class="round-row">
-                <div class="round" id="UB1"></div>
-                <div class="round" id="UB2"></div>
-                <div class="round" id="UB3"></div>
+        <button onclick="closeDetail()" style="background:#333; color:white; border:none; padding:10px; margin-bottom:20px; cursor:pointer;">← Back</button>
+        <h2 id="d-name" style="color:var(--red)"></h2>
+        <p id="d-meta" style="color:#888; font-size:0.9rem;"></p>
+
+        <div class="bracket-scroll">
+            <h4 style="color:var(--red); border-left:3px solid var(--red); padding-left:10px;">UPPER BRACKET (R32 START)</h4>
+            <div class="bracket-row">
+                <div class="round" id="UB1"></div><div class="round" id="UB2"></div><div class="round" id="UB3"></div><div class="round" id="UB4"></div><div class="round" id="UB5"></div>
             </div>
-            <div style="color:var(--red); font-weight:bold; font-size:0.7rem; width:100%; text-align:left; border-top:1px dashed #333; padding-top:10px;">LOWER BRACKET</div>
-            <div class="round-row">
-                <div class="round" id="LB1"></div>
-                <div class="round" id="LB2"></div>
+            
+            <h4 style="color:var(--red); border-left:3px solid var(--red); padding-left:10px;">LOWER BRACKET (SURVIVAL)</h4>
+            <div class="bracket-row">
+                <div class="round" id="LB1"></div><div class="round" id="LB2"></div><div class="round" id="LB3"></div><div class="round" id="LB4"></div>
             </div>
         </div>
     </div>
 </section>
 
-<!-- ADMIN TAB -->
 <section id="admin">
-    <div id="login-form" class="admin-login">
-        <h3 style="color:var(--red); text-align:center;">SYSTEM ACCESS</h3>
-        <label>username:</label>
+    <!-- Login -->
+    <div id="login" class="admin-box">
+        <h3 style="color:var(--red); text-align:center;">ADMIN ACCESS</h3>
+        <label style="font-size:10px; color:#666;">username:</label>
         <input id="user" type="text">
-        <label>password:</label>
+        <label style="font-size:10px; color:#666;">password:</label>
         <input id="pass" type="password">
         <button onclick="login()">LOGIN</button>
     </div>
 
-    <div id="dashboard" class="admin-login" style="display:none; width:450px;">
+    <!-- Dashboard -->
+    <div id="dash" class="admin-box" style="display:none; width:500px;">
         <h3 style="color:var(--red); text-align:center;">COMMAND CENTER</h3>
-        <div style="display:grid; grid-template-columns: 1fr 1fr; gap:10px;">
-            <div style="border:1px solid #222; padding:10px;">
-                <label>Global Announcement:</label>
-                <input id="new-msg" placeholder="Announcement text">
-                <button onclick="updateMsg()" style="font-size:10px;">Post Update</button>
-            </div>
-            <div style="border:1px solid #222; padding:10px;">
-                <label>Manage Staff:</label>
-                <input id="staff-u" placeholder="Username">
-                <input id="staff-p" type="password" placeholder="Password">
-                <button onclick="alert('Staff Added')" style="font-size:10px;">Add Staff</button>
-            </div>
+        
+        <div style="border:1px solid #222; padding:15px; margin-bottom:15px;">
+            <h4 style="margin:0 0 10px 0;">Post Update</h4>
+            <input id="upd-txt" placeholder="Announcement text...">
+            <button onclick="postUpd()" style="font-size:12px;">Push to Home</button>
         </div>
-        <button onclick="location.reload()" style="background:#444; margin-top:15px;">Logout</button>
+
+        <div style="border:1px solid #222; padding:15px;">
+            <h4 style="margin:0 0 10px 0;">Create New Tournament</h4>
+            <input id="new-name" placeholder="Tournament Name">
+            <input id="new-prize" placeholder="Prize (e.g., RM 500)">
+            <input id="new-time" placeholder="Time/Date">
+            <textarea id="new-desc" placeholder="Description"></textarea>
+            <button onclick="createTour()" style="background:green;">Generate Tournament</button>
+        </div>
+        
+        <button onclick="location.reload()" style="background:#444; margin-top:10px;">Logout</button>
     </div>
 </section>
 
 <script>
 let currentUser = null;
-let bData = JSON.parse(localStorage.getItem('djy_dynamic_data')) || {
-    UB1: Array(4).fill().map((_,i)=>({t1:"Team "+(i*2+1), t2:"Team "+(i*2+2), s1:0, s2:0})),
-    UB2: Array(2).fill({t1:"TBD", t2:"TBD", s1:0, s2:0}),
-    UB3: [{t1:"TBD", t2:"TBD", s1:0, s2:0}],
-    LB1: Array(2).fill({t1:"TBD", t2:"TBD", s1:0, s2:0}),
-    LB2: [{t1:"TBD", t2:"TBD", s1:0, s2:0}]
-};
+let tournaments = JSON.parse(localStorage.getItem('djy_tours')) || [];
 
-function show(id) {
+// Initial Bracket Schema
+const getBlankBracket = () => ({
+    UB1: Array(16).fill().map((_,i)=>({t1:"Team "+(i*2+1), t2:"Team "+(i*2+2), s1:0, s2:0})),
+    UB2: Array(8).fill({t1:"TBD", t2:"TBD", s1:0, s2:0}),
+    UB3: Array(4).fill({t1:"TBD", t2:"TBD", s1:0, s2:0}),
+    UB4: Array(2).fill({t1:"TBD", t2:"TBD", s1:0, s2:0}),
+    UB5: [{t1:"TBD", t2:"TBD", s1:0, s2:0}],
+    LB1: Array(8).fill({t1:"TBD", t2:"TBD", s1:0, s2:0}),
+    LB2: Array(4).fill({t1:"TBD", t2:"TBD", s1:0, s2:0}),
+    LB3: Array(2).fill({t1:"TBD", t2:"TBD", s1:0, s2:0}),
+    LB4: [{t1:"TBD", t2:"TBD", s1:0, s2:0}]
+});
+
+let activeTourIdx = null;
+
+function tab(id) {
     document.querySelectorAll('section').forEach(s => s.classList.remove('active'));
     document.querySelectorAll('nav a').forEach(a => a.classList.remove('active'));
     document.getElementById(id).classList.add('active');
-    document.getElementById('nav-'+id).classList.add('active');
-}
-
-function openTournament(name) {
-    document.getElementById('tournament-list').style.display = 'none';
-    document.getElementById('detail-view').style.display = 'block';
-    document.getElementById('detail-title').innerText = name;
-    render();
-}
-
-function closeTournament() {
-    document.getElementById('tournament-list').style.display = 'block';
-    document.getElementById('detail-view').style.display = 'none';
+    document.getElementById('n-'+id).classList.add('active');
+    if(id === 'tour') renderTourList();
 }
 
 function login() {
     if(document.getElementById('user').value === "moonboi" && document.getElementById('pass').value === "123") {
         currentUser = "master";
-        document.getElementById('login-form').style.display = 'none';
-        document.getElementById('dashboard').style.display = 'block';
-        render();
+        document.getElementById('login').style.display = 'none';
+        document.getElementById('dash').style.display = 'block';
     }
 }
 
-function updateMsg() { document.getElementById('announcement-bar').innerText = document.getElementById('new-msg').value.toUpperCase(); }
+function postUpd() {
+    let msg = document.getElementById('upd-txt').value;
+    document.getElementById('top-msg').innerText = msg.toUpperCase();
+    localStorage.setItem('djy_ann', msg);
+}
+
+function createTour() {
+    let name = document.getElementById('new-name').value;
+    let prize = document.getElementById('new-prize').value;
+    let time = document.getElementById('new-time').value;
+    let desc = document.getElementById('new-desc').value;
+    
+    if(name) {
+        tournaments.push({ name, prize, time, desc, bracket: getBlankBracket() });
+        localStorage.setItem('djy_tours', JSON.stringify(tournaments));
+        alert("Tournament Created!");
+        renderTourList();
+    }
+}
+
+function renderTourList() {
+    const container = document.getElementById('tournament-container');
+    container.innerHTML = "";
+    tournaments.forEach((t, i) => {
+        container.innerHTML += `
+            <div class="t-card" onclick="openDetail(${i})">
+                <h3>${t.name}</h3>
+                <p style="font-size:0.8rem; color:#888;">Prize: ${t.prize} | ${t.time}</p>
+            </div>
+        `;
+    });
+}
+
+function openDetail(idx) {
+    activeTourIdx = idx;
+    let t = tournaments[idx];
+    document.getElementById('list-view').style.display = 'none';
+    document.getElementById('detail-view').style.display = 'block';
+    document.getElementById('d-name').innerText = t.name;
+    document.getElementById('d-meta').innerText = `${t.prize} • ${t.time} • ${t.desc}`;
+    renderBracket();
+}
+
+function closeDetail() {
+    document.getElementById('list-view').style.display = 'block';
+    document.getElementById('detail-view').style.display = 'none';
+}
 
 function updateScore(r, i, f, v) {
-    bData[r][i][f] = v;
-    if(f.startsWith('s')) {
-        let m = bData[r][i];
-        let win = parseInt(m.s1) > parseInt(m.s2) ? m.t1 : m.t2;
-        let map = {UB1:"UB2", UB2:"UB3", LB1:"LB2"};
-        if(map[r]) bData[map[r]][Math.floor(i/2)][(i%2===0)?'t1':'t2'] = win;
+    let b = tournaments[activeTourIdx].bracket;
+    if(f.startsWith('t')) b[r][i][f] = v;
+    else {
+        b[r][i][f] = v;
+        let win = parseInt(b[r][i].s1) > parseInt(b[r][i].s2) ? b[r][i].t1 : b[r][i].t2;
+        let lose = parseInt(b[r][i].s1) > parseInt(b[r][i].s2) ? b[r][i].t2 : b[r][i].t1;
+        
+        // Progression Logic
+        if(r === 'UB1') advance(win, 'UB2', i);
+        if(r === 'UB2') { advance(win, 'UB3', i); drop(lose, 'LB1', i); }
+        if(r === 'UB3') { advance(win, 'UB4', i); drop(lose, 'LB2', i); }
     }
-    localStorage.setItem('djy_dynamic_data', JSON.stringify(bData));
-    render();
+    localStorage.setItem('djy_tours', JSON.stringify(tournaments));
+    renderBracket();
 }
 
-function render() {
-    const rounds = ["UB1","UB2","UB3","LB1","LB2"];
+function advance(team, target, idx) {
+    tournaments[activeTourIdx].bracket[target][Math.floor(idx/2)][(idx%2===0)?'t1':'t2'] = team;
+}
+function drop(team, target, idx) {
+    tournaments[activeTourIdx].bracket[target][idx]['t1'] = team; // Simple drop logic
+}
+
+function renderBracket() {
+    let b = tournaments[activeTourIdx].bracket;
+    const rounds = ["UB1","UB2","UB3","UB4","UB5","LB1","LB2","LB3","LB4"];
     rounds.forEach(r => {
         const el = document.getElementById(r); if(!el) return;
         el.innerHTML = "";
-        bData[r].forEach((m, i) => {
+        b[r].forEach((m, i) => {
             el.innerHTML += `<div class="match">
                 <div class="team"><input value="${m.t1}" onchange="updateScore('${r}',${i},'t1',this.value)" ${!currentUser?'disabled':''}> <div class="score" onclick="setS('${r}',${i},1)">${m.s1}</div></div>
                 <div class="team"><input value="${m.t2}" onchange="updateScore('${r}',${i},'t2',this.value)" ${!currentUser?'disabled':''}> <div class="score" onclick="setS('${r}',${i},2)">${m.s2}</div></div>
@@ -199,7 +249,10 @@ function render() {
 
 function setS(r, i, t) { if(currentUser) { let s = prompt("Score:"); if(s) updateScore(r, i, 's'+t, s); } }
 
-render();
+// Load Announcement
+if(localStorage.getItem('djy_ann')) document.getElementById('top-msg').innerText = localStorage.getItem('djy_ann').toUpperCase();
+
+renderTourList();
 </script>
 </body>
 </html>
