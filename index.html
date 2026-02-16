@@ -12,18 +12,26 @@
         header h1 { margin: 0; color: var(--red); text-transform: uppercase; letter-spacing: 2px; font-size: 1.1rem; }
         nav { display: flex; justify-content: center; gap: 25px; margin-top: 10px; }
         nav a { color: #888; text-decoration: none; font-weight: bold; cursor: pointer; font-size: 0.8rem; padding: 5px 10px; transition: 0.3s; }
-        
-        /* Active Tab Highlight */
         nav a.active { color: var(--red); border-bottom: 2px solid var(--red); background: rgba(255, 43, 43, 0.1); }
 
         section { display: none; padding: 20px; min-height: 85vh; }
         section.active { display: block; }
 
+        /* Button Press Effect */
+        button { 
+            transition: all 0.1s ease; 
+            box-shadow: 0 4px 0 #8b0000;
+        }
+        button:active { 
+            transform: translateY(3px); 
+            box-shadow: 0 1px 0 #8b0000; 
+        }
+
         .announcement-bar { background: var(--red); color: black; padding: 10px; text-align: center; font-weight: 900; text-transform: uppercase; margin-bottom: 20px; border-radius: 4px; }
         
         /* Home Profile */
         .profile-pic { width: 140px; height: 140px; border-radius: 50%; border: 3px solid var(--red); margin-bottom: 15px; object-fit: cover; box-shadow: 0 0 20px var(--red); }
-        .description { font-style: italic; color: #bbb; max-width: 600px; margin: auto; line-height: 1.6; }
+        .description { font-style: normal; color: #bbb; max-width: 650px; margin: auto; line-height: 1.7; text-align: justify; }
 
         /* Tournament Divisions */
         .division-title { color: var(--red); border-left: 4px solid var(--red); padding-left: 10px; margin: 30px 0 15px; text-transform: uppercase; font-size: 0.9rem; }
@@ -42,11 +50,11 @@
 
         /* Admin Panels */
         .admin-box { width: 350px; margin: 40px auto; border: 1px solid var(--red); padding: 30px; background: #000; }
-        .admin-box input { width: 100%; padding: 10px; margin-bottom: 15px; background: #111; border: 1px solid #333; color: white; box-sizing: border-box; }
+        .admin-box input, .admin-box select, .admin-box textarea { width: 100%; padding: 10px; margin-bottom: 15px; background: #111; border: 1px solid #333; color: white; box-sizing: border-box; }
         .admin-box button { width: 100%; padding: 12px; background: var(--red); border: none; font-weight: bold; cursor: pointer; margin-bottom: 8px; }
         .manage-item { background: #111; padding: 10px; margin-top: 10px; border: 1px solid #333; border-radius: 4px; font-size: 12px; }
         .control-btns { display: flex; gap: 5px; margin-top: 10px; }
-        .control-btns button { flex: 1; font-size: 9px; padding: 5px; cursor: pointer; border: none; font-weight: bold; }
+        .control-btns button { flex: 1; font-size: 9px; padding: 5px; cursor: pointer; border: none; font-weight: bold; box-shadow: none; }
     </style>
 </head>
 <body>
@@ -64,9 +72,11 @@
     <div id="top-ann" class="announcement-bar">Welcome to DJY Arena</div>
     <div style="text-align:center; max-width:700px; margin:auto;">
         <img src="https://yt3.googleusercontent.com" alt="DJY Official PFP" class="profile-pic">
-        <h2 style="color:var(--red)">DJY: Professional MLBB YouTuber</h2>
+        <h2 style="color:var(--red)">DJY: The Deathless Warrior</h2>
         <p class="description">
-            DJY is a premier Mobile Legends: Bang Bang YouTuber and digital host known for his high-tier strategy breakdowns and high-energy casting. As a dedicated content creator, he provides his audience with the latest meta shifts while organizing professional-grade tournaments for the community.
+            DJY is a premier <b>Mobile Legends: Bang Bang YouTuber</b> and professional <b>MPL Malaysia athlete</b>. Starting his journey as a dedicated MLBB clipper, he rose to fame through his high-tier gameplay and strategic analysis, eventually joining the professional ranks with Ocean Black in Season 15.
+            <br><br>
+            Known as the "Deathless Guy" by his community, DJY bridges the gap between grassroots content and professional esports. This platform is his official arena, designed to host high-stakes community tournaments where every player can experience the intensity of professional knockout stages.
         </p>
     </div>
 </section>
@@ -83,7 +93,8 @@
 
     <div id="detail-view" style="display:none;">
         <button onclick="closeDetail()" style="background:#333; color:white; border:none; padding:10px; cursor:pointer; margin-bottom:20px;">← Back</button>
-        <h2 id="det-name" style="color:var(--red)"></h2>
+        <h2 id="det-name" style="color:var(--red); margin-bottom: 5px;"></h2>
+        <p id="det-desc" style="color:#888; font-size:0.85rem; margin-bottom: 20px;"></p>
         <div style="overflow-x:auto;">
             <div class="bracket-wrapper" id="bracket-root">
                 <canvas id="line-canvas"></canvas>
@@ -122,6 +133,11 @@
             <h4>Create New Tournament</h4>
             <input id="t-n" placeholder="Tournament Name">
             <input id="t-p" placeholder="Prize Pool">
+            <textarea id="t-d" placeholder="Tournament Description (Optional)" rows="2"></textarea>
+            <select id="t-type">
+                <option value="double">Upper & Lower Bracket</option>
+                <option value="single">Upper Bracket Only</option>
+            </select>
             <button onclick="createTour()">Generate R32</button>
         </div>
         <button onclick="logout()" style="background:#444; margin-top:10px;">Logout</button>
@@ -170,9 +186,13 @@ function logout() {
 
 function createTour() {
     let name = document.getElementById('t-n').value;
+    let prize = document.getElementById('t-p').value;
+    let desc = document.getElementById('t-d').value;
+    let type = document.getElementById('t-type').value;
     if(!name) return;
+    
     tours.push({
-        name, prize: document.getElementById('t-p').value, status: 'UPCOMING',
+        name, prize, desc, status: 'UPCOMING', type,
         bracket: {
             R32: Array(16).fill().map((_,i)=>({t1:"Team "+(i*2+1), t2:"Team "+(i*2+2), s1:0, s2:0})),
             R16: Array(8).fill({t1:"TBD", t2:"TBD", s1:0, s2:0}), R8: Array(4).fill({t1:"TBD", t2:"TBD", s1:0, s2:0}),
@@ -241,6 +261,7 @@ function openDetail(i) {
     document.getElementById('list-view').style.display = 'none';
     document.getElementById('detail-view').style.display = 'block';
     document.getElementById('det-name').innerText = tours[i].name;
+    document.getElementById('det-desc').innerText = tours[i].desc || "No description provided.";
     renderBracket();
     setTimeout(drawLines, 150);
 }
@@ -300,7 +321,6 @@ function drawLines() {
     }
 }
 
-// Initial Session and Tour render
 checkSession();
 renderTours();
 </script>
