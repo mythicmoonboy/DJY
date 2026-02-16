@@ -27,31 +27,25 @@
         .profile-pic { width: 140px; height: 140px; border-radius: 50%; border: 3px solid var(--red); margin-bottom: 15px; object-fit: cover; box-shadow: 0 0 20px var(--red); }
         .description { color: #bbb; max-width: 650px; margin: auto; line-height: 1.7; text-align: center; }
 
-        /* Tournament List */
+        /* Tournament List Divisions */
         .division-title { color: var(--red); border-left: 4px solid var(--red); padding-left: 10px; margin: 30px 0 15px; text-transform: uppercase; font-size: 0.9rem; }
         .t-long-box { background: var(--card); border: 1px solid var(--border); padding: 20px 40px; margin-bottom: 15px; border-radius: 4px; cursor: pointer; display: flex; justify-content: space-between; align-items: center; transition: 0.3s; }
-        .t-long-box:hover { border-color: var(--red); }
+        .t-long-box:hover { border-color: var(--red); background: #1a1a1a; }
         .status-tag { font-size: 10px; padding: 2px 6px; border-radius: 3px; color: #fff; text-transform: uppercase; font-weight: bold; }
 
-        /* M6/M7 Pro Bracket UI */
+        /* Pro Bracket with Canvas Lines */
         .bracket-wrapper { position: relative; padding: 60px; min-width: 2400px; display: flex; flex-direction: column; gap: 80px; }
-        #svg-lines { position: absolute; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none; z-index: 1; }
+        canvas#line-canvas { position: absolute; top: 0; left: 0; pointer-events: none; z-index: 1; }
         .bracket-row { display: flex; gap: 100px; align-items: stretch; position: relative; z-index: 2; }
         .round { display: flex; flex-direction: column; justify-content: space-around; width: 180px; }
-        
-        .match { background: #000; border: 1px solid var(--border); padding: 8px; margin: 20px 0; border-radius: 4px; position: relative; }
+        .match { background: #000; border: 1px solid var(--border); padding: 8px; margin: 20px 0; border-radius: 4px; }
         .team { display: flex; justify-content: space-between; font-size: 12px; padding: 5px; border-bottom: 1px solid #222; }
-        .team:last-child { border-bottom: none; }
-        .team input { background: transparent; border: none; color: white; width: 110px; font-size: 11px; }
+        .team input { background: transparent; border: none; color: white; width: 110px; }
         .score { color: var(--red); font-weight: bold; cursor: pointer; min-width: 20px; text-align: center; }
 
-        /* Grand Final Hub */
-        .gf-container { display: flex; align-items: center; justify-content: center; width: 250px; }
-        .match.gf-box { border: 2px solid var(--gold); background: rgba(255, 215, 0, 0.05); width: 100%; box-shadow: 0 0 20px rgba(255, 215, 0, 0.2); }
-
-        /* Admin UI */
+        /* Admin Dashboard */
         .admin-box { width: 350px; margin: 40px auto; border: 1px solid var(--red); padding: 30px; background: #000; }
-        .admin-box input, .admin-box select, .admin-box textarea { width: 100%; padding: 10px; margin-bottom: 15px; background: #111; border: 1px solid #333; color: white; box-sizing: border-box; }
+        .admin-box input, .admin-box select { width: 100%; padding: 10px; margin-bottom: 15px; background: #111; border: 1px solid #333; color: white; box-sizing: border-box; }
         .admin-box button { width: 100%; padding: 12px; background: var(--red); color: #000; font-weight: bold; cursor: pointer; margin-bottom: 8px; }
         .manage-item { background: #111; padding: 10px; margin-top: 10px; border: 1px solid #333; border-radius: 4px; font-size: 12px; }
     </style>
@@ -68,12 +62,12 @@
 </header>
 
 <section id="home" class="active">
-    <div id="top-ann" class="announcement-bar">Official DJY Tournament Website</div>
+    <div id="top-ann" class="announcement-bar">Official DJY Tournament Hub</div>
     <div style="text-align:center; max-width:700px; margin:auto;">
         <img src="https://yt3.googleusercontent.com" alt="DJY PFP" class="profile-pic">
         <h2 style="color:var(--red)">DJY: The Clipper of MLBB</h2>
         <p class="description">
-            DJY is a leading Mobile Legends: Bang Bang YouTuber and professional MPL athlete. Known initially for his precise and high-impact MLBB clips, he has evolved into a pillar of the community, hosting elite professional-grade tournaments for grassroots talent.
+            DJY is a premier Mobile Legends: Bang Bang YouTuber and professional MPL athlete. Known initially for his high-impact clips, he has evolved into a professional coach and tournament host for the community.
         </p>
     </div>
 </section>
@@ -89,32 +83,20 @@
     </div>
 
     <div id="detail-view" style="display:none;">
-        <button onclick="closeDetail()" style="background:#333; color:white; border:none; padding:10px; cursor:pointer; margin-bottom:20px;">← Back</button>
+        <button onclick="closeDetail()" style="background:#333; color:white; padding:10px;">← Back</button>
         <h2 id="det-name" style="color:var(--red)"></h2>
         <div style="overflow-x:auto;">
             <div class="bracket-wrapper" id="bracket-root">
-                <svg id="svg-lines"></svg>
-                <!-- Upper Bracket Section -->
+                <canvas id="line-canvas"></canvas>
                 <div class="bracket-row">
-                    <div class="round" id="R32"></div>
-                    <div class="round" id="R16"></div>
-                    <div class="round" id="R8"></div>
-                    <div class="round" id="R4"></div>
-                    <div class="gf-container">
-                        <div class="match gf-box" id="GF-MATCH"></div>
-                    </div>
+                    <div class="round" id="R32"></div><div class="round" id="R16"></div>
+                    <div class="round" id="R8"></div><div class="round" id="R4"></div>
+                    <div class="round" id="GF"><div class="match gf-box" id="GF-MATCH"></div></div>
                 </div>
-                
-                <div style="height:2px; background:var(--border); margin:40px 0; position:relative;">
-                    <span style="position:absolute; left:50%; top:-10px; transform:translateX(-50%); background:var(--bg); padding:0 20px; font-size:10px; color:#555;">LOWER BRACKET SURVIVAL</span>
-                </div>
-                
-                <!-- Lower Bracket Section -->
+                <div style="height:2px; background:var(--border); margin:40px 0;"></div>
                 <div class="bracket-row" id="lower-bracket-row">
-                    <div class="round" id="LR1"></div>
-                    <div class="round" id="LR2"></div>
-                    <div class="round" id="LR3"></div>
-                    <div class="round" id="LR4"></div>
+                    <div class="round" id="LR1"></div><div class="round" id="LR2"></div>
+                    <div class="round" id="LR3"></div><div class="round" id="LR4"></div>
                 </div>
             </div>
         </div>
@@ -123,30 +105,28 @@
 
 <section id="admin">
     <div id="login-ui" class="admin-box">
-        <h3 style="color:var(--red); text-align:center;">ADMIN LOGIN</h3>
-        <input id="user" placeholder="username">
-        <input id="pass" type="password" placeholder="password">
+        <h3>ADMIN LOGIN</h3>
+        <input id="user" placeholder="username"><input id="pass" type="password" placeholder="password">
         <button onclick="login()">LOGIN</button>
     </div>
 
     <div id="dash-ui" class="admin-box" style="display:none; width:500px;">
-        <h3 style="color:var(--red); text-align:center;">COMMAND CENTER</h3>
+        <h3>COMMAND CENTER</h3>
         <div id="head-admin-tools" style="display:none; border:1px solid #222; padding:10px; margin-bottom:15px;">
             <h4 style="color:var(--red)">Staff Manager (moonboi only)</h4>
-            <input id="s-u" placeholder="New Staff User">
-            <input id="s-p" placeholder="New Staff Pass">
-            <button onclick="addStaff()">Create Staff</button>
+            <input id="s-u" placeholder="Username"><input id="s-p" placeholder="Password">
+            <button onclick="addStaff()">Add Staff</button>
             <div id="s-list"></div>
         </div>
+        <div style="border:1px solid #222; padding:10px; margin-bottom:15px;">
+            <h4>Tournament Status Control</h4>
+            <div id="admin-tour-manager"></div>
+        </div>
         <div style="border:1px solid #222; padding:10px;">
-            <h4>Generate Tournament</h4>
-            <input id="t-n" placeholder="Tournament Name">
-            <input id="t-p" placeholder="Prize Pool">
-            <select id="t-type">
-                <option value="double">M7 Double Elimination</option>
-                <option value="single">Single Elimination</option>
-            </select>
-            <button onclick="createTour()">Create Bracket</button>
+            <h4>Create Tournament</h4>
+            <input id="t-n" placeholder="Name"><input id="t-p" placeholder="Prize">
+            <select id="t-type"><option value="double">Double Elimination</option><option value="single">Single Elimination</option></select>
+            <button onclick="createTour()">Generate R32</button>
         </div>
         <button onclick="logout()" style="background:#444; margin-top:10px;">Logout</button>
     </div>
@@ -166,30 +146,25 @@ function tab(id) {
     if(id === 'tour') renderTours();
 }
 
-function login() {
-    let u = document.getElementById('user').value;
-    let p = document.getElementById('pass').value;
-    let auth = accounts.find(a => a.u === u && a.p === p);
-    if(auth) {
-        currentUser = auth;
-        localStorage.setItem('djy_session', JSON.stringify(auth));
-        checkSession();
-    }
-}
-
 function checkSession() {
     if (currentUser) {
         document.getElementById('login-ui').style.display = 'none';
         document.getElementById('dash-ui').style.display = 'block';
         if(currentUser.role === 'head') document.getElementById('head-admin-tools').style.display = 'block';
+        renderStaff(); renderAdminManager();
     }
+}
+
+function login() {
+    let u = document.getElementById('user').value, p = document.getElementById('pass').value;
+    let auth = accounts.find(a => a.u === u && a.p === p);
+    if(auth) { currentUser = auth; localStorage.setItem('djy_session', JSON.stringify(auth)); checkSession(); }
 }
 
 function logout() { localStorage.removeItem('djy_session'); location.reload(); }
 
 function createTour() {
-    let name = document.getElementById('t-n').value;
-    if(!name) return;
+    let name = document.getElementById('t-n').value; if(!name) return;
     tours.push({
         name, prize: document.getElementById('t-p').value, status: 'UPCOMING', type: document.getElementById('t-type').value,
         bracket: {
@@ -200,8 +175,7 @@ function createTour() {
             LR3: Array(2).fill({t1:"TBD", t2:"TBD", s1:0, s2:0}), LR4: [{t1:"TBD", t2:"TBD", s1:0, s2:0}]
         }
     });
-    localStorage.setItem('djy_tours', JSON.stringify(tours));
-    alert("Tournament Created!");
+    save(); renderAdminManager(); renderTours();
 }
 
 function renderTours() {
@@ -214,13 +188,8 @@ function renderTours() {
 }
 
 function openDetail(i) {
-    activeIdx = i;
-    document.getElementById('list-view').style.display = 'none';
-    document.getElementById('detail-view').style.display = 'block';
-    document.getElementById('det-name').innerText = tours[i].name;
-    document.getElementById('lower-bracket-row').style.display = tours[i].type === 'double' ? 'flex' : 'none';
-    renderBracket();
-    setTimeout(drawLines, 300);
+    activeIdx = i; document.getElementById('list-view').style.display = 'none'; document.getElementById('detail-view').style.display = 'block';
+    document.getElementById('det-name').innerText = tours[i].name; renderBracket(); setTimeout(drawLines, 200);
 }
 
 function renderBracket() {
@@ -236,58 +205,27 @@ function renderBracket() {
             </div>`;
         });
     });
-    document.getElementById('GF-MATCH').innerHTML = `<div id="GF-0">
-        <div class="team"><input value="${b.GF[0].t1}" disabled> <div class="score" onclick="setS('GF',0,1)">${b.GF[0].s1}</div></div>
-        <div class="team"><input value="${b.GF[0].t2}" disabled> <div class="score" onclick="setS('GF',0,2)">${b.GF[0].s2}</div></div>
-    </div>`;
 }
 
-function setS(r, i, tNum) {
-    if(!currentUser) return;
-    let s = prompt("Score:");
-    if(s !== null) {
-        let b = tours[activeIdx].bracket;
-        if(r==='GF') b.GF[0]['s'+tNum] = s; else b[r][i]['s'+tNum] = s;
-        save(); renderBracket(); drawLines();
+function drawLines() {
+    const canvas = document.getElementById('line-canvas'), root = document.getElementById('bracket-root');
+    canvas.width = root.scrollWidth; canvas.height = root.scrollHeight;
+    const ctx = canvas.getContext('2d'); ctx.strokeStyle = '#ff2b2b'; ctx.lineWidth = 2;
+    const rounds = ["R32", "R16", "R8", "R4"];
+    for(let j=0; j<rounds.length-1; j++) {
+        tours[activeIdx].bracket[rounds[j]].forEach((_, i) => {
+            let fromEl = document.getElementById(`${rounds[j]}-${i}`), toEl = document.getElementById(`${rounds[j+1]}-${Math.floor(i/2)}`);
+            if(fromEl && toEl) {
+                let fR = fromEl.getBoundingClientRect(), tR = toEl.getBoundingClientRect(), rR = root.getBoundingClientRect();
+                ctx.beginPath(); ctx.moveTo(fR.right - rR.left, fR.top + fR.height/2 - rR.top); ctx.lineTo(tR.left - rR.left, tR.top + tR.height/2 - rR.top); ctx.stroke();
+            }
+        });
     }
 }
 
 function save() { localStorage.setItem('djy_tours', JSON.stringify(tours)); }
-
-function drawLines() {
-    const svg = document.getElementById('svg-lines');
-    const root = document.getElementById('bracket-root');
-    svg.innerHTML = "";
-    const b = tours[activeIdx].bracket;
-
-    const connect = (fromId, toId) => {
-        const fEl = document.getElementById(fromId);
-        const tEl = document.getElementById(toId);
-        if(!fEl || !tEl) return;
-        const fR = fEl.getBoundingClientRect(), tR = tEl.getBoundingClientRect(), rR = root.getBoundingClientRect();
-        const x1 = fR.right - rR.left, y1 = fR.top + fR.height/2 - rR.top;
-        const x2 = tR.left - rR.left, y2 = tR.top + tR.height/2 - rR.top;
-        const line = document.createElementNS("http://www.w3.org", "path");
-        line.setAttribute("d", `M ${x1} ${y1} C ${x1+40} ${y1}, ${x2-40} ${y2}, ${x2} ${y2}`);
-        line.setAttribute("stroke", "#ff2b2b"); line.setAttribute("fill", "none"); line.setAttribute("stroke-width", "2");
-        svg.appendChild(line);
-    };
-
-    // Upper Bracket Connections
-    for(let i=0; i<16; i++) connect(`R32-${i}`, `R16-${Math.floor(i/2)}`);
-    for(let i=0; i<8; i++) connect(`R16-${i}`, `R8-${Math.floor(i/2)}`);
-    for(let i=0; i<4; i++) connect(`R8-${i}`, `R4-${Math.floor(i/2)}`);
-    connect(`R4-0`, `GF-0`);
-    
-    // Lower Bracket to Grand Final
-    if(tours[activeIdx].type === 'double') {
-        for(let i=0; i<8; i++) connect(`LR1-${i}`, `LR2-${Math.floor(i/2)}`);
-        connect(`LR4-0`, `GF-0`);
-    }
-}
-
 function closeDetail() { document.getElementById('list-view').style.display='block'; document.getElementById('detail-view').style.display='none'; }
-checkSession();
+checkSession(); renderTours();
 </script>
 </body>
 </html>
