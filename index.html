@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>DJY MLBB HUB | ROUNDED EDITION</title>
-    <script src="https://cdn.jsdelivr.net"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <style>
         :root { --neon: #ff003c; --bg: #0a0a0a; --card: #151515; --glow: 0 0 15px #ff003c; }
         body { background: var(--bg); color: white; font-family: 'Segoe UI', sans-serif; margin: 0; overflow-x: hidden; }
@@ -84,12 +84,33 @@
 
 <!-- TAB: ADMIN -->
 <div id="admin" class="container">
-    <div id="login-form" class="hero" style="max-width: 400px; margin: auto;">
-        <h2 style="color: var(--neon);">ADMIN LOGIN</h2>
+<div id="login-form" class="hero" style="max-width: 400px; margin: auto;">
+    <h2 style="color: var(--neon);">ADMIN ACCESS</h2>
+
+    <!-- Toggle buttons -->
+    <div style="display:flex; gap:10px; margin-bottom:20px;">
+        <button class="btn-neon" style="flex:1" onclick="showAuthForm('login')">LOGIN</button>
+        <button class="btn-neon" style="flex:1" onclick="showAuthForm('signup')">SIGN UP</button>
+    </div>
+
+    <!-- Login Form -->
+    <div id="form-login">
         <input type="text" id="adm-u" placeholder="Username">
         <input type="password" id="adm-p" placeholder="Password">
-        <button class="btn-neon" style="width:100%" onclick="login()">LOGIN</button>
+        <button class="btn-neon" style="width:100%; margin-top:10px;" onclick="login()">LOGIN</button>
     </div>
+
+    <!-- Signup Form -->
+    <div id="form-signup" style="display:none;">
+        <input type="text" id="new-u" placeholder="Choose Username">
+        <input type="password" id="new-p" placeholder="Choose Password">
+        <input type="text" id="signup-key" placeholder="Admin Invite Key">
+        <button class="btn-neon" style="width:100%; margin-top:10px; border-color:#00ffaa; color:#00ffaa;" onclick="signup()">CREATE ACCOUNT</button>
+        <p style="color:#888; font-size:12px; margin-top:10px;">You need an invite key from Moonboi to sign up.</p>
+    </div>
+
+    <p id="auth-msg" style="color:red; margin-top:10px;"></p>
+</div>
 
     <div id="dashboard" style="display:none;">
         <div class="hero">
@@ -131,17 +152,70 @@
         loadData('upcoming');
     }
 
-    async function login() {
-        const u = document.getElementById('adm-u').value;
-        const p = document.getElementById('adm-p').value;
-        if(u === "moonboi" && p === "123") {
-            saveSession(true, "moonboi");
-        } else {
-            const { data } = await _supabase.from('admin_accounts').select('*').eq('username', u).eq('password', p);
-            if(data && data.length > 0) saveSession(false, u);
-            else alert("Invalid Credentials");
-        }
+// Replace login() with this:
+async function login() {
+    const u = document.getElementById('adm-u').value.trim();
+    const p = document.getElementById('adm-p').value;
+    setMsg('');
+
+    if (u === "moonboi" && p === "123") {
+        saveSession(true, "moonboi");
+        return;
     }
+
+    const { data, error } = await _supabase
+        .from('admin_accounts')
+        .select('*')
+        .eq('username', u)
+        .eq('password', p);
+
+    if (data && data.length > 0) {
+        saveSession(false, u);
+    } else {
+        setMsg('Invalid credentials.');
+    }
+}
+
+// Add these new functions:
+const INVITE_KEY = 'DJY2025'; // Change this to whatever secret key you want
+
+async function signup() {
+    const u = document.getElementById('new-u').value.trim();
+    const p = document.getElementById('new-p').value;
+    const key = document.getElementById('signup-key').value.trim();
+    setMsg('');
+
+    if (!u || !p) return setMsg('Fill in all fields.');
+    if (key !== INVITE_KEY) return setMsg('Invalid invite key.');
+
+    // Check if username already taken
+    const { data: existing } = await _supabase
+        .from('admin_accounts')
+        .select('id')
+        .eq('username', u);
+
+    if (existing && existing.length > 0) return setMsg('Username already taken.');
+
+    const { error } = await _supabase
+        .from('admin_accounts')
+        .insert([{ username: u, password: p }]);
+
+    if (error) return setMsg(error.message);
+
+    setMsg('Account created! You can now log in.');
+    showAuthForm('login');
+}
+
+function showAuthForm(type) {
+    document.getElementById('form-login').style.display = type === 'login' ? 'block' : 'none';
+    document.getElementById('form-signup').style.display = type === 'signup' ? 'block' : 'none';
+    setMsg('');
+}
+
+function setMsg(msg) {
+    document.getElementById('auth-msg').textContent = msg;
+}
+
 
     function saveSession(isHead, name) {
         localStorage.setItem('djy_session', JSON.stringify({ isHead, name }));
