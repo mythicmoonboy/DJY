@@ -3,28 +3,23 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>DJY MLBB HUB | INSTANT SYNC</title>
+    <title>DJY HUB | INSTANT SYNC</title>
     <script src="https://cdn.jsdelivr.net"></script>
     <style>
         :root { --neon: #ff003c; --bg: #0a0a0a; --card: #151515; --glow: 0 0 15px #ff003c; }
-        body { background: var(--bg); color: white; font-family: 'Segoe UI', sans-serif; margin: 0; overflow-x: hidden; }
+        body { background: var(--bg); color: white; font-family: sans-serif; margin: 0; overflow-x: hidden; }
         nav { background: #000; padding: 15px; text-align: center; border-bottom: 2px solid var(--neon); box-shadow: var(--glow); position: sticky; top: 0; z-index: 1000; }
-        nav button { background: none; border: none; color: white; font-weight: bold; margin: 0 10px; cursor: pointer; text-transform: uppercase; transition: 0.2s; }
-        button:active { transform: scale(0.9); filter: brightness(1.2); }
-        .container { max-width: 900px; margin: 30px auto; padding: 20px; display: none; }
-        .active { display: block; animation: fadeIn 0.3s ease; }
-        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
-        .hero { text-align: center; padding: 40px; border: 1px solid var(--neon); background: rgba(255,0,60,0.05); border-radius: 8px; }
-        .btn-neon { display: inline-block; padding: 12px 24px; border: 2px solid var(--neon); color: white; font-weight: bold; background: none; cursor: pointer; border-radius: 4px; transition: 0.2s; }
+        nav button { background: none; border: none; color: white; font-weight: bold; margin: 0 10px; cursor: pointer; text-transform: uppercase; }
+        button:active { transform: scale(0.9); }
+        .container { max-width: 800px; margin: 30px auto; padding: 20px; display: none; }
+        .active { display: block; }
+        .hero { text-align: center; padding: 40px; border: 1px solid var(--neon); background: rgba(255,0,60,0.05); }
+        .btn-neon { display: inline-block; padding: 12px 24px; border: 2px solid var(--neon); color: white; font-weight: bold; background: none; cursor: pointer; transition: 0.2s; }
         .btn-neon:hover { background: var(--neon); box-shadow: var(--glow); }
-        .tourney-card { background: var(--card); border-left: 5px solid var(--neon); padding: 20px; margin-bottom: 15px; cursor: pointer; border-radius: 0 8px 8px 0; }
-        input, select { width: 100%; padding: 12px; margin: 10px 0; background: #000; border: 1px solid #444; color: white; border-radius: 4px; }
+        .tourney-card { background: var(--card); border-left: 5px solid var(--neon); padding: 20px; margin-bottom: 15px; cursor: pointer; }
+        input, select { width: 100%; padding: 12px; margin: 10px 0; background: #000; border: 1px solid #444; color: white; }
         #bracket-screen { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: #000; z-index: 2000; overflow: auto; padding: 50px; }
-        .bracket-container { position: relative; width: 1000px; height: 700px; margin: auto; }
-        .match-box { position: absolute; width: 140px; height: 60px; background: #111; border: 1px solid var(--neon); display: flex; flex-direction: column; justify-content: center; align-items: center; font-size: 11px; z-index: 5; border-radius: 4px; }
-        canvas { position: absolute; top: 0; left: 0; z-index: 1; pointer-events: none; }
-        .close-bracket { position: fixed; top: 20px; right: 20px; background: var(--neon); color: white; border: none; padding: 10px 20px; cursor: pointer; z-index: 3000; font-weight: bold; }
-        .admin-item { display: flex; justify-content: space-between; align-items: center; background: #1a1a1a; padding: 12px; margin: 8px 0; border-radius: 4px; border-left: 3px solid var(--neon); }
+        .match-box { position: absolute; width: 140px; height: 60px; background: #111; border: 1px solid var(--neon); display: flex; flex-direction: column; justify-content: center; align-items: center; font-size: 11px; z-index: 5; }
     </style>
 </head>
 <body onload="initApp()">
@@ -35,20 +30,15 @@
     <button onclick="tab('admin')">Admin</button>
 </nav>
 
-<!-- HOME -->
 <div id="home" class="container active">
     <div class="hero">
         <h1 style="color: var(--neon); text-shadow: var(--glow); font-size: 3rem;">DJY MLBB</h1>
-        <p>Real-time Hub Active. Syncing Phone & PC.</p>
-        <div style="margin-top: 30px;">
-            <a href="https://discord.gg" target="_blank" class="btn-neon" style="text-decoration:none">Tournament Discord</a>
-        </div>
+        <a href="https://discord.gg" target="_blank" class="btn-neon" style="text-decoration:none">Tournament Discord</a>
     </div>
 </div>
 
-<!-- TOURNAMENT -->
 <div id="tournament" class="container">
-    <div style="text-align: center; margin-bottom: 30px;">
+    <div style="text-align: center; margin-bottom: 20px;">
         <button class="btn-neon" onclick="loadData('upcoming')">Upcoming</button>
         <button class="btn-neon" onclick="loadData('live')">Live</button>
         <button class="btn-neon" onclick="loadData('finished')">Finished</button>
@@ -56,19 +46,14 @@
     <div id="list-display"></div>
 </div>
 
-<!-- BRACKET -->
 <div id="bracket-screen">
-    <button class="close-bracket" onclick="document.getElementById('bracket-screen').style.display='none'">EXIT VIEW</button>
-    <h2 id="b-title" style="text-align:center; color:var(--neon); text-transform:uppercase;">Bracket View</h2>
-    <div class="bracket-container" id="bracket-area">
-        <canvas id="bracketCanvas" width="1000" height="700"></canvas>
-    </div>
+    <button onclick="document.getElementById('bracket-screen').style.display='none'" style="color:white; background:red; padding:10px; cursor:pointer;">EXIT</button>
+    <h2 id="b-title" style="text-align:center; color:var(--neon);">Bracket</h2>
+    <div style="position:relative; width:1000px; height:600px; margin:auto;" id="bracket-area"></div>
 </div>
 
-<!-- ADMIN -->
 <div id="admin" class="container">
     <div id="login-form" class="hero" style="max-width: 400px; margin: auto;">
-        <h2>ADMIN LOGIN</h2>
         <input type="text" id="adm-u" placeholder="Username">
         <input type="password" id="adm-p" placeholder="Password">
         <button class="btn-neon" style="width:100%" onclick="login()">LOGIN</button>
@@ -77,9 +62,8 @@
     <div id="dashboard" style="display:none;">
         <div class="hero">
             <h2 id="welcome-msg">Dashboard</h2>
-            <button class="btn-neon" onclick="logout()" style="border-color:gray; font-size:10px;">LOGOUT SYSTEM</button>
-            <hr border-color="var(--neon)">
-            <h3>Post Tournament</h3>
+            <button onclick="logout()">[Logout]</button>
+            <hr>
             <input id="t-name" placeholder="Tournament Name">
             <input id="t-prize" placeholder="Prize Pool">
             <select id="t-status">
@@ -87,14 +71,13 @@
                 <option value="live">Live</option>
                 <option value="finished">Finished</option>
             </select>
-            <button class="btn-neon" style="width:100%;" onclick="uploadTournament()">PUBLISH NOW</button>
+            <button class="btn-neon" onclick="upload()">PUBLISH</button>
         </div>
-
-        <div id="moonboi-ctrl" style="display:none; border: 2px solid gold; padding: 20px; margin-top: 30px; border-radius: 8px;">
-            <h3 style="color:gold">HEAD ADMIN (Moonboi)</h3>
-            <input id="new-adm-u" placeholder="Username"><input id="new-adm-p" placeholder="Password">
-            <button class="btn-neon" style="border-color:gold; color:gold;" onclick="addAdminAcc()">ADD ADMIN</button>
-            <div id="admin-list-box" style="margin-top:15px;"></div>
+        <div id="moonboi-ctrl" style="display:none; border: 2px solid gold; padding: 20px; margin-top: 20px;">
+            <h3 style="color:gold">Head Admin Control</h3>
+            <input id="new-u" placeholder="New User"><input id="new-p" placeholder="New Pass">
+            <button class="btn-neon" onclick="addAdmin()">Add Admin</button>
+            <div id="admin-list-box" style="margin-top:10px;"></div>
         </div>
     </div>
 </div>
@@ -104,15 +87,13 @@
     const SUPABASE_KEY = 'sb_publishable_bOr8dIV2-Zt_9CUpboVsBQ_pzwpyRZw'; 
     const _supabase = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
-    let currentFilter = 'upcoming';
-
     function initApp() {
         const session = localStorage.getItem('djy_session');
         if(session) {
             const user = JSON.parse(session);
             showDash(user.isHead, user.name);
         }
-        loadData(currentFilter);
+        loadData('upcoming');
     }
 
     async function login() {
@@ -123,7 +104,7 @@
         } else {
             const { data } = await _supabase.from('admin_accounts').select('*').eq('username', u).eq('password', p);
             if(data && data.length > 0) saveSession(false, u);
-            else alert("Invalid Credentials");
+            else alert("Login Failed");
         }
     }
 
@@ -146,7 +127,7 @@
         document.getElementById(id).classList.add('active');
     }
 
-    async function uploadTournament() {
+    async function upload() {
         const status = document.getElementById('t-status').value;
         const { error } = await _supabase.from('tournaments').insert([{
             title: document.getElementById('t-name').value,
@@ -154,64 +135,29 @@
             status: status
         }]);
         if(error) alert(error.message);
-        else { 
-            alert("Published to " + status.toUpperCase() + "!");
-            document.getElementById('t-name').value = "";
-            tab('tournament');
-            loadData(status); // Jump to the correct tab immediately
-        }
+        else { alert("Published!"); loadData(status); tab('tournament'); }
     }
 
     async function loadData(filter) {
-        currentFilter = filter;
         const display = document.getElementById('list-display');
-        let { data } = await _supabase.from('tournaments').select('*').eq('status', filter).order('created_at', { ascending: false });
-        display.innerHTML = (data && data.length > 0) ? "" : `<p style="text-align:center; color:#555;">No ${filter} tournaments.</p>`;
+        let { data, error } = await _supabase.from('tournaments').select('*').eq('status', filter);
+        
+        if(error) { alert("Supabase Error: " + error.message); return; }
+
+        display.innerHTML = (data && data.length > 0) ? "" : `<p style="text-align:center;">No ${filter} tournaments.</p>`;
         data?.forEach(t => {
-            display.innerHTML += `
-                <div class="tourney-card" onclick="openBracket('${t.title}')">
-                    <h3 style="color:var(--neon); margin:0;">${t.title}</h3>
-                    <p style="margin:5px 0; color:#888;">Prize: ${t.prize}</p>
-                </div>`;
+            display.innerHTML += `<div class="tourney-card" onclick="openB('${t.title}')"><h3>${t.title}</h3><p>${t.prize}</p></div>`;
         });
     }
 
-    function openBracket(title) {
+    function openB(title) {
         document.getElementById('bracket-screen').style.display = 'block';
-        document.getElementById('b-title').innerText = title + " Bracket";
-        drawBracket();
+        document.getElementById('b-title').innerText = title;
+        document.getElementById('bracket-area').innerHTML = `<div class="match-box" style="left:50px;top:100px;"><b>Round 1</b><br>TBD vs TBD</div>`;
     }
 
-    function drawBracket() {
-        const area = document.getElementById('bracket-area');
-        const canvas = document.getElementById('bracketCanvas');
-        const ctx = canvas.getContext('2d');
-        ctx.clearRect(0,0,1000,700);
-        ctx.strokeStyle = '#ff003c'; ctx.lineWidth = 2;
-        document.querySelectorAll('.match-box').forEach(m => m.remove());
-
-        const matches = [
-            {x: 50, y: 100, name: "Winners R1-A"}, {x: 50, y: 250, name: "Winners R1-B"},
-            {x: 250, y: 175, name: "Winners Final"}, {x: 250, y: 400, name: "Losers Final"},
-            {x: 500, y: 300, name: "Grand Final"}
-        ];
-
-        matches.forEach(m => {
-            const div = document.createElement('div');
-            div.className = 'match-box';
-            div.style.left = m.x + 'px'; div.style.top = m.y + 'px';
-            div.innerHTML = `<b>${m.name}</b><br>TBD vs TBD`;
-            area.appendChild(div);
-        });
-
-        line(ctx, 190, 130, 250, 205); line(ctx, 190, 280, 250, 205);
-        line(ctx, 390, 205, 500, 330); line(ctx, 390, 430, 500, 330);
-    }
-
-    function line(ctx, x1, y1, x2, y2) { ctx.beginPath(); ctx.moveTo(x1, y1); ctx.lineTo(x2, y2); ctx.stroke(); }
-
-    async function addAdminAcc() {
-        await _supabase.from('admin_accounts').insert([{ username: document.getElementById('new-adm-u').value, password: document.getElementById('new-adm-p').value }]);
+    async function addAdmin() {
+        await _supabase.from('admin_accounts').insert([{ username: document.getElementById('new-u').value, password: document.getElementById('new-p').value }]);
         fetchAdmins();
     }
 
@@ -220,17 +166,14 @@
         const { data } = await _supabase.from('admin_accounts').select('*');
         box.innerHTML = "";
         data?.forEach(adm => {
-            box.innerHTML += `<div class="admin-item"><span>${adm.username}</span><button onclick="deleteAdmin('${adm.id}')" style="color:red; background:none; border:none;">X</button></div>`;
+            box.innerHTML += `<div style="display:flex; justify-content:space-between; background:#222; padding:5px; margin:2px;">${adm.username} <button onclick="delAdm('${adm.id}')">X</button></div>`;
         });
     }
 
-    async function deleteAdmin(id) {
-        await _supabase.from('admin_accounts').delete().eq('id', id); fetchAdmins();
-    }
+    async function delAdm(id) { await _supabase.from('admin_accounts').delete().eq('id', id); fetchAdmins(); }
 
-    // --- REAL-TIME SYNC ---
     _supabase.channel('any').on('postgres_changes', { event: '*', schema: 'public', table: 'tournaments' }, () => {
-        loadData(currentFilter);
+        loadData('upcoming'); loadData('live');
     }).subscribe();
 </script>
 </body>
