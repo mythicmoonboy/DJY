@@ -3,23 +3,47 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>DJY HUB | INSTANT SYNC</title>
+    <title>DJY MLBB HUB | ROUNDED EDITION</title>
     <script src="https://cdn.jsdelivr.net"></script>
     <style>
         :root { --neon: #ff003c; --bg: #0a0a0a; --card: #151515; --glow: 0 0 15px #ff003c; }
-        body { background: var(--bg); color: white; font-family: sans-serif; margin: 0; overflow-x: hidden; }
+        body { background: var(--bg); color: white; font-family: 'Segoe UI', sans-serif; margin: 0; overflow-x: hidden; }
+        
+        /* Navigation */
         nav { background: #000; padding: 15px; text-align: center; border-bottom: 2px solid var(--neon); box-shadow: var(--glow); position: sticky; top: 0; z-index: 1000; }
-        nav button { background: none; border: none; color: white; font-weight: bold; margin: 0 10px; cursor: pointer; text-transform: uppercase; }
-        button:active { transform: scale(0.9); }
-        .container { max-width: 800px; margin: 30px auto; padding: 20px; display: none; }
-        .active { display: block; }
-        .hero { text-align: center; padding: 40px; border: 1px solid var(--neon); background: rgba(255,0,60,0.05); }
-        .btn-neon { display: inline-block; padding: 12px 24px; border: 2px solid var(--neon); color: white; font-weight: bold; background: none; cursor: pointer; transition: 0.2s; }
+        nav button { background: none; border: none; color: white; font-weight: bold; margin: 0 10px; cursor: pointer; text-transform: uppercase; transition: 0.2s; }
+        
+        /* ROUNDED BUTTONS & REACTIONS */
+        button:active { transform: scale(0.92); filter: brightness(1.2); }
+        .btn-neon { 
+            display: inline-block; padding: 12px 24px; border: 2px solid var(--neon); 
+            color: white; font-weight: bold; background: none; cursor: pointer; 
+            transition: all 0.2s ease; border-radius: 12px; text-transform: uppercase;
+        }
         .btn-neon:hover { background: var(--neon); box-shadow: var(--glow); }
-        .tourney-card { background: var(--card); border-left: 5px solid var(--neon); padding: 20px; margin-bottom: 15px; cursor: pointer; }
-        input, select { width: 100%; padding: 12px; margin: 10px 0; background: #000; border: 1px solid #444; color: white; }
+
+        .container { max-width: 900px; margin: 30px auto; padding: 20px; display: none; }
+        .active { display: block; animation: fadeIn 0.4s ease; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+
+        /* ROUNDED HERO & CARDS */
+        .hero { text-align: center; padding: 40px; border: 1px solid var(--neon); background: rgba(255,0,60,0.05); border-radius: 20px; }
+        .tourney-card { background: var(--card); border-left: 6px solid var(--neon); padding: 20px; margin-bottom: 15px; border-radius: 15px; cursor: pointer; transition: 0.3s; border: 1px solid #222; }
+        .tourney-card:hover { transform: translateX(10px); background: #202020; }
+        
+        /* ROUNDED INPUTS */
+        input, select, textarea { width: 100%; padding: 12px; margin: 10px 0; background: #000; border: 1px solid #444; color: white; border-radius: 12px; box-sizing: border-box; }
+        input:focus { border-color: var(--neon); outline: none; box-shadow: 0 0 8px var(--neon); }
+
+        /* BRACKET SYSTEM (ROUNDED BOXES) */
         #bracket-screen { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: #000; z-index: 2000; overflow: auto; padding: 50px; }
-        .match-box { position: absolute; width: 140px; height: 60px; background: #111; border: 1px solid var(--neon); display: flex; flex-direction: column; justify-content: center; align-items: center; font-size: 11px; z-index: 5; }
+        .bracket-container { position: relative; width: 1000px; height: 700px; margin: auto; }
+        .match-box { position: absolute; width: 150px; height: 70px; background: #111; border: 1px solid var(--neon); display: flex; flex-direction: column; justify-content: center; align-items: center; font-size: 11px; z-index: 5; border-radius: 12px; box-shadow: 0 4px 10px rgba(0,0,0,0.5); }
+        canvas { position: absolute; top: 0; left: 0; z-index: 1; pointer-events: none; }
+        .close-btn { position: fixed; top: 20px; right: 20px; background: var(--neon); color: white; border: none; padding: 12px 25px; cursor: pointer; z-index: 3000; font-weight: bold; border-radius: 12px; }
+
+        /* ADMIN MANAGEMENT ROUNDED */
+        .manage-item { display: flex; justify-content: space-between; align-items: center; background: #1a1a1a; padding: 15px; margin: 10px 0; border-radius: 12px; border: 1px solid #333; }
     </style>
 </head>
 <body onload="initApp()">
@@ -30,30 +54,38 @@
     <button onclick="tab('admin')">Admin</button>
 </nav>
 
+<!-- TAB: HOME -->
 <div id="home" class="container active">
     <div class="hero">
-        <h1 style="color: var(--neon); text-shadow: var(--glow); font-size: 3rem;">DJY MLBB</h1>
+        <h1 style="color: var(--neon); text-shadow: var(--glow); font-size: 3rem; margin-bottom: 10px;">DJY MLBB</h1>
+        <p style="color: #ccc; margin-bottom: 30px;">Professional Tournament Hub with Real-time Sync.</p>
         <a href="https://discord.gg" target="_blank" class="btn-neon" style="text-decoration:none">Tournament Discord</a>
     </div>
 </div>
 
+<!-- TAB: TOURNAMENT -->
 <div id="tournament" class="container">
-    <div style="text-align: center; margin-bottom: 20px;">
+    <div style="text-align: center; margin-bottom: 30px; display: flex; justify-content: center; gap: 10px;">
         <button class="btn-neon" onclick="loadData('upcoming')">Upcoming</button>
         <button class="btn-neon" onclick="loadData('live')">Live</button>
         <button class="btn-neon" onclick="loadData('finished')">Finished</button>
     </div>
-    <div id="list-display"></div>
+    <div id="list-display">Select a category to view.</div>
 </div>
 
+<!-- BRACKET OVERLAY -->
 <div id="bracket-screen">
-    <button onclick="document.getElementById('bracket-screen').style.display='none'" style="color:white; background:red; padding:10px; cursor:pointer;">EXIT</button>
-    <h2 id="b-title" style="text-align:center; color:var(--neon);">Bracket</h2>
-    <div style="position:relative; width:1000px; height:600px; margin:auto;" id="bracket-area"></div>
+    <button class="close-btn" onclick="document.getElementById('bracket-screen').style.display='none'">EXIT VIEW</button>
+    <h2 id="b-title" style="text-align:center; color:var(--neon); text-transform:uppercase;">Bracket View</h2>
+    <div class="bracket-container" id="bracket-area">
+        <canvas id="bracketCanvas" width="1000" height="700"></canvas>
+    </div>
 </div>
 
+<!-- TAB: ADMIN -->
 <div id="admin" class="container">
     <div id="login-form" class="hero" style="max-width: 400px; margin: auto;">
+        <h2 style="color: var(--neon);">ADMIN LOGIN</h2>
         <input type="text" id="adm-u" placeholder="Username">
         <input type="password" id="adm-p" placeholder="Password">
         <button class="btn-neon" style="width:100%" onclick="login()">LOGIN</button>
@@ -62,8 +94,9 @@
     <div id="dashboard" style="display:none;">
         <div class="hero">
             <h2 id="welcome-msg">Dashboard</h2>
-            <button onclick="logout()">[Logout]</button>
-            <hr>
+            <button onclick="logout()" style="color:gray; background:none; border:none; cursor:pointer;">[Logout System]</button>
+            <hr border-color="var(--neon)">
+            <h3>Post Tournament</h3>
             <input id="t-name" placeholder="Tournament Name">
             <input id="t-prize" placeholder="Prize Pool">
             <select id="t-status">
@@ -71,13 +104,15 @@
                 <option value="live">Live</option>
                 <option value="finished">Finished</option>
             </select>
-            <button class="btn-neon" onclick="upload()">PUBLISH</button>
+            <button class="btn-neon" style="width:100%;" onclick="uploadTournament()">PUBLISH INSTANTLY</button>
         </div>
-        <div id="moonboi-ctrl" style="display:none; border: 2px solid gold; padding: 20px; margin-top: 20px;">
-            <h3 style="color:gold">Head Admin Control</h3>
-            <input id="new-u" placeholder="New User"><input id="new-p" placeholder="New Pass">
-            <button class="btn-neon" onclick="addAdmin()">Add Admin</button>
-            <div id="admin-list-box" style="margin-top:10px;"></div>
+
+        <!-- MOONBOI ONLY -->
+        <div id="moonboi-ctrl" style="display:none; border: 2px solid gold; padding: 20px; margin-top: 30px; border-radius: 20px;">
+            <h3 style="color:gold">HEAD ADMIN (Moonboi)</h3>
+            <input id="new-adm-u" placeholder="Username"><input id="new-adm-p" placeholder="Password">
+            <button class="btn-neon" style="border-color:gold; color:gold;" onclick="addAdminAcc()">ADD ADMIN</button>
+            <div id="admin-list-box" style="margin-top:15px;"></div>
         </div>
     </div>
 </div>
@@ -104,7 +139,7 @@
         } else {
             const { data } = await _supabase.from('admin_accounts').select('*').eq('username', u).eq('password', p);
             if(data && data.length > 0) saveSession(false, u);
-            else alert("Login Failed");
+            else alert("Invalid Credentials");
         }
     }
 
@@ -127,7 +162,7 @@
         document.getElementById(id).classList.add('active');
     }
 
-    async function upload() {
+    async function uploadTournament() {
         const status = document.getElementById('t-status').value;
         const { error } = await _supabase.from('tournaments').insert([{
             title: document.getElementById('t-name').value,
@@ -135,29 +170,59 @@
             status: status
         }]);
         if(error) alert(error.message);
-        else { alert("Published!"); loadData(status); tab('tournament'); }
+        else { alert("Tournament Published!"); loadData(status); tab('tournament'); }
     }
 
     async function loadData(filter) {
         const display = document.getElementById('list-display');
-        let { data, error } = await _supabase.from('tournaments').select('*').eq('status', filter);
-        
-        if(error) { alert("Supabase Error: " + error.message); return; }
-
+        let { data, error } = await _supabase.from('tournaments').select('*').eq('status', filter).order('created_at', { ascending: false });
+        if(error) { display.innerHTML = "Error loading data."; return; }
         display.innerHTML = (data && data.length > 0) ? "" : `<p style="text-align:center;">No ${filter} tournaments.</p>`;
         data?.forEach(t => {
-            display.innerHTML += `<div class="tourney-card" onclick="openB('${t.title}')"><h3>${t.title}</h3><p>${t.prize}</p></div>`;
+            display.innerHTML += `
+                <div class="tourney-card" onclick="openBracket('${t.title}')">
+                    <h3 style="color:var(--neon); margin:0;">${t.title}</h3>
+                    <p style="margin:5px 0; color:#888;">Prize: ${t.prize}</p>
+                </div>`;
         });
     }
 
-    function openB(title) {
+    function openBracket(title) {
         document.getElementById('bracket-screen').style.display = 'block';
-        document.getElementById('b-title').innerText = title;
-        document.getElementById('bracket-area').innerHTML = `<div class="match-box" style="left:50px;top:100px;"><b>Round 1</b><br>TBD vs TBD</div>`;
+        document.getElementById('b-title').innerText = title + " Bracket";
+        drawBracket();
     }
 
-    async function addAdmin() {
-        await _supabase.from('admin_accounts').insert([{ username: document.getElementById('new-u').value, password: document.getElementById('new-p').value }]);
+    function drawBracket() {
+        const area = document.getElementById('bracket-area');
+        const canvas = document.getElementById('bracketCanvas');
+        const ctx = canvas.getContext('2d');
+        ctx.clearRect(0,0,1000,700);
+        ctx.strokeStyle = '#ff003c'; ctx.lineWidth = 2;
+        document.querySelectorAll('.match-box').forEach(m => m.remove());
+
+        const matches = [
+            {x: 50, y: 100, name: "Winners R1-A"}, {x: 50, y: 250, name: "Winners R1-B"},
+            {x: 250, y: 175, name: "Winners Final"}, {x: 250, y: 400, name: "Losers Final"},
+            {x: 550, y: 300, name: "Grand Final"}
+        ];
+
+        matches.forEach(m => {
+            const div = document.createElement('div');
+            div.className = 'match-box';
+            div.style.left = m.x + 'px'; div.style.top = m.y + 'px';
+            div.innerHTML = `<b>${m.name}</b><br><span style="font-size:9px">TBD vs TBD</span>`;
+            area.appendChild(div);
+        });
+
+        line(ctx, 200, 135, 250, 205); line(ctx, 200, 285, 250, 205);
+        line(ctx, 400, 210, 550, 335); line(ctx, 400, 435, 550, 335);
+    }
+
+    function line(ctx, x1, y1, x2, y2) { ctx.beginPath(); ctx.moveTo(x1, y1); ctx.lineTo(x2, y2); ctx.stroke(); }
+
+    async function addAdminAcc() {
+        await _supabase.from('admin_accounts').insert([{ username: document.getElementById('new-adm-u').value, password: document.getElementById('new-adm-p').value }]);
         fetchAdmins();
     }
 
@@ -166,11 +231,11 @@
         const { data } = await _supabase.from('admin_accounts').select('*');
         box.innerHTML = "";
         data?.forEach(adm => {
-            box.innerHTML += `<div style="display:flex; justify-content:space-between; background:#222; padding:5px; margin:2px;">${adm.username} <button onclick="delAdm('${adm.id}')">X</button></div>`;
+            box.innerHTML += `<div class="manage-item"><span>${adm.username}</span><button onclick="deleteAdmin('${adm.id}')" style="color:red; background:none; border:none; cursor:pointer;">Delete</button></div>`;
         });
     }
 
-    async function delAdm(id) { await _supabase.from('admin_accounts').delete().eq('id', id); fetchAdmins(); }
+    async function deleteAdmin(id) { await _supabase.from('admin_accounts').delete().eq('id', id); fetchAdmins(); }
 
     _supabase.channel('any').on('postgres_changes', { event: '*', schema: 'public', table: 'tournaments' }, () => {
         loadData('upcoming'); loadData('live');
