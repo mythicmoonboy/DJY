@@ -3,8 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>DJY MLBB LIVE HUB</title>
-    <!-- Supabase Library -->
+    <title>DJY MLBB HUB</title>
     <script src="https://cdn.jsdelivr.net"></script>
     <style>
         :root { --neon: #ff003c; --bg: #0a0a0a; --card: #151515; --glow: 0 0 15px #ff003c; }
@@ -36,7 +35,7 @@
 <div id="home" class="container active">
     <div class="hero">
         <h1 style="color: var(--neon); text-shadow: var(--glow); font-size: 2.8rem; margin-bottom: 10px;">DJY MLBB</h1>
-        <p style="font-size: 1.1rem; color: #ccc;">Official YouTuber & Community Hub. Real-time tournament updates powered by Supabase.</p>
+        <p style="font-size: 1.1rem; color: #ccc;">Official YouTuber & Community Hub.</p>
         <div style="margin-top: 30px;">
             <a href="https://discord.gg" target="_blank" class="btn-neon">Tournament Discord</a>
             <a href="https://discord.gg" target="_blank" class="btn-neon" style="margin-left: 10px;">Community Discord</a>
@@ -51,7 +50,7 @@
         <button class="btn-neon" onclick="loadData('live')">Live</button>
         <button class="btn-neon" onclick="loadData('finished')">Finished</button>
     </div>
-    <div id="list-display">Connecting to live feed...</div>
+    <div id="list-display">Connecting...</div>
 </div>
 
 <!-- TAB: ADMIN -->
@@ -74,11 +73,11 @@
                 <option value="live">Live</option>
                 <option value="finished">Finished</option>
             </select>
-            <button class="btn-neon" style="width:100%; margin-top:10px;" onclick="uploadTournament()">PUBLISH TO WEBSITE</button>
+            <button class="btn-neon" style="width:100%;" onclick="uploadTournament()">PUBLISH</button>
         </div>
         <div id="moonboi-ctrl" style="display:none; border: 2px solid gold; padding: 20px; margin-top: 30px; border-radius: 8px;">
-            <h3 style="color:gold">Head Admin: Moonboi</h3>
-            <button class="btn-neon" style="border-color:gold; font-size: 0.8rem;" onclick="location.reload()">LOGOUT</button>
+            <h3 style="color:gold">Head Admin: moonboi</h3>
+            <button class="btn-neon" style="border-color:gold;" onclick="location.reload()">LOGOUT</button>
         </div>
     </div>
 </div>
@@ -97,11 +96,11 @@
     function login() {
         const u = document.getElementById('adm-u').value;
         const p = document.getElementById('adm-p').value;
-        if(u === "Moonboi" && p === "12345678liowYANmoon.") {
+        if(u === "moonboi" && p === "123") {
             document.getElementById('login-form').style.display = 'none';
             document.getElementById('dashboard').style.display = 'block';
             document.getElementById('moonboi-ctrl').style.display = 'block';
-        } else { alert("Invalid Admin Credentials."); }
+        } else { alert("Wrong Username/Password"); }
     }
 
     async function uploadTournament() {
@@ -112,20 +111,20 @@
             status: document.getElementById('t-status').value
         }]);
         if(error) alert(error.message);
-        else { alert("Successfully Published!"); tab('tournament'); }
+        else { alert("Published!"); tab('tournament'); }
     }
 
     async function loadData(filter) {
         const display = document.getElementById('list-display');
-        display.innerHTML = `<p style="text-align:center; color:var(--neon);">Fetching ${filter} data...</p>`;
+        display.innerHTML = `<p>Loading ${filter}...</p>`;
         let { data, error } = await _supabase.from('tournaments').select('*').eq('status', filter).order('created_at', { ascending: false });
-        if(error) { display.innerHTML = "Error loading data."; return; }
-        display.innerHTML = (data.length > 0) ? "" : `<p style="text-align:center;">No ${filter} tournaments found.</p>`;
+        if(error) { display.innerHTML = "Error!"; return; }
+        display.innerHTML = (data.length > 0) ? "" : `<p>No tournaments.</p>`;
         data.forEach(t => {
             display.innerHTML += `
                 <div class="tourney-card">
-                    <h3 style="color:var(--neon); margin:0;">${t.title}</h3>
-                    <p style="margin: 10px 0; color: #aaa;">🏆 Prize: ${t.prize} | 📅 ${t.time}</p>
+                    <h3>${t.title}</h3>
+                    <p>Prize: ${t.prize} | Time: ${t.time}</p>
                     <div class="bracket-container">
                         <div><div class="match-box">Team 1</div><div class="match-box" style="margin-top:5px;">Team 2</div></div>
                         <div class="line"></div><div class="match-box" style="border-color: gold;">Winner</div>
