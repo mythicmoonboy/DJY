@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, user-scalable=yes">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>DJY COMMUNITY TOURNAMENT OFFICIAL WEBSITE</title>
     <style>
         :root { --red: #ff2b2b; --bg: #050505; --card: #121212; --border: #333; --gold: #ffd700; }
@@ -17,54 +17,30 @@
         section { display: none; padding: 15px; min-height: 85vh; }
         section.active { display: block; }
 
-        button { transition: all 0.1s ease; box-shadow: 0 4px 0 #8b0000; cursor: pointer; border-radius: 4px; border:none; }
-        button:active { transform: translateY(2px); box-shadow: 0 1px 0 #8b0000; }
-
         .announcement-bar { background: var(--red); color: black; padding: 10px; text-align: center; font-weight: 900; text-transform: uppercase; margin-bottom: 15px; border-radius: 4px; font-size: 0.8rem; }
         
-        .profile-pic { width: 120px; height: 120px; border-radius: 50%; border: 3px solid var(--red); margin-bottom: 15px; object-fit: cover; box-shadow: 0 0 15px var(--red); }
-        .description { color: #bbb; max-width: 600px; margin: auto; line-height: 1.6; text-align: center; font-size: 0.9rem; }
-
-        .division-title { color: var(--red); border-left: 4px solid var(--red); padding-left: 10px; margin: 25px 0 10px; text-transform: uppercase; font-size: 0.8rem; }
-        .t-long-box { background: var(--card); border: 1px solid var(--border); padding: 15px 25px; margin-bottom: 10px; border-radius: 4px; cursor: pointer; display: flex; justify-content: space-between; align-items: center; }
-
-        /* BRACKET SYSTEM - FIXED FOR ALL DEVICES */
-        .bracket-wrapper { position: relative; padding: 30px; min-width: 2200px; display: flex; flex-direction: column; align-items: flex-start; gap: 15px; }
-        canvas#line-canvas { position: absolute; top: 0; left: 0; pointer-events: none; z-index: 1; }
-        .bracket-row { display: flex; gap: 80px; align-items: stretch; position: relative; z-index: 2; }
-        .round { display: flex; flex-direction: column; justify-content: space-around; width: 140px; }
+        /* BRACKET LAYOUT */
+        .bracket-container { overflow-x: auto; padding: 20px 0; -webkit-overflow-scrolling: touch; }
+        .bracket-wrapper { position: relative; padding: 40px; min-width: 1800px; display: flex; gap: 60px; }
+        canvas#line-canvas { position: absolute; top: 0; left: 0; pointer-events: none; z-index: 0; }
         
-        .match { background: #000; border: 1px solid var(--border); padding: 5px; margin: 8px 0; border-radius: 4px; position: relative; }
-        .match.gf-box { border: 2px solid var(--gold); background: rgba(255, 215, 0, 0.1); width: 160px; }
+        .round { display: flex; flex-direction: column; justify-content: space-around; width: 160px; z-index: 1; }
+        .match { background: #000; border: 1px solid var(--border); padding: 5px; margin: 15px 0; border-radius: 4px; position: relative; }
+        .match.gf-box { border: 2px solid var(--gold); background: rgba(255, 215, 0, 0.1); width: 180px; }
         
-        .team { display: flex; justify-content: space-between; font-size: 10px; padding: 4px; border-bottom: 1px solid #222; }
-        .team input { background: transparent; border: none; color: white; width: 90px; font-size: 10px; }
-        .score { color: var(--red); font-weight: bold; cursor: pointer; min-width: 15px; text-align: center; }
+        .team { display: flex; justify-content: space-between; font-size: 11px; padding: 6px; border-bottom: 1px solid #222; }
+        .team input { background: transparent; border: none; color: white; width: 110px; font-size: 11px; outline: none; }
+        .score { color: var(--red); font-weight: bold; cursor: pointer; min-width: 20px; text-align: center; }
 
-        /* STAFF MANAGER LAYOUT FIX */
+        /* ADMIN */
         .admin-box { width: 350px; margin: 20px auto; border: 1px solid var(--red); padding: 25px; background: #000; }
-        .admin-box input, .admin-box select { width: 100%; padding: 10px; margin-bottom: 12px; background: #111; border: 1px solid #333; color: white; box-sizing: border-box; }
-        .admin-box button { width: 100%; padding: 10px; background: var(--red); color: #000; font-weight: bold; cursor: pointer; margin-bottom: 8px; }
-        
-        .staff-item { 
-            display: flex; 
-            justify-content: space-between; 
-            align-items: center; 
-            padding: 10px; 
-            margin-top: 5px;
-            background: #111;
-            border: 1px solid #333;
-            border-radius: 4px;
-        }
-        .staff-item button { 
-            background: #333; color: white; padding: 2px 8px; font-size: 10px; box-shadow: none; 
-        }
+        .admin-box input { width: 100%; padding: 10px; margin-bottom: 12px; background: #111; border: 1px solid #333; color: white; box-sizing: border-box; }
+        .admin-box button { width: 100%; padding: 12px; background: var(--red); color: #000; font-weight: bold; cursor: pointer; border: none; }
 
-        /* MOBILE ADJUSTMENT: Scroll instead of stack */
+        /* DEVICE DETECTION TWEAKS */
         @media (max-width: 768px) {
-            .bracket-wrapper { scale: 0.8; transform-origin: top left; }
-            .t-long-box { padding: 15px; }
-            .admin-box { width: 90%; }
+            .bracket-wrapper { transform: scale(0.9); transform-origin: top left; }
+            header h1 { font-size: 0.9rem; }
         }
     </style>
 </head>
@@ -80,39 +56,29 @@
 </header>
 
 <section id="home" class="active">
-    <div id="top-ann" class="announcement-bar">Official DJY Tournament Hub</div>
+    <div class="announcement-bar">Official DJY Tournament Hub</div>
     <div style="text-align:center;">
-        <img src="https://yt3.googleusercontent.com" alt="DJY PFP" class="profile-pic">
         <h2 style="color:var(--red)">DJY: The Clipper of MLBB</h2>
-        <p class="description">
-            DJY is a premier Mobile Legends: Bang Bang YouTuber and professional MPL athlete. Known initially as the definitive <b>Clipper of MLBB</b>, he revolutionized community content before hosting professional-grade tournaments. 
-        </p>
+        <p>Welcome to the official community tournament portal.</p>
     </div>
 </section>
 
 <section id="tour">
     <div id="list-view">
-        <div class="division-title">🔴 LIVE</div><div id="live-list"></div>
-        <div class="division-title">📅 UPCOMING</div><div id="upcoming-list"></div>
-        <div class="division-title">🏁 FINISHED</div><div id="finished-list"></div>
+        <div class="division-title" style="color:var(--red); padding: 10px;">🔴 LIVE TOURNAMENTS</div>
+        <div id="live-list"></div>
     </div>
 
     <div id="detail-view" style="display:none;">
-        <button onclick="closeDetail()" style="background:#333; color:white; padding:8px; font-size:0.7rem;">← BACK</button>
-        <h2 id="det-name" style="color:var(--red); display: inline; margin-left: 15px; font-size: 1rem;"></h2>
-        <div style="overflow-x:auto; margin-top: 15px; -webkit-overflow-scrolling: touch;">
+        <button onclick="closeDetail()" style="background:#333; color:white; padding:8px 15px; border:none; margin-bottom:10px;">← BACK</button>
+        <div class="bracket-container">
             <div class="bracket-wrapper" id="bracket-root">
                 <canvas id="line-canvas"></canvas>
-                <div class="bracket-row">
-                    <div class="round" id="R32"></div><div class="round" id="R16"></div>
-                    <div class="round" id="R8"></div><div class="round" id="R4"></div>
-                    <div class="round" id="GF-COL"><div class="match gf-box" id="GF-0"></div></div>
-                </div>
-                <div style="height:2px; background:var(--border); width: 100%; margin: 15px 0;"></div>
-                <div class="bracket-row" id="lower-row">
-                    <div class="round" id="LR1"></div><div class="round" id="LR2"></div>
-                    <div class="round" id="LR3"></div><div class="round" id="LR4"></div>
-                </div>
+                <div class="round" id="R32"></div>
+                <div class="round" id="R16"></div>
+                <div class="round" id="R8"></div>
+                <div class="round" id="R4"></div>
+                <div class="round" id="GF-COL"><div class="match gf-box" id="GF-0"></div></div>
             </div>
         </div>
     </div>
@@ -120,162 +86,178 @@
 
 <section id="admin">
     <div id="login-ui" class="admin-box">
-        <h3 style="color:var(--red); text-align:center;">ADMIN LOGIN</h3>
-        <input id="user" placeholder="username"><input id="pass" type="password" placeholder="password">
+        <h3>ADMIN LOGIN</h3>
+        <input id="user" placeholder="Username">
+        <input id="pass" type="password" placeholder="Password">
         <button onclick="login()">LOGIN</button>
     </div>
-
-    <div id="dash-ui" class="admin-box" style="display:none; width:450px;">
-        <h3 style="color:var(--red); text-align:center;">COMMAND CENTER</h3>
-        <div id="head-admin-tools" style="display:none; border:1px solid #222; padding:10px; margin-bottom:10px;">
-            <h4 style="color:var(--red); font-size: 0.8rem;">Staff Manager (moonboi only)</h4>
-            <input id="s-u" placeholder="New User"><input id="s-p" placeholder="New Pass">
-            <button onclick="addStaff()">Create Staff</button>
-            <div id="s-list" style="margin-top: 10px;"></div>
-        </div>
-        <div style="border:1px solid #222; padding:10px; margin-bottom:10px;">
-            <h4>Tournament Control</h4>
-            <div id="admin-tour-manager"></div>
-        </div>
-        <div style="border:1px solid #222; padding:10px;">
-            <h4>Generate R32</h4>
-            <input id="t-n" placeholder="Name"><input id="t-p" placeholder="Prize">
-            <select id="t-type"><option value="double">Double Elimination</option><option value="single">Single Elimination</option></select>
-            <button onclick="createTour()">Generate Tournament</button>
-        </div>
-        <button onclick="logout()" style="background:#444; margin-top:10px;">LOGOUT</button>
+    <div id="dash-ui" class="admin-box" style="display:none;">
+        <h3>COMMAND CENTER</h3>
+        <button onclick="createTour()">+ NEW TOURNAMENT</button>
+        <div id="admin-tour-manager" style="margin-top:20px;"></div>
     </div>
 </section>
 
 <script>
-let accounts = JSON.parse(localStorage.getItem('djy_accs')) || [{u:"moonboi", p:"123", role:"head"}];
-let tours = JSON.parse(localStorage.getItem('djy_tours')) || [];
-let currentUser = JSON.parse(localStorage.getItem('djy_session')) || null;
-let activeIdx = null;
+    let tournaments = JSON.parse(localStorage.getItem('djy_data')) || [];
+    let currentUser = null;
+    let activeId = null;
 
-function tab(id) {
-    document.querySelectorAll('section').forEach(s => s.classList.remove('active'));
-    document.querySelectorAll('nav a').forEach(a => a.classList.remove('active'));
-    document.getElementById(id).classList.add('active');
-    document.getElementById('n-'+id).classList.add('active');
-    if(id === 'tour' || id === 'admin') renderTours();
-}
-
-function checkSession() {
-    if (currentUser) {
-        document.getElementById('login-ui').style.display = 'none';
-        document.getElementById('dash-ui').style.display = 'block';
-        if(currentUser.role === 'head') document.getElementById('head-admin-tools').style.display = 'block';
-        renderStaff(); renderAdminManager();
+    function tab(id) {
+        document.querySelectorAll('section').forEach(s => s.classList.remove('active'));
+        document.querySelectorAll('nav a').forEach(a => a.classList.remove('active'));
+        document.getElementById(id).classList.add('active');
+        document.getElementById('n-' + id).classList.add('active');
+        if(id === 'tour') renderTourList();
     }
-}
 
-function login() {
-    let u = document.getElementById('user').value, p = document.getElementById('pass').value;
-    let auth = accounts.find(a => a.u === u && a.p === p);
-    if(auth) { currentUser = auth; localStorage.setItem('djy_session', JSON.stringify(auth)); checkSession(); }
-}
+    // --- CANVAS ENGINE (Detects positions and draws lines) ---
+    function drawBracketLines() {
+        const canvas = document.getElementById('line-canvas');
+        if (!canvas) return;
+        const ctx = canvas.getContext('2d');
+        const root = document.getElementById('bracket-root');
+        
+        // Match canvas size to the scrollable bracket area
+        canvas.width = root.scrollWidth;
+        canvas.height = root.scrollHeight;
+        
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        ctx.strokeStyle = '#444';
+        ctx.lineWidth = 2;
 
-function logout() { localStorage.removeItem('djy_session'); location.reload(); }
+        const rounds = ['R32', 'R16', 'R8', 'R4', 'GF-COL'];
+        
+        for (let i = 0; i < rounds.length - 1; i++) {
+            const matches = document.getElementById(rounds[i]).querySelectorAll('.match');
+            const nextRoundMatches = document.getElementById(rounds[i+1]).querySelectorAll('.match');
 
-function createTour() {
-    let name = document.getElementById('t-n').value; if(!name) return;
-    tours.push({
-        name, prize: document.getElementById('t-p').value, status: 'UPCOMING', type: document.getElementById('t-type').value,
-        bracket: {
-            R32: Array(16).fill().map((_,i)=>({t1:"Team "+(i*2+1), t2:"Team "+(i*2+2), s1:0, s2:0})),
-            R16: Array(8).fill({t1:"TBD", t2:"TBD", s1:0, s2:0}), R8: Array(4).fill({t1:"TBD", t2:"TBD", s1:0, s2:0}),
-            R4: Array(2).fill({t1:"TBD", t2:"TBD", s1:0, s2:0}), GF: [{t1:"UB Winner", t2:"LB Survivor", s1:0, s2:0}],
-            LR1: Array(8).fill({t1:"TBD", t2:"TBD", s1:0, s2:0}), LR2: Array(4).fill({t1:"TBD", t2:"TBD", s1:0, s2:0}),
-            LR3: Array(2).fill({t1:"TBD", t2:"TBD", s1:0, s2:0}), LR4: [{t1:"TBD", t2:"TBD", s1:0, s2:0}]
+            matches.forEach((m, idx) => {
+                const targetMatch = nextRoundMatches[Math.floor(idx / 2)];
+                if (targetMatch) {
+                    const startX = m.offsetLeft + m.offsetWidth;
+                    const startY = m.offsetTop + (m.offsetHeight / 2);
+                    const endX = targetMatch.offsetLeft;
+                    const endY = targetMatch.offsetTop + (targetMatch.offsetHeight / 2);
+                    
+                    const midX = startX + (endX - startX) / 2;
+
+                    ctx.beginPath();
+                    ctx.moveTo(startX, startY);
+                    ctx.lineTo(midX, startY);
+                    ctx.lineTo(midX, endY);
+                    ctx.lineTo(endX, endY);
+                    ctx.stroke();
+                }
+            });
         }
-    });
-    save(); renderAdminManager(); renderTours();
-}
-
-function renderTours() {
-    const ids = { LIVE: 'live-list', UPCOMING: 'upcoming-list', FINISHED: 'finished-list' };
-    Object.values(ids).forEach(id => {if(document.getElementById(id)) document.getElementById(id).innerHTML = "";});
-    tours.forEach((t, i) => {
-        let color = t.status === 'LIVE' ? 'green' : (t.status === 'UPCOMING' ? 'orange' : '#555');
-        document.getElementById(ids[t.status]).innerHTML += `<div class="t-long-box" onclick="openDetail(${i})"><h3>${t.name} <span class="status-tag" style="background:${color}">${t.status}</span></h3><span>${t.prize}</span></div>`;
-    });
-}
-
-function openDetail(i) {
-    activeIdx = i; document.getElementById('list-view').style.display = 'none'; document.getElementById('detail-view').style.display = 'block';
-    document.getElementById('det-name').innerText = tours[i].name; 
-    document.getElementById('lower-row').style.display = tours[i].type === 'double' ? 'flex' : 'none';
-    renderBracket(); setTimeout(drawLines, 350);
-}
-
-function renderBracket() {
-    const b = tours[activeIdx].bracket;
-    const rounds = ["R32", "R16", "R8", "R4", "LR1", "LR2", "LR3", "LR4", "GF"];
-    rounds.forEach(r => {
-        const el = document.getElementById(r === 'GF' ? 'GF-0' : r); if(!el) return;
-        el.innerHTML = "";
-        let matches = r === 'GF' ? b.GF : b[r];
-        matches.forEach((m, i) => {
-            el.innerHTML += `<div class="match" id="${r}-${i}">
-                <div class="team"><input value="${m.t1}" onchange="tours[activeIdx].bracket['${r}'][${i}].t1=this.value; save();" ${!currentUser?'disabled':''}> <div class="score" onclick="setS('${r}',${i},1)">${m.s1}</div></div>
-                <div class="team"><input value="${m.t2}" onchange="tours[activeIdx].bracket['${r}'][${i}].t2=this.value; save();" ${!currentUser?'disabled':''}> <div class="score" onclick="setS('${r}',${i},2)">${m.s2}</div></div>
-            </div>`;
-        });
-    });
-}
-
-function setS(r, i, n) {
-    if(!currentUser) return;
-    let s = prompt("Score:"); if(s === null) return;
-    let b = tours[activeIdx].bracket;
-    if(r === 'GF') b.GF[i]['s'+n] = s; else b[r][i]['s'+n] = s;
-    save(); renderBracket(); drawLines();
-}
-
-function drawLines() {
-    const canvas = document.getElementById('line-canvas'), root = document.getElementById('bracket-root');
-    canvas.width = root.scrollWidth; canvas.height = root.scrollHeight;
-    const ctx = canvas.getContext('2d'); ctx.strokeStyle = '#ff2b2b'; ctx.lineWidth = 1.5;
-    
-    const drawStraight = (fromId, toId) => {
-        const fEl = document.getElementById(fromId), tEl = document.getElementById(toId);
-        if(!fEl || !tEl) return;
-        const fR = fEl.getBoundingClientRect(), tR = tEl.getBoundingClientRect(), rR = root.getBoundingClientRect();
-        let x1 = fR.right - rR.left, y1 = fR.top + fR.height/2 - rR.top;
-        let x2 = tR.left - rR.left, y2 = tR.top + tR.height/2 - rR.top;
-        let midX = x1 + (x2 - x1) / 2;
-        ctx.beginPath(); ctx.moveTo(x1, y1); ctx.lineTo(midX, y1); ctx.lineTo(midX, y2); ctx.lineTo(x2, y2); ctx.stroke();
-    };
-
-    for(let i=0; i<16; i++) drawStraight(`R32-${i}`, `R16-${Math.floor(i/2)}`);
-    for(let i=0; i<8; i++) drawStraight(`R16-${i}`, `R8-${Math.floor(i/2)}`);
-    for(let i=0; i<4; i++) drawStraight(`R8-${i}`, `R4-${Math.floor(i/2)}`);
-    drawStraight(`R4-0`, `GF-0`);
-    if(tours[activeIdx].type === 'double') {
-        for(let i=0; i<8; i++) drawStraight(`LR1-${i}`, `LR2-${Math.floor(i/2)}`);
-        for(let i=0; i<4; i++) drawStraight(`LR2-${i}`, `LR3-${Math.floor(i/2)}`);
-        for(let i=0; i<2; i++) drawStraight(`LR3-${i}`, `LR4-0`);
-        drawStraight(`LR4-0`, `GF-0`);
     }
-}
 
-function save() { localStorage.setItem('djy_tours', JSON.stringify(tours)); }
-function closeDetail() { document.getElementById('list-view').style.display='block'; document.getElementById('detail-view').style.display='none'; }
-function addStaff() { accounts.push({u:document.getElementById('s-u').value, p:document.getElementById('s-p').value, role:'staff'}); localStorage.setItem('djy_accs', JSON.stringify(accounts)); renderStaff(); }
-function renderStaff() { 
-    const l = document.getElementById('s-list'); if(!l) return; l.innerHTML = "";
-    accounts.forEach((a,i) => { if(a.role!=='head') l.innerHTML += `<div class="staff-item"><span>${a.u}</span> <button onclick="accounts.splice(${i},1); localStorage.setItem('djy_accs',JSON.stringify(accounts)); renderStaff();">X</button></div>`; });
-}
-function renderAdminManager() {
-    const c = document.getElementById('admin-tour-manager'); if(!c) return; c.innerHTML = "";
-    tours.forEach((t, i) => {
-        c.innerHTML += `<div class="manage-item"><b>${t.name}</b><div style="display:flex; gap:3px; margin-top:5px;"><button onclick="updateStatus(${i},'LIVE')">LIVE</button><button onclick="updateStatus(${i},'UPCOMING')">UPCOMING</button><button onclick="updateStatus(${i},'FINISHED')">FINISH</button><button onclick="deleteTour(${i})">DEL</button></div></div>`;
-    });
-}
-function updateStatus(i, s) { tours[i].status = s; save(); renderTours(); renderAdminManager(); }
-function deleteTour(i) { if(confirm("DEL?")) { tours.splice(i,1); save(); renderTours(); renderAdminManager(); } }
-checkSession(); renderTours();
+    // --- RENDER LOGIC ---
+    function renderBracket(t) {
+        const rounds = ['R32', 'R16', 'R8', 'R4'];
+        rounds.forEach(r => {
+            document.getElementById(r).innerHTML = t.matches[r].map((m, i) => `
+                <div class="match">
+                    <div class="team"><input value="${m.t1}" onchange="updateTeam('${r}',${i},1,this.value)" ${!currentUser?'readonly':''}> <span class="score" onclick="updateScore('${r}',${i},1)">${m.s1}</span></div>
+                    <div class="team"><input value="${m.t2}" onchange="updateTeam('${r}',${i},2,this.value)" ${!currentUser?'readonly':''}> <span class="score" onclick="updateScore('${r}',${i},2)">${m.s2}</span></div>
+                </div>
+            `).join('');
+        });
+        
+        const gf = t.matches.GF;
+        document.getElementById('GF-0').innerHTML = `
+            <div class="team"><input value="${gf.t1}" onchange="updateTeam('GF',0,1,this.value)" ${!currentUser?'readonly':''}> <span class="score" onclick="updateScore('GF',0,1)">${gf.s1}</span></div>
+            <div class="team"><input value="${gf.t2}" onchange="updateTeam('GF',0,2,this.value)" ${!currentUser?'readonly':''}> <span class="score" onclick="updateScore('GF',0,2)">${gf.s2}</span></div>
+        `;
+
+        // Run Line Engine after bracket renders
+        setTimeout(drawBracketLines, 100);
+    }
+
+    function renderTourList() {
+        const list = document.getElementById('live-list');
+        list.innerHTML = tournaments.map(t => `
+            <div style="background:var(--card); padding:15px; margin:10px; border-radius:4px; cursor:pointer;" onclick="viewTour(${t.id})">
+                ${t.name} <span style="float:right; color:var(--red);">VIEW ➔</span>
+            </div>
+        `).join('');
+    }
+
+    function viewTour(id) {
+        activeId = id;
+        const t = tournaments.find(x => x.id === id);
+        document.getElementById('list-view').style.display = 'none';
+        document.getElementById('detail-view').style.display = 'block';
+        renderBracket(t);
+    }
+
+    function closeDetail() {
+        document.getElementById('list-view').style.display = 'block';
+        document.getElementById('detail-view').style.display = 'none';
+        activeId = null;
+    }
+
+    // --- ADMIN ACTIONS ---
+    function login() {
+        if(document.getElementById('pass').value === 'admin123') {
+            currentUser = 'admin';
+            document.getElementById('login-ui').style.display = 'none';
+            document.getElementById('dash-ui').style.display = 'block';
+            renderAdmin();
+        }
+    }
+
+    function createTour() {
+        const name = prompt("Enter Tournament Name:");
+        if(!name) return;
+        const newT = {
+            id: Date.now(),
+            name: name,
+            matches: {
+                R32: Array(16).fill(0).map(()=>({t1:'',t2:'',s1:0,s2:0})),
+                R16: Array(8).fill(0).map(()=>({t1:'',t2:'',s1:0,s2:0})),
+                R8: Array(4).fill(0).map(()=>({t1:'',t2:'',s1:0,s2:0})),
+                R4: Array(2).fill(0).map(()=>({t1:'',t2:'',s1:0,s2:0})),
+                GF: {t1:'',t2:'',s1:0,s2:0}
+            }
+        };
+        tournaments.push(newT);
+        save();
+        renderAdmin();
+    }
+
+    function updateTeam(r, i, n, v) {
+        const t = tournaments.find(x => x.id === activeId);
+        const m = r === 'GF' ? t.matches.GF : t.matches[r][i];
+        if(n === 1) m.t1 = v; else m.t2 = v;
+        save();
+    }
+
+    function updateScore(r, i, n) {
+        if(!currentUser) return;
+        const t = tournaments.find(x => x.id === activeId);
+        const m = r === 'GF' ? t.matches.GF : t.matches[r][i];
+        const s = prompt("Enter Score:", n === 1 ? m.s1 : m.s2);
+        if(s !== null) {
+            if(n === 1) m.s1 = s; else m.s2 = s;
+            save();
+            renderBracket(t);
+        }
+    }
+
+    function renderAdmin() {
+        document.getElementById('admin-tour-manager').innerHTML = tournaments.map((t, i) => `
+            <div style="background:#111; padding:10px; margin-bottom:5px; border:1px solid #333;">
+                ${t.name} <button onclick="tournaments.splice(${i},1);save();renderAdmin();" style="float:right; background:maroon; width:auto; padding:5px 10px;">DEL</button>
+            </div>
+        `).join('');
+    }
+
+    function save() { localStorage.setItem('djy_data', JSON.stringify(tournaments)); }
+
+    // Redraw lines if phone screen orientation changes
+    window.addEventListener('resize', () => { if(activeId) drawBracketLines(); });
 </script>
 </body>
 </html>
