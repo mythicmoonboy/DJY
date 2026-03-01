@@ -3,41 +3,40 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>DJY MLBB HUB | PRO SYSTEM</title>
+    <title>DJY MLBB HUB | DOUBLE ELIMINATION</title>
     <script src="https://cdn.jsdelivr.net"></script>
     <style>
         :root { --neon: #ff003c; --bg: #0a0a0a; --card: #151515; --glow: 0 0 15px #ff003c; }
         body { background: var(--bg); color: white; font-family: 'Segoe UI', sans-serif; margin: 0; overflow-x: hidden; }
         
         nav { background: #000; padding: 15px; text-align: center; border-bottom: 2px solid var(--neon); box-shadow: var(--glow); position: sticky; top: 0; z-index: 1000; }
-        nav button { background: none; border: none; color: white; font-weight: bold; margin: 0 10px; cursor: pointer; text-transform: uppercase; transition: 0.2s; }
+        nav button { background: none; border: none; color: white; font-weight: bold; margin: 0 10px; cursor: pointer; text-transform: uppercase; }
         
-        button:active { transform: scale(0.92); filter: brightness(1.2); }
-        .btn-neon { display: inline-block; padding: 12px 24px; border: 2px solid var(--neon); color: white; font-weight: bold; background: none; cursor: pointer; transition: 0.2s; border-radius: 4px; text-transform: uppercase; }
+        button:active { transform: scale(0.95); }
+        .btn-neon { padding: 12px 20px; border: 2px solid var(--neon); color: white; font-weight: bold; background: none; cursor: pointer; transition: 0.2s; border-radius: 4px; }
         .btn-neon:hover { background: var(--neon); box-shadow: var(--glow); }
 
-        .container { max-width: 900px; margin: 30px auto; padding: 20px; display: none; }
-        .active { display: block; animation: fadeIn 0.4s ease; }
-        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+        .container { max-width: 1000px; margin: 30px auto; padding: 20px; display: none; }
+        .active { display: block; animation: fadeIn 0.3s; }
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
 
         .hero { text-align: center; padding: 40px; border: 1px solid var(--neon); background: rgba(255,0,60,0.05); border-radius: 8px; }
-        .tourney-card { background: var(--card); border-left: 5px solid var(--neon); padding: 20px; margin-bottom: 15px; cursor: pointer; }
-        
-        input, select, textarea { width: 100%; padding: 12px; margin: 10px 0; background: #000; border: 1px solid #444; color: white; border-radius: 4px; }
-        
-        /* BRACKET CSS */
-        .bracket-wrapper { display: flex; align-items: center; gap: 20px; background: #000; padding: 20px; border: 1px dashed var(--neon); margin-top: 10px; overflow-x: auto; }
-        .bracket-column { display: flex; flex-direction: column; justify-content: space-around; gap: 20px; }
-        .match-box { background: #222; border: 1px solid #444; padding: 10px; width: 120px; text-align: center; font-size: 12px; position: relative; }
-        .match-box::after { content: ''; position: absolute; right: -20px; top: 50%; width: 20px; height: 2px; background: var(--neon); }
-        .winner-box { border-color: gold; color: gold; font-weight: bold; }
-        .winner-box::after { display: none; }
+        .tourney-card { background: var(--card); border-left: 5px solid var(--neon); padding: 20px; margin-bottom: 15px; cursor: pointer; border-radius: 4px; }
 
-        .admin-status-box { background: #1a1a1a; border: 1px solid #333; padding: 15px; margin-top: 20px; border-radius: 8px; }
-        .manage-item { display: flex; justify-content: space-between; align-items: center; background: #222; padding: 10px; margin: 5px 0; border-radius: 4px; }
+        input, select { width: 100%; padding: 12px; margin: 10px 0; background: #000; border: 1px solid #444; color: white; border-radius: 4px; }
+
+        /* BRACKET CANVAS SYSTEM */
+        #bracket-screen { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: #000; z-index: 2000; overflow: auto; padding: 50px; box-sizing: border-box; }
+        .bracket-container { position: relative; width: 1200px; height: 800px; }
+        .match-box { position: absolute; width: 140px; height: 60px; background: #222; border: 1px solid var(--neon); display: flex; flex-direction: column; justify-content: center; align-items: center; font-size: 11px; z-index: 5; border-radius: 4px; }
+        .match-box b { color: gold; }
+        canvas { position: absolute; top: 0; left: 0; z-index: 1; pointer-events: none; }
+
+        .close-btn { position: fixed; top: 20px; right: 20px; color: white; background: red; border: none; padding: 10px 20px; cursor: pointer; z-index: 3000; }
+        .admin-controls { position: fixed; bottom: 20px; left: 20px; background: #111; padding: 15px; border: 1px solid gold; z-index: 3000; display: none; }
     </style>
 </head>
-<body onload="checkPersistentLogin()">
+<body onload="checkLogin()">
 
 <nav>
     <button onclick="tab('home')">Home</button>
@@ -49,60 +48,59 @@
 <div id="home" class="container active">
     <div class="hero">
         <h1 style="color: var(--neon); text-shadow: var(--glow); font-size: 3rem;">DJY MLBB</h1>
-        <p>2026 Automatic Bracket System Hub.</p>
-        <div style="margin-top: 30px;">
-            <a href="https://discord.gg" target="_blank" class="btn-neon" style="text-decoration:none">Tourney Discord</a>
-            <a href="https://discord.gg" target="_blank" class="btn-neon" style="text-decoration:none; margin-left:10px;">Community Discord</a>
+        <p>Double Elimination Bracket System Active.</p>
+        <div style="margin-top: 20px;">
+            <a href="https://discord.gg" target="_blank" class="btn-neon" style="text-decoration:none">Discord Hub</a>
         </div>
     </div>
 </div>
 
-<!-- TOURNAMENT -->
+<!-- TOURNAMENT TAB -->
 <div id="tournament" class="container">
     <div style="text-align: center; margin-bottom: 20px;">
-        <button class="btn-neon" onclick="loadData('upcoming')">Upcoming</button>
-        <button class="btn-neon" onclick="loadData('live')">Live</button>
-        <button class="btn-neon" onclick="loadData('finished')">Finished</button>
+        <button class="btn-neon" onclick="loadList('upcoming')">Upcoming</button>
+        <button class="btn-neon" onclick="loadList('live')">Live</button>
+        <button class="btn-neon" onclick="loadList('finished')">Finished</button>
     </div>
-    <div id="list-display">Connecting...</div>
+    <div id="tourney-list">Connecting to live feed...</div>
 </div>
 
-<!-- ADMIN -->
+<!-- BRACKET OVERLAY -->
+<div id="bracket-screen">
+    <button class="close-btn" onclick="closeBracket()">EXIT BRACKET</button>
+    <div id="admin-bracket-tools" class="admin-controls">
+        <p style="color:gold; margin:0 0 10px 0;">Admin: Update Teams</p>
+        <input id="team-name-input" placeholder="Team Name" style="width:150px;">
+        <button onclick="updateBracketTeam()" class="btn-neon" style="padding:5px;">Set Team</button>
+    </div>
+    <h2 id="bracket-title" style="color:var(--neon); text-align:center;">Tournament Bracket</h2>
+    <div class="bracket-container" id="bracket-area">
+        <canvas id="bracketCanvas" width="1200" height="800"></canvas>
+        <!-- Dynamic matches injected here -->
+    </div>
+</div>
+
+<!-- ADMIN TAB -->
 <div id="admin" class="container">
-    <div id="login-form" class="hero" style="max-width: 400px; margin: auto;">
+    <div id="login-panel" class="hero" style="max-width: 400px; margin: auto;">
         <h2>ADMIN LOGIN</h2>
         <input type="text" id="adm-u" placeholder="Username">
         <input type="password" id="adm-p" placeholder="Password">
         <button class="btn-neon" style="width:100%" onclick="login()">LOGIN</button>
     </div>
 
-    <div id="dashboard" style="display:none;">
+    <div id="dash" style="display:none;">
         <div class="hero">
-            <h2 id="welcome-msg">Admin Dashboard</h2>
-            <button class="btn-neon" onclick="logout()" style="border-color:gray; font-size:10px;">LOGOUT</button>
-            <hr border-color="var(--neon)">
-            <h3>Create Tournament</h3>
-            <input id="t-name" placeholder="Tournament Name">
+            <h3>Publish Tournament</h3>
+            <input id="t-name" placeholder="Name">
             <input id="t-prize" placeholder="Prize Pool">
             <select id="t-status">
                 <option value="upcoming">Upcoming</option>
                 <option value="live">Live</option>
                 <option value="finished">Finished</option>
             </select>
-            <button class="btn-neon" style="width:100%;" onclick="uploadTournament()">PUBLISH</button>
-        </div>
-
-        <div class="admin-status-box">
-            <h3>Manage Tournaments</h3>
-            <div id="admin-manage-list"></div>
-        </div>
-
-        <div id="moonboi-ctrl" style="display:none; border: 2px solid gold; padding: 20px; margin-top: 30px;">
-            <h3 style="color:gold">HEAD ADMIN (Moonboi)</h3>
-            <input id="new-adm-u" placeholder="New Admin User">
-            <input id="new-adm-p" placeholder="New Admin Pass">
-            <button class="btn-neon" style="border-color:gold;" onclick="addAdminAcc()">ADD ADMIN</button>
-            <div id="admin-list-box"></div>
+            <button class="btn-neon" style="width:100%;" onclick="publish()">POST NOW</button>
+            <button onclick="logout()" style="margin-top:20px; background:none; border:none; color:gray; cursor:pointer;">Logout System</button>
         </div>
     </div>
 </div>
@@ -110,123 +108,112 @@
 <script>
     const SUPABASE_URL = 'https://yfsjflymbkbfiketvxof.supabase.co';
     const SUPABASE_KEY = 'sb_publishable_bOr8dIV2-Zt_9CUpboVsBQ_pzwpyRZw'; 
-    const _supabase = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+    const _db = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
-    // --- PERSISTENT LOGIN ---
-    function checkPersistentLogin() {
-        const session = localStorage.getItem('djy_admin');
-        if(session) {
-            const user = JSON.parse(session);
-            showDashboard(user.isHead, user.name);
-        }
+    let activeTourneyId = null;
+    let isAdminSession = false;
+
+    // SESSION LOGIC
+    function checkLogin() {
+        const session = localStorage.getItem('djy_session');
+        if(session) { isAdminSession = true; showDash(); }
     }
 
     async function login() {
         const u = document.getElementById('adm-u').value;
         const p = document.getElementById('adm-p').value;
         if(u === "moonboi" && p === "123") {
-            saveSession(true, "moonboi");
-        } else {
-            const { data } = await _supabase.from('admin_accounts').select('*').eq('username', u).eq('password', p);
-            if(data && data.length > 0) saveSession(false, u);
-            else alert("Wrong Credentials!");
-        }
+            localStorage.setItem('djy_session', 'true');
+            isAdminSession = true; showDash();
+        } else { alert("Wrong!"); }
     }
 
-    function saveSession(isHead, name) {
-        localStorage.setItem('djy_admin', JSON.stringify({ isHead, name }));
-        showDashboard(isHead, name);
-    }
+    function logout() { localStorage.removeItem('djy_session'); location.reload(); }
+    function showDash() { document.getElementById('login-panel').style.display='none'; document.getElementById('dash').style.display='block'; }
+    function tab(id) { document.querySelectorAll('.container').forEach(c=>c.classList.remove('active')); document.getElementById(id).classList.add('active'); }
 
-    function logout() {
-        localStorage.removeItem('djy_admin');
-        location.reload();
-    }
-
-    function showDashboard(isHead, name) {
-        document.getElementById('login-form').style.display = 'none';
-        document.getElementById('dashboard').style.display = 'block';
-        document.getElementById('welcome-msg').innerText = "Welcome, " + name;
-        if(isHead) { document.getElementById('moonboi-ctrl').style.display = 'block'; fetchAdmins(); }
-        fetchManageList();
-    }
-
-    function tab(id) {
-        document.querySelectorAll('.container').forEach(c => c.classList.remove('active'));
-        document.getElementById(id).classList.add('active');
-        if(id === 'tournament') loadData('upcoming');
-    }
-
-    // --- BRACKET GENERATION ---
-    function generateBracketHTML() {
-        return `
-            <div class="bracket-wrapper">
-                <div class="bracket-column">
-                    <div class="match-box">Team A</div>
-                    <div class="match-box">Team B</div>
-                </div>
-                <div class="bracket-column">
-                    <div class="match-box winner-box">WINNER TBD</div>
-                </div>
-            </div>`;
-    }
-
-    async function uploadTournament() {
-        await _supabase.from('tournaments').insert([{
+    // DATA LOGIC
+    async function publish() {
+        const { data, error } = await _db.from('tournaments').insert([{
             title: document.getElementById('t-name').value,
             prize: document.getElementById('t-prize').value,
             status: document.getElementById('t-status').value
-        }]);
+        }]).select();
         alert("Published!");
-        fetchManageList();
+        tab('tournament');
     }
 
-    async function loadData(filter) {
-        const display = document.getElementById('list-display');
-        let { data } = await _supabase.from('tournaments').select('*').eq('status', filter).order('created_at', { ascending: false });
-        display.innerHTML = (data && data.length > 0) ? "" : `<p>No ${filter} tournaments.</p>`;
+    async function loadList(status) {
+        const list = document.getElementById('tourney-list');
+        let { data } = await _db.from('tournaments').select('*').eq('status', status).order('created_at', {ascending:false});
+        list.innerHTML = data?.length ? "" : `<p>No ${status} tournaments.</p>`;
         data?.forEach(t => {
-            display.innerHTML += `
-                <div class="tourney-card">
-                    <h3>${t.title}</h3>
-                    <p>Prize: ${t.prize}</p>
-                    <p style="font-size:10px; color:var(--neon)">BRACKET VIEW:</p>
-                    ${generateBracketHTML()}
-                </div>`;
+            list.innerHTML += `<div class="tourney-card" onclick="openBracket('${t.id}', '${t.title}')">
+                <h3>${t.title}</h3><p>Prize: ${t.prize}</p><small>Click to view Bracket</small>
+            </div>`;
         });
     }
 
-    async function fetchManageList() {
-        const list = document.getElementById('admin-manage-list');
-        let { data } = await _supabase.from('tournaments').select('*').order('created_at', { ascending: false });
-        list.innerHTML = "";
-        data?.forEach(t => {
-            list.innerHTML += `<div class="manage-item"><span>${t.title} (${t.status})</span> <button onclick="deleteT('${t.id}')" style="color:red; background:none; border:none;">Delete</button></div>`;
-        });
+    // BRACKET LOGIC
+    function openBracket(id, title) {
+        activeTourneyId = id;
+        document.getElementById('bracket-screen').style.display = 'block';
+        document.getElementById('bracket-title').innerText = title + " - Double Elimination";
+        if(isAdminSession) document.getElementById('admin-bracket-tools').style.display = 'block';
+        
+        drawBracketBase();
     }
 
-    async function deleteT(id) {
-        await _supabase.from('tournaments').delete().eq('id', id);
-        fetchManageList();
+    function drawBracketBase() {
+        const area = document.getElementById('bracket-area');
+        const ctx = document.getElementById('bracketCanvas').getContext('2d');
+        ctx.clearRect(0,0,1200,800);
+        ctx.strokeStyle = '#ff003c';
+        ctx.lineWidth = 2;
+
+        // Clear old boxes
+        document.querySelectorAll('.match-box').forEach(b => b.remove());
+
+        // Winners Round 1
+        createMatch(50, 100, "Match 1", "Team 1", "Team 2");
+        createMatch(50, 250, "Match 2", "Team 3", "Team 4");
+
+        // Winners Final
+        createMatch(300, 175, "Winners Final", "Winner M1", "Winner M2");
+
+        // Losers Round 1
+        createMatch(50, 450, "Losers Round 1", "Loser M1", "Loser M2");
+
+        // Losers Final
+        createMatch(300, 450, "Losers Final", "Loser WF", "Winner LR1");
+
+        // GRAND FINAL
+        createMatch(600, 300, "GRAND FINAL", "Winner WF", "Winner LF");
+
+        // Draw Lines
+        drawLine(ctx, 190, 130, 300, 190); // M1 to WF
+        drawLine(ctx, 190, 280, 300, 220); // M2 to WF
+        drawLine(ctx, 440, 205, 600, 315); // WF to GF
+        drawLine(ctx, 440, 480, 600, 345); // LF to GF
     }
 
-    async function fetchAdmins() {
-        const box = document.getElementById('admin-list-box');
-        const { data } = await _supabase.from('admin_accounts').select('*');
-        box.innerHTML = "";
-        data?.forEach(adm => {
-            box.innerHTML += `<div class="manage-item">${adm.username} <button onclick="deleteAdm('${adm.id}')" style="color:red; background:none; border:none;">X</button></div>`;
-        });
+    function createMatch(x, y, id, t1, t2) {
+        const div = document.createElement('div');
+        div.className = 'match-box';
+        div.style.left = x + 'px';
+        div.style.top = y + 'px';
+        div.innerHTML = `<b>${id}</b><span>${t1}</span><span>${t2}</span>`;
+        document.getElementById('bracket-area').appendChild(div);
     }
 
-    async function addAdminAcc() {
-        await _supabase.from('admin_accounts').insert([{ username: document.getElementById('new-adm-u').value, password: document.getElementById('new-adm-p').value }]);
-        fetchAdmins();
+    function drawLine(ctx, x1, y1, x2, y2) {
+        ctx.beginPath();
+        ctx.moveTo(x1, y1);
+        ctx.lineTo(x2, y2);
+        ctx.stroke();
     }
 
-    _supabase.channel('any').on('postgres_changes', { event: '*', schema: 'public', table: 'tournaments' }, () => {
-        loadData('upcoming'); fetchManageList();
-    }).subscribe();
+    function closeBracket() { document.getElementById('bracket-screen').style.display = 'none'; }
 </script>
 </body>
 </html>
