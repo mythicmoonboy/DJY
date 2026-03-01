@@ -3,40 +3,37 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>DJY MLBB HUB | DOUBLE ELIMINATION</title>
+    <title>DJY MLBB HUB | OFFICIAL</title>
     <script src="https://cdn.jsdelivr.net"></script>
     <style>
         :root { --neon: #ff003c; --bg: #0a0a0a; --card: #151515; --glow: 0 0 15px #ff003c; }
         body { background: var(--bg); color: white; font-family: 'Segoe UI', sans-serif; margin: 0; overflow-x: hidden; }
         
+        /* Nav & Buttons */
         nav { background: #000; padding: 15px; text-align: center; border-bottom: 2px solid var(--neon); box-shadow: var(--glow); position: sticky; top: 0; z-index: 1000; }
         nav button { background: none; border: none; color: white; font-weight: bold; margin: 0 10px; cursor: pointer; text-transform: uppercase; }
-        
-        button:active { transform: scale(0.95); }
-        .btn-neon { padding: 12px 20px; border: 2px solid var(--neon); color: white; font-weight: bold; background: none; cursor: pointer; transition: 0.2s; border-radius: 4px; }
+        button:active { transform: scale(0.92); filter: brightness(1.2); }
+        .btn-neon { display: inline-block; padding: 12px 24px; border: 2px solid var(--neon); color: white; font-weight: bold; background: none; cursor: pointer; transition: 0.2s; border-radius: 4px; text-transform: uppercase; }
         .btn-neon:hover { background: var(--neon); box-shadow: var(--glow); }
 
-        .container { max-width: 1000px; margin: 30px auto; padding: 20px; display: none; }
-        .active { display: block; animation: fadeIn 0.3s; }
-        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+        .container { max-width: 900px; margin: 30px auto; padding: 20px; display: none; }
+        .active { display: block; animation: fadeIn 0.4s ease; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
 
+        /* UI Elements */
         .hero { text-align: center; padding: 40px; border: 1px solid var(--neon); background: rgba(255,0,60,0.05); border-radius: 8px; }
-        .tourney-card { background: var(--card); border-left: 5px solid var(--neon); padding: 20px; margin-bottom: 15px; cursor: pointer; border-radius: 4px; }
-
+        .tourney-card { background: var(--card); border-left: 5px solid var(--neon); padding: 20px; margin-bottom: 15px; border-radius: 0 8px 8px 0; cursor: pointer; }
         input, select { width: 100%; padding: 12px; margin: 10px 0; background: #000; border: 1px solid #444; color: white; border-radius: 4px; }
 
-        /* BRACKET CANVAS SYSTEM */
-        #bracket-screen { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: #000; z-index: 2000; overflow: auto; padding: 50px; box-sizing: border-box; }
-        .bracket-container { position: relative; width: 1200px; height: 800px; }
-        .match-box { position: absolute; width: 140px; height: 60px; background: #222; border: 1px solid var(--neon); display: flex; flex-direction: column; justify-content: center; align-items: center; font-size: 11px; z-index: 5; border-radius: 4px; }
-        .match-box b { color: gold; }
+        /* BRACKET OVERLAY */
+        #bracket-screen { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: #000; z-index: 2000; overflow: auto; padding: 50px; }
+        .bracket-container { position: relative; width: 1200px; height: 800px; margin: auto; }
+        .match-box { position: absolute; width: 150px; height: 70px; background: #111; border: 1px solid var(--neon); display: flex; flex-direction: column; justify-content: center; align-items: center; font-size: 11px; z-index: 5; border-radius: 4px; }
         canvas { position: absolute; top: 0; left: 0; z-index: 1; pointer-events: none; }
-
-        .close-btn { position: fixed; top: 20px; right: 20px; color: white; background: red; border: none; padding: 10px 20px; cursor: pointer; z-index: 3000; }
-        .admin-controls { position: fixed; bottom: 20px; left: 20px; background: #111; padding: 15px; border: 1px solid gold; z-index: 3000; display: none; }
+        .close-bracket { position: fixed; top: 20px; right: 20px; background: var(--neon); color: white; border: none; padding: 10px 20px; cursor: pointer; z-index: 3000; font-weight: bold; }
     </style>
 </head>
-<body onload="checkLogin()">
+<body onload="checkSession()">
 
 <nav>
     <button onclick="tab('home')">Home</button>
@@ -44,46 +41,41 @@
     <button onclick="tab('admin')">Admin</button>
 </nav>
 
-<!-- HOME -->
+<!-- PAGE: HOME -->
 <div id="home" class="container active">
     <div class="hero">
         <h1 style="color: var(--neon); text-shadow: var(--glow); font-size: 3rem;">DJY MLBB</h1>
-        <p>Double Elimination Bracket System Active.</p>
-        <div style="margin-top: 20px;">
-            <a href="https://discord.gg" target="_blank" class="btn-neon" style="text-decoration:none">Discord Hub</a>
+        <p>Official Hub for DJY Tournaments. Real-time Brackets & Updates.</p>
+        <div style="margin-top: 30px;">
+            <a href="https://discord.gg" target="_blank" class="btn-neon" style="text-decoration:none">Tournament Discord</a>
+            <a href="https://discord.gg" target="_blank" class="btn-neon" style="text-decoration:none; margin-left: 10px;">Community Discord</a>
         </div>
     </div>
 </div>
 
-<!-- TOURNAMENT TAB -->
+<!-- PAGE: TOURNAMENT -->
 <div id="tournament" class="container">
-    <div style="text-align: center; margin-bottom: 20px;">
-        <button class="btn-neon" onclick="loadList('upcoming')">Upcoming</button>
-        <button class="btn-neon" onclick="loadList('live')">Live</button>
-        <button class="btn-neon" onclick="loadList('finished')">Finished</button>
+    <div style="text-align: center; margin-bottom: 30px;">
+        <button class="btn-neon" onclick="loadData('upcoming')">Upcoming</button>
+        <button class="btn-neon" onclick="loadData('live')">Live</button>
+        <button class="btn-neon" onclick="loadData('finished')">Finished</button>
     </div>
-    <div id="tourney-list">Connecting to live feed...</div>
+    <div id="list-display">Connecting to feed...</div>
 </div>
 
-<!-- BRACKET OVERLAY -->
+<!-- BRACKET OVERLAY VIEW -->
 <div id="bracket-screen">
-    <button class="close-btn" onclick="closeBracket()">EXIT BRACKET</button>
-    <div id="admin-bracket-tools" class="admin-controls">
-        <p style="color:gold; margin:0 0 10px 0;">Admin: Update Teams</p>
-        <input id="team-name-input" placeholder="Team Name" style="width:150px;">
-        <button onclick="updateBracketTeam()" class="btn-neon" style="padding:5px;">Set Team</button>
-    </div>
-    <h2 id="bracket-title" style="color:var(--neon); text-align:center;">Tournament Bracket</h2>
+    <button class="close-bracket" onclick="document.getElementById('bracket-screen').style.display='none'">EXIT VIEW</button>
+    <h2 id="b-title" style="text-align:center; color:var(--neon); text-transform:uppercase;">Bracket View</h2>
     <div class="bracket-container" id="bracket-area">
         <canvas id="bracketCanvas" width="1200" height="800"></canvas>
-        <!-- Dynamic matches injected here -->
     </div>
 </div>
 
-<!-- ADMIN TAB -->
+<!-- PAGE: ADMIN -->
 <div id="admin" class="container">
-    <div id="login-panel" class="hero" style="max-width: 400px; margin: auto;">
-        <h2>ADMIN LOGIN</h2>
+    <div id="login-form" class="hero" style="max-width: 400px; margin: auto;">
+        <h2 style="color: var(--neon);">ADMIN LOGIN</h2>
         <input type="text" id="adm-u" placeholder="Username">
         <input type="password" id="adm-p" placeholder="Password">
         <button class="btn-neon" style="width:100%" onclick="login()">LOGIN</button>
@@ -91,16 +83,25 @@
 
     <div id="dash" style="display:none;">
         <div class="hero">
+            <h2 id="greet">Admin Dashboard</h2>
+            <hr border-color="var(--neon)">
             <h3>Publish Tournament</h3>
-            <input id="t-name" placeholder="Name">
+            <input id="t-name" placeholder="Tournament Name">
             <input id="t-prize" placeholder="Prize Pool">
             <select id="t-status">
                 <option value="upcoming">Upcoming</option>
                 <option value="live">Live</option>
                 <option value="finished">Finished</option>
             </select>
-            <button class="btn-neon" style="width:100%;" onclick="publish()">POST NOW</button>
-            <button onclick="logout()" style="margin-top:20px; background:none; border:none; color:gray; cursor:pointer;">Logout System</button>
+            <button class="btn-neon" style="width:100%;" onclick="publish()">POST TO WEBSITE</button>
+        </div>
+
+        <div id="moonboi-ctrl" style="display:none; border: 2px solid gold; padding: 20px; margin-top: 30px; border-radius: 8px;">
+            <h3 style="color:gold">HEAD ADMIN PANEL</h3>
+            <input id="new-u" placeholder="New Admin User"><input id="new-p" placeholder="New Admin Pass">
+            <button class="btn-neon" style="border-color:gold; color:gold;" onclick="addAdmin()">ADD ADMIN ACC</button>
+            <div id="admin-list" style="margin-top:10px;"></div>
+            <button class="btn-neon" style="margin-top:20px; border-color:#555;" onclick="logout()">LOGOUT</button>
         </div>
     </div>
 </div>
@@ -108,112 +109,108 @@
 <script>
     const SUPABASE_URL = 'https://yfsjflymbkbfiketvxof.supabase.co';
     const SUPABASE_KEY = 'sb_publishable_bOr8dIV2-Zt_9CUpboVsBQ_pzwpyRZw'; 
-    const _db = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+    const _supabase = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
-    let activeTourneyId = null;
-    let isAdminSession = false;
-
-    // SESSION LOGIC
-    function checkLogin() {
-        const session = localStorage.getItem('djy_session');
-        if(session) { isAdminSession = true; showDash(); }
+    // --- SESSION & LOGIN ---
+    function checkSession() {
+        const user = localStorage.getItem('djy_user');
+        if(user) { 
+            const data = JSON.parse(user);
+            showDash(data.isHead, data.name);
+        }
     }
 
-    async function login() {
+    function login() {
         const u = document.getElementById('adm-u').value;
         const p = document.getElementById('adm-p').value;
         if(u === "moonboi" && p === "123") {
-            localStorage.setItem('djy_session', 'true');
-            isAdminSession = true; showDash();
-        } else { alert("Wrong!"); }
+            const data = { isHead: true, name: "moonboi" };
+            localStorage.setItem('djy_user', JSON.stringify(data));
+            showDash(true, "moonboi");
+        } else { alert("Wrong Credentials"); }
     }
 
-    function logout() { localStorage.removeItem('djy_session'); location.reload(); }
-    function showDash() { document.getElementById('login-panel').style.display='none'; document.getElementById('dash').style.display='block'; }
-    function tab(id) { document.querySelectorAll('.container').forEach(c=>c.classList.remove('active')); document.getElementById(id).classList.add('active'); }
+    function logout() { localStorage.removeItem('djy_user'); location.reload(); }
 
-    // DATA LOGIC
+    function showDash(isHead, name) {
+        document.getElementById('login-form').style.display = 'none';
+        document.getElementById('dash').style.display = 'block';
+        document.getElementById('greet').innerText = "Welcome, " + name;
+        if(isHead) document.getElementById('moonboi-ctrl').style.display = 'block';
+    }
+
+    function tab(id) {
+        document.querySelectorAll('.container').forEach(c => c.classList.remove('active'));
+        document.getElementById(id).classList.add('active');
+        if(id === 'tournament') loadData('upcoming');
+    }
+
+    // --- TOURNAMENT LOGIC ---
     async function publish() {
-        const { data, error } = await _db.from('tournaments').insert([{
+        await _supabase.from('tournaments').insert([{
             title: document.getElementById('t-name').value,
             prize: document.getElementById('t-prize').value,
             status: document.getElementById('t-status').value
-        }]).select();
-        alert("Published!");
-        tab('tournament');
+        }]);
+        alert("Published!"); tab('tournament');
     }
 
-    async function loadList(status) {
-        const list = document.getElementById('tourney-list');
-        let { data } = await _db.from('tournaments').select('*').eq('status', status).order('created_at', {ascending:false});
-        list.innerHTML = data?.length ? "" : `<p>No ${status} tournaments.</p>`;
+    async function loadData(filter) {
+        const display = document.getElementById('list-display');
+        let { data } = await _supabase.from('tournaments').select('*').eq('status', filter).order('created_at', { ascending: false });
+        display.innerHTML = data?.length ? "" : `<p>No ${filter} tournaments.</p>`;
         data?.forEach(t => {
-            list.innerHTML += `<div class="tourney-card" onclick="openBracket('${t.id}', '${t.title}')">
-                <h3>${t.title}</h3><p>Prize: ${t.prize}</p><small>Click to view Bracket</small>
+            display.innerHTML += `<div class="tourney-card" onclick="openBracket('${t.title}')">
+                <h3>${t.title}</h3><p>Prize: ${t.prize}</p><small>Tap to view Bracket</small>
             </div>`;
         });
     }
 
-    // BRACKET LOGIC
-    function openBracket(id, title) {
-        activeTourneyId = id;
+    // --- DOUBLE ELIMINATION BRACKET ---
+    function openBracket(title) {
         document.getElementById('bracket-screen').style.display = 'block';
-        document.getElementById('bracket-title').innerText = title + " - Double Elimination";
-        if(isAdminSession) document.getElementById('admin-bracket-tools').style.display = 'block';
-        
-        drawBracketBase();
+        document.getElementById('b-title').innerText = title + " Bracket";
+        drawBracket();
     }
 
-    function drawBracketBase() {
+    function drawBracket() {
         const area = document.getElementById('bracket-area');
-        const ctx = document.getElementById('bracketCanvas').getContext('2d');
+        const canvas = document.getElementById('bracketCanvas');
+        const ctx = canvas.getContext('2d');
         ctx.clearRect(0,0,1200,800);
-        ctx.strokeStyle = '#ff003c';
-        ctx.lineWidth = 2;
+        ctx.strokeStyle = '#ff003c'; ctx.lineWidth = 2;
+        document.querySelectorAll('.match-box').forEach(m => m.remove());
 
-        // Clear old boxes
-        document.querySelectorAll('.match-box').forEach(b => b.remove());
+        // Positions: Winners Bracket
+        createMatch(50, 100, "Winner R1-A");
+        createMatch(50, 250, "Winner R1-B");
+        createMatch(300, 175, "Winners Final");
 
-        // Winners Round 1
-        createMatch(50, 100, "Match 1", "Team 1", "Team 2");
-        createMatch(50, 250, "Match 2", "Team 3", "Team 4");
+        // Positions: Losers Bracket
+        createMatch(50, 450, "Loser R1");
+        createMatch(300, 450, "Losers Final");
 
-        // Winners Final
-        createMatch(300, 175, "Winners Final", "Winner M1", "Winner M2");
+        // Grand Final
+        createMatch(600, 310, "GRAND FINAL");
 
-        // Losers Round 1
-        createMatch(50, 450, "Losers Round 1", "Loser M1", "Loser M2");
-
-        // Losers Final
-        createMatch(300, 450, "Losers Final", "Loser WF", "Winner LR1");
-
-        // GRAND FINAL
-        createMatch(600, 300, "GRAND FINAL", "Winner WF", "Winner LF");
-
-        // Draw Lines
-        drawLine(ctx, 190, 130, 300, 190); // M1 to WF
-        drawLine(ctx, 190, 280, 300, 220); // M2 to WF
-        drawLine(ctx, 440, 205, 600, 315); // WF to GF
-        drawLine(ctx, 440, 480, 600, 345); // LF to GF
+        // Draw Connection Lines
+        line(ctx, 200, 135, 300, 195); // WR1-A to WF
+        line(ctx, 200, 285, 300, 225); // WR1-B to WF
+        line(ctx, 450, 210, 600, 330); // WF to GF
+        line(ctx, 450, 485, 600, 360); // LF to GF
     }
 
-    function createMatch(x, y, id, t1, t2) {
+    function createMatch(x, y, name) {
         const div = document.createElement('div');
         div.className = 'match-box';
-        div.style.left = x + 'px';
-        div.style.top = y + 'px';
-        div.innerHTML = `<b>${id}</b><span>${t1}</span><span>${t2}</span>`;
+        div.style.left = x + 'px'; div.style.top = y + 'px';
+        div.innerHTML = `<b>${name}</b><br><span style="font-size:9px">Team vs Team</span>`;
         document.getElementById('bracket-area').appendChild(div);
     }
 
-    function drawLine(ctx, x1, y1, x2, y2) {
-        ctx.beginPath();
-        ctx.moveTo(x1, y1);
-        ctx.lineTo(x2, y2);
-        ctx.stroke();
+    function line(ctx, x1, y1, x2, y2) {
+        ctx.beginPath(); ctx.moveTo(x1, y1); ctx.lineTo(x2, y2); ctx.stroke();
     }
-
-    function closeBracket() { document.getElementById('bracket-screen').style.display = 'none'; }
 </script>
 </body>
 </html>
