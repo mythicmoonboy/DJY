@@ -3,46 +3,29 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>DJY MLBB HUB </title>
-    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <title>DJY MLBB HUB</title>
+    <script src="https://cdn.jsdelivr.net"></script>
     <style>
         :root { --neon: #ff003c; --bg: #0a0a0a; --card: #151515; --glow: 0 0 15px #ff003c; }
         body { background: var(--bg); color: white; font-family: 'Segoe UI', sans-serif; margin: 0; overflow-x: hidden; }
-        
-        /* Navigation */
         nav { background: #000; padding: 15px; text-align: center; border-bottom: 2px solid var(--neon); box-shadow: var(--glow); position: sticky; top: 0; z-index: 1000; }
         nav button { background: none; border: none; color: white; font-weight: bold; margin: 0 10px; cursor: pointer; text-transform: uppercase; transition: 0.2s; }
-        
-        /* ROUNDED BUTTONS & REACTIONS */
         button:active { transform: scale(0.92); filter: brightness(1.2); }
-        .btn-neon { 
-            display: inline-block; padding: 12px 24px; border: 2px solid var(--neon); 
-            color: white; font-weight: bold; background: none; cursor: pointer; 
-            transition: all 0.2s ease; border-radius: 12px; text-transform: uppercase;
-        }
+        .btn-neon { display: inline-block; padding: 12px 24px; border: 2px solid var(--neon); color: white; font-weight: bold; background: none; cursor: pointer; transition: all 0.2s ease; border-radius: 12px; text-transform: uppercase; }
         .btn-neon:hover { background: var(--neon); box-shadow: var(--glow); }
-
         .container { max-width: 900px; margin: 30px auto; padding: 20px; display: none; }
         .active { display: block; animation: fadeIn 0.4s ease; }
         @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
-
-        /* ROUNDED HERO & CARDS */
         .hero { text-align: center; padding: 40px; border: 1px solid var(--neon); background: rgba(255,0,60,0.05); border-radius: 20px; }
         .tourney-card { background: var(--card); border-left: 6px solid var(--neon); padding: 20px; margin-bottom: 15px; border-radius: 15px; cursor: pointer; transition: 0.3s; border: 1px solid #222; }
         .tourney-card:hover { transform: translateX(10px); background: #202020; }
-        
-        /* ROUNDED INPUTS */
         input, select, textarea { width: 100%; padding: 12px; margin: 10px 0; background: #000; border: 1px solid #444; color: white; border-radius: 12px; box-sizing: border-box; }
         input:focus { border-color: var(--neon); outline: none; box-shadow: 0 0 8px var(--neon); }
-
-        /* BRACKET SYSTEM (ROUNDED BOXES) */
         #bracket-screen { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: #000; z-index: 2000; overflow: auto; padding: 50px; }
         .bracket-container { position: relative; width: 1000px; height: 700px; margin: auto; }
         .match-box { position: absolute; width: 150px; height: 70px; background: #111; border: 1px solid var(--neon); display: flex; flex-direction: column; justify-content: center; align-items: center; font-size: 11px; z-index: 5; border-radius: 12px; box-shadow: 0 4px 10px rgba(0,0,0,0.5); }
         canvas { position: absolute; top: 0; left: 0; z-index: 1; pointer-events: none; }
         .close-btn { position: fixed; top: 20px; right: 20px; background: var(--neon); color: white; border: none; padding: 12px 25px; cursor: pointer; z-index: 3000; font-weight: bold; border-radius: 12px; }
-
-        /* ADMIN MANAGEMENT ROUNDED */
         .manage-item { display: flex; justify-content: space-between; align-items: center; background: #1a1a1a; padding: 15px; margin: 10px 0; border-radius: 12px; border: 1px solid #333; }
     </style>
 </head>
@@ -54,7 +37,6 @@
     <button onclick="tab('admin')">Admin</button>
 </nav>
 
-<!-- TAB: HOME -->
 <div id="home" class="container active">
     <div class="hero">
         <h1 style="color: var(--neon); text-shadow: var(--glow); font-size: 3rem; margin-bottom: 10px;">DJY MLBB</h1>
@@ -63,7 +45,6 @@
     </div>
 </div>
 
-<!-- TAB: TOURNAMENT -->
 <div id="tournament" class="container">
     <div style="text-align: center; margin-bottom: 30px; display: flex; justify-content: center; gap: 10px;">
         <button class="btn-neon" onclick="loadData('upcoming')">Upcoming</button>
@@ -73,7 +54,6 @@
     <div id="list-display">Select a category to view.</div>
 </div>
 
-<!-- BRACKET OVERLAY -->
 <div id="bracket-screen">
     <button class="close-btn" onclick="document.getElementById('bracket-screen').style.display='none'">EXIT VIEW</button>
     <h2 id="b-title" style="text-align:center; color:var(--neon); text-transform:uppercase;">Bracket View</h2>
@@ -82,35 +62,26 @@
     </div>
 </div>
 
-<!-- TAB: ADMIN -->
 <div id="admin" class="container">
-<div id="login-form" class="hero" style="max-width: 400px; margin: auto;">
-    <h2 style="color: var(--neon);">ADMIN ACCESS</h2>
-
-    <!-- Toggle buttons -->
-    <div style="display:flex; gap:10px; margin-bottom:20px;">
-        <button class="btn-neon" style="flex:1" onclick="showAuthForm('login')">LOGIN</button>
-        <button class="btn-neon" style="flex:1" onclick="showAuthForm('signup')">SIGN UP</button>
+    <div id="login-form" class="hero" style="max-width: 400px; margin: auto;">
+        <h2 style="color: var(--neon);">ADMIN ACCESS</h2>
+        <div style="display:flex; gap:10px; margin-bottom:20px;">
+            <button class="btn-neon" style="flex:1" onclick="showAuthForm('login')">LOGIN</button>
+            <button class="btn-neon" style="flex:1" onclick="showAuthForm('signup')">SIGN UP</button>
+        </div>
+        <div id="form-login">
+            <input type="text" id="adm-u" placeholder="Username">
+            <input type="password" id="adm-p" placeholder="Password">
+            <button class="btn-neon" style="width:100%; margin-top:10px;" onclick="login()">LOGIN</button>
+        </div>
+        <div id="form-signup" style="display:none;">
+            <input type="text" id="new-u" placeholder="Choose Username">
+            <input type="password" id="new-p" placeholder="Choose Password">
+            <input type="text" id="signup-key" placeholder="Admin Invite Key">
+            <button class="btn-neon" style="width:100%; margin-top:10px; border-color:#00ffaa; color:#00ffaa;" onclick="signup()">CREATE ACCOUNT</button>
+        </div>
+        <p id="auth-msg" style="color:red; margin-top:10px;"></p>
     </div>
-
-    <!-- Login Form -->
-    <div id="form-login">
-        <input type="text" id="adm-u" placeholder="Username">
-        <input type="password" id="adm-p" placeholder="Password">
-        <button class="btn-neon" style="width:100%; margin-top:10px;" onclick="login()">LOGIN</button>
-    </div>
-
-    <!-- Signup Form -->
-    <div id="form-signup" style="display:none;">
-        <input type="text" id="new-u" placeholder="Choose Username">
-        <input type="password" id="new-p" placeholder="Choose Password">
-        <input type="text" id="signup-key" placeholder="Admin Invite Key">
-        <button class="btn-neon" style="width:100%; margin-top:10px; border-color:#00ffaa; color:#00ffaa;" onclick="signup()">CREATE ACCOUNT</button>
-        <p style="color:#888; font-size:12px; margin-top:10px;">You need an invite key from Moonboi to sign up.</p>
-    </div>
-
-    <p id="auth-msg" style="color:red; margin-top:10px;"></p>
-</div>
 
     <div id="dashboard" style="display:none;">
         <div class="hero">
@@ -128,9 +99,14 @@
             <button class="btn-neon" style="width:100%;" onclick="uploadTournament()">PUBLISH INSTANTLY</button>
         </div>
 
-        <!-- MOONBOI ONLY -->
         <div id="moonboi-ctrl" style="display:none; border: 2px solid gold; padding: 20px; margin-top: 30px; border-radius: 20px;">
             <h3 style="color:gold">HEAD ADMIN (Moonboi)</h3>
+            <div class="manage-item">
+                <input id="gen-key-input" placeholder="Generated Key" readonly style="width:70%;">
+                <button class="btn-neon" style="font-size:10px; border-color:gold;" onclick="generateInviteKey()">GENERATE KEY</button>
+            </div>
+            <p style="font-size:10px; color:#888;">Active Keys: <span id="active-keys-list">None</span></p>
+            <hr>
             <input id="new-adm-u" placeholder="Username"><input id="new-adm-p" placeholder="Password">
             <button class="btn-neon" style="border-color:gold; color:gold;" onclick="addAdminAcc()">ADD ADMIN</button>
             <div id="admin-list-box" style="margin-top:15px;"></div>
@@ -152,70 +128,51 @@
         loadData('upcoming');
     }
 
-// Replace login() with this:
-async function login() {
-    const u = document.getElementById('adm-u').value.trim();
-    const p = document.getElementById('adm-p').value;
-    setMsg('');
-
-    if (u === "moonboi" && p === "123") {
-        saveSession(true, "moonboi");
-        return;
+    function showAuthForm(type) {
+        document.getElementById('form-login').style.display = type === 'login' ? 'block' : 'none';
+        document.getElementById('form-signup').style.display = type === 'signup' ? 'block' : 'none';
+        setMsg('');
     }
 
-    const { data, error } = await _supabase
-        .from('admin_accounts')
-        .select('*')
-        .eq('username', u)
-        .eq('password', p);
+    function setMsg(msg) { document.getElementById('auth-msg').textContent = msg; }
 
-    if (data && data.length > 0) {
-        saveSession(false, u);
-    } else {
-        setMsg('Invalid credentials.');
+    async function login() {
+        const u = document.getElementById('adm-u').value.trim();
+        const p = document.getElementById('adm-p').value;
+        if (u === "moonboi" && p === "123") return saveSession(true, "moonboi");
+        const { data } = await _supabase.from('admin_accounts').select('*').eq('username', u).eq('password', p);
+        if (data && data.length > 0) saveSession(false, u);
+        else setMsg('Invalid credentials.');
     }
-}
 
-// Add these new functions:
-const INVITE_KEY = 'DJY2025'; // Change this to whatever secret key you want
+    async function signup() {
+        const u = document.getElementById('new-u').value.trim();
+        const p = document.getElementById('new-p').value;
+        const key = document.getElementById('signup-key').value.trim();
+        if (!u || !p || !key) return setMsg('Fill in all fields.');
 
-async function signup() {
-    const u = document.getElementById('new-u').value.trim();
-    const p = document.getElementById('new-p').value;
-    const key = document.getElementById('signup-key').value.trim();
-    setMsg('');
+        const { data: validKey } = await _supabase.from('invite_keys').select('*').eq('key', key).eq('used', false).single();
+        if (!validKey) return setMsg('Invalid or used Invite Key.');
 
-    if (!u || !p) return setMsg('Fill in all fields.');
-    if (key !== INVITE_KEY) return setMsg('Invalid invite key.');
+        const { error } = await _supabase.from('admin_accounts').insert([{ username: u, password: p }]);
+        if (error) return setMsg('Username taken.');
 
-    // Check if username already taken
-    const { data: existing } = await _supabase
-        .from('admin_accounts')
-        .select('id')
-        .eq('username', u);
+        await _supabase.from('invite_keys').update({ used: true }).eq('key', key);
+        setMsg('Account created! Log in now.');
+        showAuthForm('login');
+    }
 
-    if (existing && existing.length > 0) return setMsg('Username already taken.');
+    async function generateInviteKey() {
+        const newKey = "DJY-" + Math.random().toString(36).substr(2, 6).toUpperCase();
+        await _supabase.from('invite_keys').insert([{ key: newKey, used: false }]);
+        document.getElementById('gen-key-input').value = newKey;
+        fetchActiveKeys();
+    }
 
-    const { error } = await _supabase
-        .from('admin_accounts')
-        .insert([{ username: u, password: p }]);
-
-    if (error) return setMsg(error.message);
-
-    setMsg('Account created! You can now log in.');
-    showAuthForm('login');
-}
-
-function showAuthForm(type) {
-    document.getElementById('form-login').style.display = type === 'login' ? 'block' : 'none';
-    document.getElementById('form-signup').style.display = type === 'signup' ? 'block' : 'none';
-    setMsg('');
-}
-
-function setMsg(msg) {
-    document.getElementById('auth-msg').textContent = msg;
-}
-
+    async function fetchActiveKeys() {
+        const { data } = await _supabase.from('invite_keys').select('key').eq('used', false);
+        document.getElementById('active-keys-list').innerText = data?.map(k => k.key).join(", ") || "None";
+    }
 
     function saveSession(isHead, name) {
         localStorage.setItem('djy_session', JSON.stringify({ isHead, name }));
@@ -225,10 +182,14 @@ function setMsg(msg) {
     function logout() { localStorage.removeItem('djy_session'); location.reload(); }
 
     function showDash(isHead, name) {
-        document.getElementById('login-form').style.display = 'none';
+        document.getElementById('login-panel').style.display = 'none';
         document.getElementById('dashboard').style.display = 'block';
         document.getElementById('welcome-msg').innerText = "Welcome, " + name;
-        if(isHead) { document.getElementById('moonboi-ctrl').style.display = 'block'; fetchAdmins(); }
+        if(isHead) { 
+            document.getElementById('moonboi-ctrl').style.display = 'block'; 
+            fetchAdmins();
+            fetchActiveKeys();
+        }
     }
 
     function tab(id) {
@@ -244,20 +205,16 @@ function setMsg(msg) {
             status: status
         }]);
         if(error) alert(error.message);
-        else { alert("Tournament Published!"); loadData(status); tab('tournament'); }
+        else { alert("Published!"); loadData(status); tab('tournament'); }
     }
 
     async function loadData(filter) {
         const display = document.getElementById('list-display');
         let { data, error } = await _supabase.from('tournaments').select('*').eq('status', filter).order('created_at', { ascending: false });
-        if(error) { display.innerHTML = "Error loading data."; return; }
+        if(error) return;
         display.innerHTML = (data && data.length > 0) ? "" : `<p style="text-align:center;">No ${filter} tournaments.</p>`;
         data?.forEach(t => {
-            display.innerHTML += `
-                <div class="tourney-card" onclick="openBracket('${t.title}')">
-                    <h3 style="color:var(--neon); margin:0;">${t.title}</h3>
-                    <p style="margin:5px 0; color:#888;">Prize: ${t.prize}</p>
-                </div>`;
+            display.innerHTML += `<div class="tourney-card" onclick="openBracket('${t.title}')"><h3>${t.title}</h3><p>${t.prize}</p></div>`;
         });
     }
 
@@ -274,13 +231,7 @@ function setMsg(msg) {
         ctx.clearRect(0,0,1000,700);
         ctx.strokeStyle = '#ff003c'; ctx.lineWidth = 2;
         document.querySelectorAll('.match-box').forEach(m => m.remove());
-
-        const matches = [
-            {x: 50, y: 100, name: "Winners R1-A"}, {x: 50, y: 250, name: "Winners R1-B"},
-            {x: 250, y: 175, name: "Winners Final"}, {x: 250, y: 400, name: "Losers Final"},
-            {x: 550, y: 300, name: "Grand Final"}
-        ];
-
+        const matches = [ {x: 50, y: 100, name: "Winners R1-A"}, {x: 50, y: 250, name: "Winners R1-B"}, {x: 250, y: 175, name: "Winners Final"}, {x: 250, y: 400, name: "Losers Final"}, {x: 550, y: 300, name: "Grand Final"} ];
         matches.forEach(m => {
             const div = document.createElement('div');
             div.className = 'match-box';
@@ -288,7 +239,6 @@ function setMsg(msg) {
             div.innerHTML = `<b>${m.name}</b><br><span style="font-size:9px">TBD vs TBD</span>`;
             area.appendChild(div);
         });
-
         line(ctx, 200, 135, 250, 205); line(ctx, 200, 285, 250, 205);
         line(ctx, 400, 210, 550, 335); line(ctx, 400, 435, 550, 335);
     }
