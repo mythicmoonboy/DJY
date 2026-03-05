@@ -4,20 +4,59 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>DJY MLBB HUB</title>
-    <script src="https://cdn.jsdelivr.net"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <style>
         :root { --neon: #ff003c; --bg: #0a0a0a; --card: #151515; --glow: 0 0 15px #ff003c; }
+        * { box-sizing: border-box; }
         body { background: var(--bg); color: white; font-family: 'Segoe UI', sans-serif; margin: 0; overflow-x: hidden; }
-        
-        /* Navigation */
-        nav { background: #000; padding: 15px; text-align: center; border-bottom: 2px solid var(--neon); box-shadow: var(--glow); position: sticky; top: 0; z-index: 1000; }
-        nav button { background: none; border: none; color: white; font-weight: bold; margin: 0 10px; cursor: pointer; text-transform: uppercase; transition: 0.2s; }
-        
-        /* ROUNDED BUTTONS & REACTIONS */
-        button:active { transform: scale(0.92); filter: brightness(1.2); }
-        .btn-neon { 
-            display: inline-block; padding: 12px 24px; border: 2px solid var(--neon); 
-            color: white; font-weight: bold; background: none; cursor: pointer; 
+
+        /* ── NAV ── */
+        nav {
+            background: #000; padding: 0 20px;
+            border-bottom: 2px solid var(--neon); box-shadow: var(--glow);
+            position: sticky; top: 0; z-index: 1000;
+            display: flex; align-items: center; justify-content: space-between; height: 54px;
+        }
+        .nav-links { display: flex; align-items: center; gap: 4px; }
+        nav button.nav-btn {
+            background: none; border: none; color: #aaa; font-weight: bold;
+            padding: 8px 16px; cursor: pointer; text-transform: uppercase;
+            transition: 0.2s; font-size: 13px; border-radius: 8px; letter-spacing: 0.5px;
+        }
+        nav button.nav-btn:hover { color: white; }
+        nav button.nav-btn.nav-active { color: var(--neon); }
+
+        .nav-right { display: flex; align-items: center; gap: 10px; }
+
+        /* LOGIN button in nav */
+        #nav-login-btn {
+            background: none; border: 1.5px solid var(--neon);
+            color: var(--neon); font-weight: bold; font-size: 12px;
+            padding: 7px 18px; border-radius: 10px; cursor: pointer;
+            text-transform: uppercase; letter-spacing: 1px;
+            transition: all 0.2s; display: block;
+        }
+        #nav-login-btn:hover { background: var(--neon); color: white; box-shadow: var(--glow); }
+
+        /* LOGOUT button in nav */
+        #nav-logout-btn {
+            background: rgba(255,0,60,0.1); border: 1.5px solid rgba(255,0,60,0.4);
+            color: #ff4466; font-weight: bold; font-size: 12px;
+            padding: 7px 18px; border-radius: 10px; cursor: pointer;
+            text-transform: uppercase; letter-spacing: 1px;
+            transition: all 0.2s; display: none;
+        }
+        #nav-logout-btn:hover { background: var(--neon); color: white; box-shadow: var(--glow); }
+
+        #nav-user-label {
+            display: none; color: #555; font-size: 12px;
+            font-weight: bold; letter-spacing: 1px; text-transform: uppercase;
+        }
+
+        button:active { transform: scale(0.93); }
+        .btn-neon {
+            display: inline-block; padding: 12px 24px; border: 2px solid var(--neon);
+            color: white; font-weight: bold; background: none; cursor: pointer;
             transition: all 0.2s ease; border-radius: 12px; text-transform: uppercase;
         }
         .btn-neon:hover { background: var(--neon); box-shadow: var(--glow); }
@@ -26,309 +65,942 @@
         .active { display: block; animation: fadeIn 0.4s ease; }
         @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
 
-        /* ROUNDED HERO & CARDS */
         .hero { text-align: center; padding: 40px; border: 1px solid var(--neon); background: rgba(255,0,60,0.05); border-radius: 20px; }
         .tourney-card { background: var(--card); border-left: 6px solid var(--neon); padding: 20px; margin-bottom: 15px; border-radius: 15px; cursor: pointer; transition: 0.3s; border: 1px solid #222; }
         .tourney-card:hover { transform: translateX(10px); background: #202020; }
-        
-        /* ROUNDED INPUTS */
-        input, select, textarea { width: 100%; padding: 12px; margin: 10px 0; background: #000; border: 1px solid #444; color: white; border-radius: 12px; box-sizing: border-box; }
-        input:focus { border-color: var(--neon); outline: none; box-shadow: 0 0 8px var(--neon); }
 
-        /* BRACKET SYSTEM (ROUNDED BOXES) */
-        #bracket-screen { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: #000; z-index: 2000; overflow: auto; padding: 50px; }
-        .bracket-container { position: relative; width: 1000px; height: 700px; margin: auto; }
-        .match-box { position: absolute; width: 150px; height: 70px; background: #111; border: 1px solid var(--neon); display: flex; flex-direction: column; justify-content: center; align-items: center; font-size: 11px; z-index: 5; border-radius: 12px; box-shadow: 0 4px 10px rgba(0,0,0,0.5); }
-        canvas { position: absolute; top: 0; left: 0; z-index: 1; pointer-events: none; }
-        .close-btn { position: fixed; top: 20px; right: 20px; background: var(--neon); color: white; border: none; padding: 12px 25px; cursor: pointer; z-index: 3000; font-weight: bold; border-radius: 12px; }
+        input, select, textarea { width: 100%; padding: 12px; margin: 10px 0; background: #000; border: 1px solid #444; color: white; border-radius: 12px; font-size: 14px; }
+        input:focus, select:focus { border-color: var(--neon); outline: none; box-shadow: 0 0 8px var(--neon); }
+        input[readonly] { color: #00ffaa; border-color: #1a4a1a; background: #050f05; cursor: default; }
 
-        /* ADMIN MANAGEMENT ROUNDED */
         .manage-item { display: flex; justify-content: space-between; align-items: center; background: #1a1a1a; padding: 15px; margin: 10px 0; border-radius: 12px; border: 1px solid #333; }
+
+        /* ── LOGIN MODAL ── */
+        #login-modal-overlay {
+            display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.85); z-index: 5000;
+            justify-content: center; align-items: center;
+            animation: fadeIn 0.2s ease;
+        }
+        #login-modal-overlay.show { display: flex; }
+        #login-modal {
+            background: #111; border: 1px solid var(--neon);
+            box-shadow: var(--glow); border-radius: 20px;
+            padding: 36px 32px; width: 90%; max-width: 400px;
+            animation: popIn 0.25s cubic-bezier(0.34,1.56,0.64,1);
+            position: relative;
+        }
+        @keyframes popIn { from { opacity:0; transform:scale(0.88); } to { opacity:1; transform:scale(1); } }
+        #login-modal h2 { color: var(--neon); margin: 0 0 20px; text-align: center; letter-spacing: 2px; font-size: 20px; }
+        .modal-close {
+            position: absolute; top: 14px; right: 18px;
+            background: none; border: none; color: #555; font-size: 20px; cursor: pointer; line-height: 1;
+        }
+        .modal-close:hover { color: white; }
+        .modal-tabs { display: flex; gap: 8px; margin-bottom: 20px; }
+        .modal-tab {
+            flex: 1; padding: 9px; border: 1.5px solid #333; background: none; color: #666;
+            border-radius: 10px; cursor: pointer; font-weight: bold; font-size: 13px;
+            text-transform: uppercase; letter-spacing: 1px; transition: 0.2s;
+        }
+        .modal-tab.active { border-color: var(--neon); color: var(--neon); background: rgba(255,0,60,0.08); }
+
+        /* ── POPUP ── */
+        #popup-overlay {
+            display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.8); z-index: 9000;
+            justify-content: center; align-items: center;
+        }
+        #popup-overlay.show { display: flex; }
+        #popup-box {
+            background: #111; border-radius: 18px; padding: 36px 32px;
+            max-width: 360px; width: 90%; text-align: center;
+            animation: popIn 0.25s cubic-bezier(0.34,1.56,0.64,1);
+        }
+        #popup-box.success { border: 1.5px solid #00ffaa; box-shadow: 0 0 30px rgba(0,255,170,0.15); }
+        #popup-box.error   { border: 1.5px solid var(--neon); box-shadow: 0 0 30px rgba(255,0,60,0.15); }
+        #popup-box.confirm { border: 1.5px solid #ffaa00; box-shadow: 0 0 30px rgba(255,170,0,0.12); }
+        #popup-icon { font-size: 46px; margin-bottom: 12px; }
+        #popup-title { font-size: 19px; font-weight: bold; margin-bottom: 8px; text-transform: uppercase; letter-spacing: 1px; }
+        #popup-box.success #popup-title { color: #00ffaa; }
+        #popup-box.error   #popup-title { color: var(--neon); }
+        #popup-box.confirm #popup-title { color: #ffaa00; }
+        #popup-msg { color: #aaa; font-size: 14px; margin-bottom: 22px; line-height: 1.6; }
+        .popup-btn-row { display: flex; gap: 12px; justify-content: center; }
+        #popup-ok {
+            padding: 10px 38px; border-radius: 12px; font-weight: bold; font-size: 14px;
+            cursor: pointer; border: 2px solid; text-transform: uppercase; letter-spacing: 1px;
+            transition: 0.2s; background: none;
+        }
+        #popup-box.success #popup-ok { border-color: #00ffaa; color: #00ffaa; }
+        #popup-box.success #popup-ok:hover { background: #00ffaa; color: #000; }
+        #popup-box.error   #popup-ok { border-color: var(--neon); color: var(--neon); }
+        #popup-box.error   #popup-ok:hover { background: var(--neon); color: white; }
+        #popup-box.confirm #popup-ok { border-color: var(--neon); color: var(--neon); }
+        #popup-box.confirm #popup-ok:hover { background: var(--neon); color: white; }
+        #popup-cancel {
+            display: none; padding: 10px 38px; border-radius: 12px; font-weight: bold; font-size: 14px;
+            cursor: pointer; border: 2px solid #333; color: #666; text-transform: uppercase;
+            letter-spacing: 1px; transition: 0.2s; background: none;
+        }
+        #popup-cancel:hover { border-color: #555; color: #aaa; }
+        #popup-box.confirm #popup-cancel { display: inline-block; }
+        /* ── TOURNEY CARD ADMIN CONTROLS ── */
+        .tourney-card-actions {
+            display: flex; gap: 8px; margin-top: 12px; flex-wrap: wrap;
+        }
+        .tc-btn {
+            padding: 5px 14px; border-radius: 8px; font-size: 12px; font-weight: bold;
+            cursor: pointer; border: 1px solid; text-transform: uppercase; letter-spacing: 0.5px;
+            transition: 0.2s; background: none;
+        }
+        .tc-btn.live-btn   { border-color: #00cc44; color: #00cc44; }
+        .tc-btn.live-btn:hover   { background: #00cc44; color: #000; }
+        .tc-btn.finish-btn { border-color: #aaa; color: #aaa; }
+        .tc-btn.finish-btn:hover { background: #aaa; color: #000; }
+        .tc-btn.date-btn   { border-color: #4488ff; color: #4488ff; }
+        .tc-btn.date-btn:hover   { background: #4488ff; color: #000; }
+        /* date input styling */
+        input[type="date"] { color-scheme: dark; }
+
+        /* ── KEY STYLES ── */
+        .key-box { background: #050f05; border: 1.5px solid #1a5c1a; border-radius: 12px; padding: 14px 16px; display: flex; align-items: center; gap: 10px; margin-top: 10px; }
+        .key-box input { flex:1; margin:0; background:transparent; border:none; color:#00ffaa; font-family:monospace; font-size:15px; letter-spacing:2px; font-weight:bold; }
+        .key-box input:focus { box-shadow:none; border:none; }
+        .copy-btn { background:none; border:1px solid #1a5c1a; color:#00ffaa; border-radius:8px; padding:6px 12px; cursor:pointer; font-size:12px; font-weight:bold; transition:0.2s; white-space:nowrap; }
+        .copy-btn:hover { background:#00ffaa; color:#000; }
+        .key-badge { display:inline-block; padding:3px 10px; border-radius:20px; font-size:11px; font-weight:bold; letter-spacing:1px; white-space:nowrap; }
+        .key-badge.live { background:rgba(0,255,100,0.15); color:#00ff64; border:1px solid #00ff6444; }
+        .key-badge.used { background:rgba(255,0,60,0.15); color:#ff4466; border:1px solid #ff003c44; }
+        #key-list-box .key-item { display:flex; justify-content:space-between; align-items:center; background:#111; border:1px solid #222; border-radius:10px; padding:10px 14px; margin:6px 0; gap:8px; flex-wrap:wrap; }
+        #key-list-box .key-item .key-code { font-family:monospace; font-size:13px; letter-spacing:1px; color:#ccc; flex:1; }
+        .key-item-actions { display:flex; align-items:center; gap:6px; }
+        .key-copy-btn { background:none; border:1px solid #1a5c1a; color:#00ffaa; border-radius:6px; padding:3px 10px; cursor:pointer; font-size:11px; font-weight:bold; transition:0.2s; }
+        .key-copy-btn:hover { background:#00ffaa; color:#000; }
+        .key-revoke-btn { background:none; border:1px solid #2a2a2a; color:#555; border-radius:6px; padding:3px 10px; cursor:pointer; font-size:11px; transition:0.2s; }
+        .key-revoke-btn:hover { border-color:var(--neon); color:var(--neon); }
+
+        /* ── BRACKET OVERLAY ── */
+        #bracket-screen {
+            display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: #060606; z-index: 3000; flex-direction: column;
+        }
+        #bracket-screen.show { display: flex; }
+        .bracket-topbar {
+            display: flex; align-items: center; justify-content: space-between;
+            padding: 12px 20px; border-bottom: 1px solid #1a1a1a;
+            background: #060606; flex-shrink: 0; flex-wrap: wrap; gap: 10px;
+        }
+        .bracket-topbar h2 { color: var(--neon); margin: 0; font-size: 18px; text-transform: uppercase; letter-spacing: 2px; }
+        .b-tabs { display: flex; gap: 6px; }
+        .b-tab {
+            padding: 7px 16px; border: 1px solid #333; background: none; color: #666;
+            border-radius: 8px; cursor: pointer; font-weight: bold; font-size: 13px;
+            text-transform: uppercase; letter-spacing: 1px; transition: 0.2s;
+        }
+        .b-tab:hover { color: #aaa; border-color: #555; }
+        .b-tab.active { border-color: var(--neon); color: var(--neon); background: rgba(255,0,60,0.1); }
+        .b-close { background:none; border:1px solid #333; color:#666; padding:7px 16px; border-radius:8px; cursor:pointer; font-size:12px; font-weight:bold; letter-spacing:1px; text-transform:uppercase; transition:0.2s; }
+        .b-close:hover { border-color:var(--neon); color:var(--neon); }
+
+        .bracket-body { flex: 1; overflow: auto; padding: 24px; }
+        .b-section { display: none; }
+        .b-section.vis { display: block; }
+
+        /* Rounds layout */
+        .rounds-wrap { display: flex; align-items: flex-start; min-width: max-content; gap: 0; }
+        .round-col { display: flex; flex-direction: column; min-width: 180px; }
+        .round-label { text-align: center; font-size: 10px; color: #444; letter-spacing: 1px; text-transform: uppercase; padding-bottom: 8px; margin-bottom: 6px; border-bottom: 1px solid #161616; font-weight: bold; }
+
+        /* Match card */
+        .match-card {
+            background: #0f0f0f; border: 1px solid #222; border-radius: 10px;
+            margin: 5px 8px; overflow: hidden; transition: border-color 0.2s; min-width: 162px;
+        }
+        .match-card:hover { border-color: #333; }
+        .match-card.grand { border-color: rgba(255,215,0,0.35); box-shadow: 0 0 16px rgba(255,215,0,0.08); }
+        .match-lbl { font-size: 9px; color: #292929; padding: 3px 8px; background: #090909; letter-spacing: 1px; text-transform: uppercase; }
+
+        /* Team slot */
+        .team-slot {
+            padding: 8px 10px; font-size: 13px; font-weight: bold;
+            border-bottom: 1px solid #161616; display: flex; align-items: center;
+            justify-content: space-between; transition: background 0.15s;
+            cursor: default; user-select: none;
+        }
+        .team-slot:last-child { border-bottom: none; }
+        .team-slot:hover { background: #1a1a1a; }
+        .team-slot.dragging { opacity: 0.4; cursor: grabbing; }
+        .team-slot.drag-over { background: rgba(255,0,60,0.12); border-color: var(--neon); }
+        .slot-name { flex: 1; color: #bbb; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+        .slot-handle { color: #333; font-size: 10px; margin-left: 6px; cursor: grab; }
+
+        /* ── TEAM EDITOR PANEL ── */
+        #team-panel {
+            display: none; position: fixed; top: 0; right: 0; width: 290px; height: 100%;
+            background: #0c0c0c; border-left: 1px solid #1e1e1e; z-index: 4000;
+            overflow-y: auto; padding: 18px;
+            animation: slideIn 0.22s ease;
+        }
+        @keyframes slideIn { from { transform: translateX(100%); } to { transform: translateX(0); } }
+        #team-panel h3 { color: var(--neon); font-size: 15px; font-weight: bold; text-transform: uppercase; letter-spacing: 2px; margin: 0 0 6px; }
+        .te-row { display: flex; align-items: center; gap: 6px; margin: 4px 0; }
+        .te-row span { font-size: 10px; color: #444; min-width: 22px; text-align: right; font-family: monospace; }
+        .te-row input { flex:1; margin:0; padding:7px 10px; font-size:13px; }
+        .te-group { margin-bottom: 12px; }
+        .te-group-title { font-size: 9px; color: #333; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 5px; padding-bottom: 3px; border-bottom: 1px solid #161616; }
+
+        #edit-teams-btn { display: none; } /* shown via JS when admin opens bracket */
     </style>
 </head>
 <body onload="initApp()">
 
-<nav>
-    <button onclick="tab('home')">Home</button>
-    <button onclick="tab('tournament')">Tournament</button>
-    <button onclick="tab('admin')">Admin</button>
-</nav>
-
-<!-- TAB: HOME -->
-<div id="home" class="container active">
-    <div class="hero">
-        <h1 style="color: var(--neon); text-shadow: var(--glow); font-size: 3rem; margin-bottom: 10px;">DJY MLBB</h1>
-        <p style="color: #ccc; margin-bottom: 30px;">Professional Tournament Hub with Real-time Sync.</p>
-        <div style="margin-top: 20px;">
-            <a href="https://discord.gg" target="_blank" class="btn-neon" style="text-decoration:none">Tournament Discord</a>
+<!-- ── POPUP ── -->
+<div id="popup-overlay">
+    <div id="popup-box">
+        <div id="popup-icon"></div>
+        <div id="popup-title"></div>
+        <div id="popup-msg"></div>
+        <div class="popup-btn-row">
+            <button id="popup-cancel" onclick="closePopup()">NO</button>
+            <button id="popup-ok" onclick="closePopup()">OK</button>
         </div>
     </div>
 </div>
 
-<!-- TAB: TOURNAMENT -->
+<!-- ── LOGIN MODAL ── -->
+<div id="login-modal-overlay">
+    <div id="login-modal">
+        <button class="modal-close" onclick="closeLoginModal()">✕</button>
+        <h2>ADMIN ACCESS</h2>
+        <div class="modal-tabs">
+            <button class="modal-tab active" onclick="switchModalTab('login', this)">Login</button>
+            <button class="modal-tab" onclick="switchModalTab('signup', this)">Sign Up</button>
+        </div>
+        <!-- Login form -->
+        <div id="modal-login-form">
+            <input type="text" id="adm-u" placeholder="Username" onkeydown="if(event.key==='Enter')login()">
+            <input type="password" id="adm-p" placeholder="Password" onkeydown="if(event.key==='Enter')login()">
+            <button class="btn-neon" style="width:100%; margin-top:8px;" onclick="login()">LOGIN</button>
+        </div>
+        <!-- Signup form -->
+        <div id="modal-signup-form" style="display:none;">
+            <input type="text" id="new-u" placeholder="Choose Username">
+            <input type="password" id="new-p" placeholder="Choose Password">
+            <input type="text" id="signup-key" placeholder="One-Use Invite Key">
+            <button class="btn-neon" style="width:100%; margin-top:8px; border-color:#00ffaa; color:#00ffaa;" onclick="signup()">CREATE ACCOUNT</button>
+            <p style="color:#555; font-size:12px; margin-top:8px;">Requires invite key from Moonboi.</p>
+        </div>
+        <p id="auth-msg" style="margin-top:10px; font-size:13px; text-align:center;"></p>
+    </div>
+</div>
+
+<!-- ── NAV ── -->
+<nav>
+    <div class="nav-links">
+        <button class="nav-btn nav-active" onclick="tab('home')">Home</button>
+        <button class="nav-btn" onclick="tab('tournament')">Tournament</button>
+        <button id="nav-admin-btn" class="nav-btn" style="display:none;" onclick="tab('admin')">Admin</button>
+    </div>
+    <div class="nav-right">
+        <span id="nav-user-label"></span>
+        <button id="nav-login-btn" onclick="openLoginModal()">Login</button>
+        <button id="nav-logout-btn" onclick="logout()">⏻ Logout</button>
+    </div>
+</nav>
+
+<!-- ── HOME ── -->
+<div id="home" class="container active">
+    <div class="hero">
+        <h1 style="color:var(--neon); text-shadow:var(--glow); font-size:3rem; margin-bottom:10px;">DJY MLBB</h1>
+        <p style="color:#ccc; margin-bottom:30px;">Professional Tournament Hub with Real-time Sync.</p>
+        <a href="https://discord.gg" target="_blank" class="btn-neon" style="text-decoration:none">Tournament Discord</a>
+    </div>
+</div>
+
+<!-- ── TOURNAMENT ── -->
 <div id="tournament" class="container">
-    <div style="text-align: center; margin-bottom: 30px; display: flex; justify-content: center; gap: 10px;">
+    <div style="text-align:center; margin-bottom:30px; display:flex; justify-content:center; gap:10px; flex-wrap:wrap;">
         <button class="btn-neon" onclick="loadData('upcoming')">Upcoming</button>
         <button class="btn-neon" onclick="loadData('live')">Live</button>
         <button class="btn-neon" onclick="loadData('finished')">Finished</button>
     </div>
-    <div id="list-display">Select a category to view.</div>
+    <div id="list-display" style="color:#555; text-align:center;">Select a category to view.</div>
 </div>
 
-<!-- BRACKET OVERLAY -->
+<!-- ── BRACKET OVERLAY ── -->
 <div id="bracket-screen">
-    <button class="close-btn" onclick="document.getElementById('bracket-screen').style.display='none'">EXIT VIEW</button>
-    <h2 id="b-title" style="text-align:center; color:var(--neon); text-transform:uppercase;">Bracket View</h2>
-    <div class="bracket-container" id="bracket-area">
-        <canvas id="bracketCanvas" width="1000" height="700"></canvas>
+    <div class="bracket-topbar">
+        <h2 id="b-title">Bracket</h2>
+        <div class="b-tabs">
+            <button class="b-tab active" onclick="switchBTab('winners',this)">Winners</button>
+            <button class="b-tab" onclick="switchBTab('losers',this)">Losers</button>
+            <button class="b-tab" onclick="switchBTab('grand',this)">Grand Final</button>
+        </div>
+        <div style="display:flex; gap:8px; align-items:center;">
+            <button id="edit-teams-btn" class="btn-neon" style="font-size:12px; padding:8px 14px;" onclick="toggleTeamPanel()">✎ TEAMS</button>
+            <button class="b-close" onclick="closeBracket()">✕ CLOSE</button>
+        </div>
+    </div>
+    <div class="bracket-body">
+        <div id="b-winners" class="b-section vis"><div id="winners-rounds" class="rounds-wrap"></div></div>
+        <div id="b-losers"  class="b-section"><div id="losers-rounds"  class="rounds-wrap"></div></div>
+        <div id="b-grand"   class="b-section"><div id="grand-rounds"   class="rounds-wrap"></div></div>
     </div>
 </div>
 
-<!-- TAB: ADMIN -->
-<div id="admin" class="container">
-    <div id="login-form" class="hero" style="max-width: 400px; margin: auto;">
-        <h2 style="color: var(--neon);">ADMIN ACCESS</h2>
-
-        <!-- Toggle buttons -->
-        <div style="display:flex; gap:10px; margin-bottom:20px;">
-            <button class="btn-neon" style="flex:1" onclick="showAuthForm('login')">LOGIN</button>
-            <button class="btn-neon" style="flex:1" onclick="showAuthForm('signup')">SIGN UP</button>
-        </div>
-
-        <!-- Login Form -->
-        <div id="form-login">
-            <input type="text" id="adm-u" placeholder="Username">
-            <input type="password" id="adm-p" placeholder="Password">
-            <button class="btn-neon" style="width:100%; margin-top:10px;" onclick="login()">LOGIN</button>
-        </div>
-
-        <!-- Signup Form -->
-        <div id="form-signup" style="display:none;">
-            <input type="text" id="new-u" placeholder="Choose Username">
-            <input type="password" id="new-p" placeholder="Choose Password">
-            <input type="text" id="signup-key" placeholder="Admin Invite Key">
-            <button class="btn-neon" style="width:100%; margin-top:10px; border-color:#00ffaa; color:#00ffaa;" onclick="signup()">CREATE ACCOUNT</button>
-            <p style="color:#888; font-size:12px; margin-top:10px;">You need an invite key from Moonboi to sign up.</p>
-        </div>
-
-        <p id="auth-msg" style="color:red; margin-top:10px;"></p>
+<!-- ── TEAM PANEL ── -->
+<div id="team-panel">
+    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px;">
+        <h3>Edit Teams</h3>
+        <button onclick="toggleTeamPanel()" style="background:none;border:none;color:#444;cursor:pointer;font-size:16px;">✕</button>
     </div>
+    <p style="color:#444; font-size:12px; margin:0 0 4px; line-height:1.5;">Edit names below, or <strong style="color:#777;">drag team slots</strong> in the bracket to swap positions.</p>
+    <button class="btn-neon" style="width:100%; margin:10px 0; font-size:12px; padding:9px;" onclick="saveTeams()">SAVE TEAMS</button>
+    <p id="save-msg" style="text-align:center; font-size:12px; margin:0 0 14px; font-family:monospace;"></p>
+    <div id="team-inputs"></div>
+    <button class="btn-neon" style="width:100%; margin-top:12px; font-size:12px; padding:9px;" onclick="saveTeams()">SAVE TEAMS</button>
+</div>
 
-    <div id="dashboard" style="display:none;">
+<!-- ── ADMIN ── -->
+<div id="admin" class="container">
+    <div id="dashboard">
         <div class="hero">
-            <h2 id="welcome-msg">Dashboard</h2>
-            <button onclick="logout()" style="color:gray; background:none; border:none; cursor:pointer;">[Logout System]</button>
-            <hr border-color="var(--neon)">
-            <h3>Post Tournament</h3>
+            <h2 id="welcome-msg" style="margin-top:0;"></h2>
+            <hr style="border:none; border-top:1px solid #222; margin:16px 0;">
+            <h3 style="color:#aaa; font-size:15px; margin-bottom:4px; text-transform:uppercase; letter-spacing:1px;">Post Tournament</h3>
             <input id="t-name" placeholder="Tournament Name">
             <input id="t-prize" placeholder="Prize Pool">
-            
-            <!-- TOURNAMENT STATUS SELECTION -->
-            <p style="text-align: left; margin: 10px 0 0 5px; font-size: 12px; color: gold;">Select Tournament Category:</p>
+            <p style="text-align:left; margin:4px 0 0 4px; font-size:12px; color:gold;">Tournament Date:</p>
+            <input type="date" id="t-date">
+            <p style="text-align:left; margin:4px 0 0 4px; font-size:12px; color:gold;">Team Format:</p>
+            <select id="t-size">
+                <option value="8">8 Teams</option>
+                <option value="16">16 Teams</option>
+                <option value="32" selected>32 Teams</option>
+            </select>
+            <p style="text-align:left; margin:4px 0 0 4px; font-size:12px; color:gold;">Category:</p>
             <select id="t-status">
                 <option value="upcoming">Upcoming</option>
                 <option value="live">Live</option>
                 <option value="finished">Finished</option>
             </select>
-            
-            <button class="btn-neon" style="width:100%; margin-top: 15px;" onclick="uploadTournament()">PUBLISH INSTANTLY</button>
+            <button class="btn-neon" style="width:100%; margin-top:15px;" onclick="uploadTournament()">PUBLISH INSTANTLY</button>
+            <p id="pub-msg" style="margin-top:10px; font-size:13px;"></p>
         </div>
 
-        <!-- MOONBOI ONLY PANEL -->
-        <div id="moonboi-ctrl" style="display:none; border: 2px solid gold; padding: 20px; margin-top: 30px; border-radius: 20px;">
-            <h3 style="color:gold">HEAD ADMIN (Moonboi)</h3>
-            
-            <!-- INVITE KEY GENERATOR -->
-            <div class="manage-item" style="flex-direction: column; align-items: flex-start;">
-                <p style="color:gold; margin:0 0 10px 0;">Generate Signup Key:</p>
-                <div style="display:flex; width:100%; gap:10px;">
-                    <input id="generated-key-display" readonly placeholder="Key will appear here" style="margin:0;">
-                    <button class="btn-neon" style="border-color:gold; font-size:10px;" onclick="generateNewKey()">GENERATE</button>
+        <!-- MOONBOI PANEL -->
+        <div id="moonboi-ctrl" style="display:none; border:2px solid gold; padding:24px; margin-top:28px; border-radius:20px; background:rgba(255,215,0,0.02);">
+            <h3 style="color:gold; margin-top:0; letter-spacing:1px;">HEAD ADMIN (Moonboi)</h3>
+
+            <div style="background:#0a0a0a; border:1px solid #2a2a2a; border-radius:14px; padding:18px; margin-bottom:20px;">
+                <p style="color:gold; margin:0 0 10px; font-size:13px; font-weight:bold; text-transform:uppercase; letter-spacing:1px;">Generate One-Use Signup Key</p>
+                <p style="color:#666; font-size:12px; margin:0 0 12px;">Burns after <strong style="color:#aaa;">one use</strong> only.</p>
+                <button class="btn-neon" style="border-color:gold; color:gold; width:100%;" onclick="generateNewKey()">⚡ GENERATE NEW KEY</button>
+                <div id="generated-key-wrap" style="display:none; margin-top:12px;">
+                    <div class="key-box">
+                        <input type="text" id="generated-key-display" readonly>
+                        <button class="copy-btn" id="main-copy-btn" onclick="copyKeyText(document.getElementById('generated-key-display').value, this)">COPY</button>
+                    </div>
+                    <p id="key-status" style="font-size:12px; color:#555; margin:6px 0 0; text-align:center;"></p>
                 </div>
-                <p id="key-status" style="font-size:10px; color:#888; margin-top:5px;">Share this key for new Admin Signups.</p>
             </div>
 
-            <hr style="border: 0.5px solid #333; width:100%; margin: 20px 0;">
-            
-            <p style="color: gold; margin-bottom: 10px;">Manual Admin Management:</p>
-            <input id="new-adm-u" placeholder="Username"><input id="new-adm-p" placeholder="Password">
+            <div style="margin-bottom:20px;">
+                <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px;">
+                    <p style="color:gold; margin:0; font-size:13px; font-weight:bold; text-transform:uppercase; letter-spacing:1px;">Key History</p>
+                    <div style="display:flex; gap:6px;">
+                        <button onclick="fetchKeys()" style="background:none; border:1px solid #333; color:#666; border-radius:8px; padding:4px 12px; cursor:pointer; font-size:11px;">↻</button>
+                        <button onclick="clearKeyHistory()" style="background:none; border:1px solid #3a1a1a; color:#884444; border-radius:8px; padding:4px 12px; cursor:pointer; font-size:11px; transition:0.2s;" onmouseover="this.style.borderColor='var(--neon)';this.style.color='var(--neon)'" onmouseout="this.style.borderColor='#3a1a1a';this.style.color='#884444'">🗑 Clear Used</button>
+                    </div>
+                </div>
+                <div id="key-list-box"><p style="color:#444; font-size:13px; text-align:center;">Loading...</p></div>
+            </div>
+
+            <hr style="border:none; border-top:1px solid #2a2a2a; margin:20px 0;">
+            <p style="color:gold; margin:0 0 10px; font-size:13px; font-weight:bold; text-transform:uppercase; letter-spacing:1px;">Manual Admin Management</p>
+            <input id="new-adm-u" placeholder="Username">
+            <input id="new-adm-p" placeholder="Password">
             <button class="btn-neon" style="border-color:gold; color:gold;" onclick="addAdminAcc()">ADD ADMIN MANUALLY</button>
-            
             <div id="admin-list-box" style="margin-top:15px;"></div>
         </div>
     </div>
 </div>
 
 <script>
-    const SUPABASE_URL = 'https://yfsjflymbkbfiketvxof.supabase.co';
-    const SUPABASE_KEY = 'sb_publishable_bOr8dIV2-Zt_9CUpboVsBQ_pzwpyRZw'; 
-    const _supabase = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+const SUPABASE_URL = 'https://yfsjflymbkbfiketvxof.supabase.co';
+const SUPABASE_KEY = 'sb_publishable_bOr8dIV2-Zt_9CUpboVsBQ_pzwpyRZw';
+const _supabase    = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
-    function initApp() {
-        const session = localStorage.getItem('djy_session');
-        if(session) {
-            const user = JSON.parse(session);
-            showDash(user.isHead, user.name);
-        }
-        loadData('upcoming');
+let isAdmin          = false;
+let isHead           = false;
+let currentTourneyId = null;
+let teams            = Array.from({length:32},(_,i)=>`Team ${i+1}`);
+let dragSrcIndex     = null; // for drag-swap
+
+// ── INIT ─────────────────────────────────────────────────────────────────
+function initApp() {
+    const s = localStorage.getItem('djy_session');
+    if (s) { const u = JSON.parse(s); setLoggedIn(u.isHead, u.name); }
+    loadData('upcoming');
+}
+
+// ── SESSION ───────────────────────────────────────────────────────────────
+function setLoggedIn(head, name) {
+    isAdmin = true; isHead = head;
+    document.getElementById('nav-login-btn').style.display  = 'none';
+    document.getElementById('nav-logout-btn').style.display = 'block';
+    document.getElementById('nav-user-label').style.display = 'block';
+    document.getElementById('nav-user-label').textContent   = name;
+    document.getElementById('nav-admin-btn').style.display  = 'block';
+    document.getElementById('welcome-msg').innerText        = 'Welcome, ' + name;
+    if (head) { document.getElementById('moonboi-ctrl').style.display='block'; fetchAdmins(); fetchKeys(); }
+}
+
+function logout() {
+    localStorage.removeItem('djy_session');
+    isAdmin = false; isHead = false;
+    document.getElementById('nav-login-btn').style.display  = 'block';
+    document.getElementById('nav-logout-btn').style.display = 'none';
+    document.getElementById('nav-user-label').style.display = 'none';
+    document.getElementById('nav-admin-btn').style.display  = 'none';
+    document.getElementById('moonboi-ctrl').style.display   = 'none';
+    tab('home');
+}
+
+// ── LOGIN MODAL ───────────────────────────────────────────────────────────
+function openLoginModal() {
+    document.getElementById('login-modal-overlay').classList.add('show');
+    setMsg('');
+}
+function closeLoginModal() {
+    document.getElementById('login-modal-overlay').classList.remove('show');
+    setMsg('');
+}
+document.addEventListener('DOMContentLoaded', () => {
+    document.getElementById('login-modal-overlay').addEventListener('click', function(e){ if(e.target===this) closeLoginModal(); });
+    document.getElementById('popup-overlay').addEventListener('click', function(e){ if(e.target===this) closePopup(); });
+});
+
+function switchModalTab(type, btn) {
+    document.querySelectorAll('.modal-tab').forEach(t=>t.classList.remove('active'));
+    btn.classList.add('active');
+    document.getElementById('modal-login-form').style.display  = type==='login'  ? 'block':'none';
+    document.getElementById('modal-signup-form').style.display = type==='signup' ? 'block':'none';
+    setMsg('');
+}
+
+function setMsg(msg, success=false) {
+    const el = document.getElementById('auth-msg');
+    el.textContent = msg;
+    el.style.color = success ? '#00ffaa' : '#ff003c';
+}
+
+// ── AUTH ──────────────────────────────────────────────────────────────────
+async function login() {
+    const u = document.getElementById('adm-u').value.trim();
+    const p = document.getElementById('adm-p').value;
+    setMsg('');
+    if (u==='moonboi' && p==='123') { saveSession(true,'moonboi'); return; }
+    const {data} = await _supabase.from('admin_accounts').select('*').eq('username',u).eq('password',p);
+    if (data && data.length>0) saveSession(false,u);
+    else setMsg('Invalid credentials.');
+}
+
+async function signup() {
+    const u   = document.getElementById('new-u').value.trim();
+    const p   = document.getElementById('new-p').value;
+    const key = document.getElementById('signup-key').value.trim();
+    setMsg('');
+    if (!u||!p||!key) { showPopup('error','Missing Fields','Fill in username, password, and invite key.'); return; }
+
+    const {data:kd, error:ke} = await _supabase.from('invite_keys').select('*').eq('key',key).eq('used',false);
+    if (ke||!kd||kd.length===0) { showPopup('error','Invalid Key','That invite key is invalid or already used.'); return; }
+
+    const {data:ex} = await _supabase.from('admin_accounts').select('id').eq('username',u);
+    if (ex&&ex.length>0) { showPopup('error','Username Taken','Choose a different username.'); return; }
+
+    const {error:re} = await _supabase.from('admin_accounts').insert([{username:u,password:p}]);
+    if (re) { showPopup('error','Failed',re.message); return; }
+
+    await _supabase.from('invite_keys').update({used:true}).eq('key',key);
+    showPopup('success','Account Created!',`Welcome, ${u}! You can now log in.`);
+    document.getElementById('new-u').value='';
+    document.getElementById('new-p').value='';
+    document.getElementById('signup-key').value='';
+    switchModalTab('login', document.querySelector('.modal-tab'));
+}
+
+function saveSession(head, name) {
+    localStorage.setItem('djy_session', JSON.stringify({isHead:head,name}));
+    setLoggedIn(head, name);
+    closeLoginModal();
+    tab('admin');
+}
+
+// ── NAV ───────────────────────────────────────────────────────────────────
+function tab(id) {
+    document.querySelectorAll('.container').forEach(c=>c.classList.remove('active'));
+    document.getElementById(id).classList.add('active');
+    document.querySelectorAll('.nav-btn').forEach(b=>b.classList.remove('nav-active'));
+    const nb = document.getElementById('nav-'+id+'-btn') || [...document.querySelectorAll('.nav-btn')].find(b=>b.textContent.toLowerCase().includes(id));
+    if (nb) nb.classList.add('nav-active');
+}
+
+// ── POPUP ─────────────────────────────────────────────────────────────────
+let _confirmCallback = null;
+
+function showPopup(type, title, msg, confirmCb) {
+    const icons = { success:'✅', error:'❌', confirm:'⚠️' };
+    const okLabels = { success:'OK', error:'OK', confirm:'YES, DELETE' };
+    document.getElementById('popup-icon').textContent  = icons[type] || '❌';
+    document.getElementById('popup-title').textContent = title;
+    document.getElementById('popup-msg').textContent   = msg;
+    document.getElementById('popup-box').className     = type;
+    document.getElementById('popup-ok').textContent    = okLabels[type] || 'OK';
+    _confirmCallback = confirmCb || null;
+    if (confirmCb) {
+        document.getElementById('popup-ok').onclick = () => { closePopup(); confirmCb(); };
+    } else {
+        document.getElementById('popup-ok').onclick = closePopup;
     }
+    document.getElementById('popup-overlay').classList.add('show');
+}
+function closePopup() {
+    document.getElementById('popup-overlay').classList.remove('show');
+    _confirmCallback = null;
+}
 
-    function showAuthForm(type) {
-        document.getElementById('form-login').style.display = type === 'login' ? 'block' : 'none';
-        document.getElementById('form-signup').style.display = type === 'signup' ? 'block' : 'none';
-        setMsg('');
+// ── TOURNAMENTS ───────────────────────────────────────────────────────────
+async function uploadTournament() {
+    const name   = document.getElementById('t-name').value.trim();
+    const prize  = document.getElementById('t-prize').value.trim();
+    const status = document.getElementById('t-status').value;
+    const date   = document.getElementById('t-date').value;
+    const size   = parseInt(document.getElementById('t-size').value);
+    const msg    = document.getElementById('pub-msg');
+    if (!name) { msg.style.color='var(--neon)'; msg.textContent='Enter a tournament name.'; return; }
+
+    const teamList = Array.from({length:size},(_,i)=>`Team ${i+1}`);
+    const {error} = await _supabase.from('tournaments').insert([{
+        title:name, prize, status,
+        tournament_date: date || null,
+        team_size: size,
+        teams:JSON.stringify(teamList)
+    }]);
+    if (error) { msg.style.color='var(--neon)'; msg.textContent=error.message; }
+    else {
+        msg.style.color='#00ffaa'; msg.textContent='✓ Published!';
+        document.getElementById('t-name').value='';
+        document.getElementById('t-prize').value='';
+        document.getElementById('t-date').value='';
+        loadData(status); tab('tournament');
     }
+}
 
-    function setMsg(msg) { document.getElementById('auth-msg').textContent = msg; }
+let currentFilter = 'upcoming';
 
-    async function login() {
-        const u = document.getElementById('adm-u').value.trim();
-        const p = document.getElementById('adm-p').value;
-        if (u === "moonboi" && p === "123") return saveSession(true, "moonboi");
+async function loadData(filter) {
+    currentFilter = filter;
+    const d = document.getElementById('list-display');
+    d.innerHTML='<p style="color:#555;text-align:center;">Loading...</p>';
+    const {data,error} = await _supabase.from('tournaments').select('*').eq('status',filter).order('created_at',{ascending:false});
+    if (error) { d.innerHTML='<p style="color:var(--neon);">Error.</p>'; return; }
+    if (!data||data.length===0) { d.innerHTML=`<p style="color:#555;text-align:center;">No ${filter} tournaments.</p>`; return; }
 
-        const { data } = await _supabase.from('admin_accounts').select('*').eq('username', u).eq('password', p);
-        if (data && data.length > 0) saveSession(false, u);
-        else setMsg('Invalid credentials.');
-    }
+    d.innerHTML = data.map(t => {
+        const size    = t.team_size || 32;
+        const dateStr = t.tournament_date ? formatDate(t.tournament_date) : null;
+        const meta    = [
+            `Prize: ${t.prize||'TBD'}`,
+            `${size} Teams · Double Elim`,
+            dateStr ? `📅 ${dateStr}` : null
+        ].filter(Boolean).join(' &nbsp;·&nbsp; ');
 
-    // SIGNUP WITH INVITE KEY LOGIC
-    async function signup() {
-        const u = document.getElementById('new-u').value.trim();
-        const p = document.getElementById('new-p').value;
-        const key = document.getElementById('signup-key').value.trim();
-        if (!u || !p || !key) return setMsg('Please fill all fields.');
+        return `<div class="tourney-card"
+            data-id="${t.id}"
+            data-title="${(t.title||'').replace(/"/g,'&quot;')}"
+            data-status="${t.status}"
+            data-date="${t.tournament_date||''}"
+            data-teams="${encodeURIComponent(JSON.stringify(t.teams||null))}">
+            <h3 style="color:var(--neon);margin:0;">${t.title}</h3>
+            <p style="margin:5px 0 0;color:#888;font-size:13px;">${meta}</p>
+            <div class="tourney-card-actions admin-only" style="display:none;"></div>
+        </div>`;
+    }).join('');
 
-        // 1. Verify Key from Supabase
-        const { data: keyData, error: keyError } = await _supabase
-            .from('invite_keys')
-            .select('*')
-            .eq('key', key)
-            .eq('used', false);
-
-        if (keyError || !keyData || keyData.length === 0) return setMsg('Invalid or used Invite Key.');
-
-        // 2. Register Admin
-        const { error: regError } = await _supabase.from('admin_accounts').insert([{ username: u, password: p }]);
-        if (regError) return setMsg('Username already exists.');
-
-        // 3. Burn the Key
-        await _supabase.from('invite_keys').update({ used: true }).eq('key', key);
-
-        setMsg('Account created! Now you can login.');
-        showAuthForm('login');
-    }
-
-    // GENERATE NEW KEY (MOONBOI ONLY)
-    async function generateNewKey() {
-        const randomKey = "DJY-" + Math.random().toString(36).substring(2, 8).toUpperCase();
-        const { error } = await _supabase.from('invite_keys').insert([{ key: randomKey, used: false }]);
-        
-        if (error) alert("Database Error: " + error.message);
-        else {
-            document.getElementById('generated-key-display').value = randomKey;
-            document.getElementById('key-status').innerText = "Key is LIVE! Give it to the new admin.";
-        }
-    }
-
-    function saveSession(isHead, name) {
-        localStorage.setItem('djy_session', JSON.stringify({ isHead, name }));
-        showDash(isHead, name);
-    }
-
-    function logout() { localStorage.removeItem('djy_session'); location.reload(); }
-
-    function showDash(isHead, name) {
-        document.getElementById('login-form').style.display = 'none';
-        document.getElementById('dashboard').style.display = 'block';
-        document.getElementById('welcome-msg').innerText = "Welcome, " + name;
-        if(isHead) { document.getElementById('moonboi-ctrl').style.display = 'block'; fetchAdmins(); }
-    }
-
-    function tab(id) {
-        document.querySelectorAll('.container').forEach(c => c.classList.remove('active'));
-        document.getElementById(id).classList.add('active');
-    }
-
-    async function uploadTournament() {
-        const status = document.getElementById('t-status').value;
-        const { error } = await _supabase.from('tournaments').insert([{
-            title: document.getElementById('t-name').value,
-            prize: document.getElementById('t-prize').value,
-            status: status
-        }]);
-        if(error) alert(error.message);
-        else { alert("Tournament Published!"); loadData(status); tab('tournament'); }
-    }
-
-    async function loadData(filter) {
-        const display = document.getElementById('list-display');
-        let { data, error } = await _supabase.from('tournaments').select('*').eq('status', filter).order('created_at', { ascending: false });
-        if(error) { display.innerHTML = "Error loading data."; return; }
-        display.innerHTML = (data && data.length > 0) ? "" : `<p style="text-align:center;">No ${filter} tournaments found.</p>`;
-        data?.forEach(t => {
-            display.innerHTML += `
-                <div class="tourney-card" onclick="openBracket('${t.title}')">
-                    <h3 style="color:var(--neon); margin:0;">${t.title}</h3>
-                    <p style="margin:5px 0; color:#888;">Prize: ${t.prize}</p>
-                </div>`;
+    d.querySelectorAll('.tourney-card').forEach(card => {
+        // Open bracket on card body click (not on action buttons)
+        card.addEventListener('click', e => {
+            if (e.target.closest('.tourney-card-actions')) return;
+            openBracket(card.dataset.id, card.dataset.title, decodeURIComponent(card.dataset.teams));
         });
+
+        // Build admin action buttons if logged in
+        if (isAdmin) {
+            const actions = card.querySelector('.tourney-card-actions');
+            actions.style.display = 'flex';
+            const status = card.dataset.status;
+
+            if (status === 'upcoming') {
+                const liveBtn = document.createElement('button');
+                liveBtn.className = 'tc-btn live-btn';
+                liveBtn.textContent = '▶ Set Live';
+                liveBtn.onclick = () => updateTournament(card.dataset.id, {status:'live'}, filter);
+                actions.appendChild(liveBtn);
+            }
+            if (status === 'upcoming' || status === 'live') {
+                const finBtn = document.createElement('button');
+                finBtn.className = 'tc-btn finish-btn';
+                finBtn.textContent = '✓ Set Finished';
+                finBtn.onclick = () => updateTournament(card.dataset.id, {status:'finished'}, filter);
+                actions.appendChild(finBtn);
+            }
+
+            // Date edit button — opens an inline date picker
+            const dateBtn = document.createElement('button');
+            dateBtn.className = 'tc-btn date-btn';
+            dateBtn.textContent = '📅 Edit Date';
+            dateBtn.onclick = (e) => { e.stopPropagation(); showDatePicker(card, filter); };
+            actions.appendChild(dateBtn);
+        }
+    });
+}
+
+function formatDate(dateStr) {
+    if (!dateStr) return null;
+    const d = new Date(dateStr + 'T00:00:00');
+    return d.toLocaleDateString('en-US', {month:'short', day:'numeric', year:'numeric'});
+}
+
+async function updateTournament(id, updates, filter) {
+    const {error} = await _supabase.from('tournaments').update(updates).eq('id', id);
+    if (error) { showPopup('error','Update Failed', error.message); return; }
+    loadData(filter);
+}
+
+function showDatePicker(card, filter) {
+    // Remove any existing inline picker
+    const existing = card.querySelector('.inline-date-picker');
+    if (existing) { existing.remove(); return; }
+
+    const wrap = document.createElement('div');
+    wrap.className = 'inline-date-picker';
+    wrap.style.cssText = 'display:flex;gap:8px;align-items:center;margin-top:10px;';
+    wrap.onclick = e => e.stopPropagation();
+
+    const inp = document.createElement('input');
+    inp.type = 'date'; inp.value = card.dataset.date || '';
+    inp.style.cssText = 'flex:1;margin:0;padding:8px 10px;font-size:13px;';
+
+    const saveBtn = document.createElement('button');
+    saveBtn.className = 'tc-btn date-btn';
+    saveBtn.textContent = 'Save';
+    saveBtn.onclick = async () => {
+        await updateTournament(card.dataset.id, {tournament_date: inp.value||null}, filter);
+        wrap.remove();
+    };
+
+    const cancelBtn = document.createElement('button');
+    cancelBtn.className = 'tc-btn finish-btn';
+    cancelBtn.textContent = 'Cancel';
+    cancelBtn.onclick = () => wrap.remove();
+
+    wrap.appendChild(inp); wrap.appendChild(saveBtn); wrap.appendChild(cancelBtn);
+    card.appendChild(wrap);
+    inp.focus();
+}
+
+// ── BRACKET ───────────────────────────────────────────────────────────────
+function openBracket(id, title, teamsJson) {
+    currentTourneyId = id;
+
+    // Safe team parse — handles both string-encoded and raw JSON
+    teams = defTeams();
+    try {
+        if (teamsJson && teamsJson !== 'null') {
+            let parsed = JSON.parse(teamsJson);
+            // If it came back as a string, parse again
+            if (typeof parsed === 'string') parsed = JSON.parse(parsed);
+            if (Array.isArray(parsed) && parsed.length > 0) teams = parsed;
+        }
+    } catch(e) { teams = defTeams(); }
+    while (teams.length < 32) teams.push(`Team ${teams.length + 1}`);
+
+    document.getElementById('b-title').innerText = title;
+    document.getElementById('bracket-screen').classList.add('show');
+    document.body.style.overflow = 'hidden';
+
+    // Show edit button for any logged-in admin
+    document.getElementById('edit-teams-btn').style.display = isAdmin ? 'inline-block' : 'none';
+
+    renderAll();
+}
+
+function defTeams() { return Array.from({length:32},(_,i)=>`Team ${i+1}`); }
+
+function closeBracket() {
+    document.getElementById('bracket-screen').classList.remove('show');
+    document.getElementById('team-panel').style.display='none';
+    document.body.style.overflow='';
+    currentTourneyId=null;
+}
+
+function switchBTab(view, btn) {
+    document.querySelectorAll('.b-section').forEach(s=>s.classList.remove('vis'));
+    document.querySelectorAll('.b-tab').forEach(t=>t.classList.remove('active'));
+    document.getElementById('b-'+view).classList.add('vis');
+    btn.classList.add('active');
+}
+
+// ── BRACKET RENDERING ─────────────────────────────────────────────────────
+function renderAll() { renderWinners(); renderLosers(); renderGrand(); }
+
+function makeSlot(teamIndex) {
+    const div = document.createElement('div');
+    div.className   = 'team-slot';
+    div.dataset.idx = teamIndex;
+
+    const name = document.createElement('span');
+    name.className   = 'slot-name';
+    name.textContent = teamIndex >= 0 ? teams[teamIndex] : 'TBD';
+
+    // Only show drag handle and enable drag for admins
+    if (isAdmin) {
+        const handle = document.createElement('span');
+        handle.className   = 'slot-handle';
+        handle.textContent = '⠿';
+        div.appendChild(name);
+        div.appendChild(handle);
+
+        if (teamIndex >= 0) {
+            div.draggable = true;
+            div.style.cursor = 'grab';
+            div.addEventListener('dragstart', e => {
+                dragSrcIndex = teamIndex;
+                setTimeout(()=>div.classList.add('dragging'), 0);
+                e.dataTransfer.effectAllowed = 'move';
+            });
+            div.addEventListener('dragend', ()=>div.classList.remove('dragging'));
+            div.addEventListener('dragover', e=>{ e.preventDefault(); div.classList.add('drag-over'); });
+            div.addEventListener('dragleave', ()=>div.classList.remove('drag-over'));
+            div.addEventListener('drop', e=>{
+                e.preventDefault(); div.classList.remove('drag-over');
+                const destIndex = parseInt(div.dataset.idx);
+                if (dragSrcIndex !== null && dragSrcIndex !== destIndex) {
+                    [teams[dragSrcIndex], teams[destIndex]] = [teams[destIndex], teams[dragSrcIndex]];
+                    renderAll();
+                    buildTeamInputs();
+                }
+                dragSrcIndex = null;
+            });
+        }
+    } else {
+        // Non-admin: read-only, no drag, no handle
+        div.style.cursor = 'default';
+        div.appendChild(name);
     }
 
-    function openBracket(title) {
-        document.getElementById('bracket-screen').style.display = 'block';
-        document.getElementById('b-title').innerText = title + " Bracket";
-        drawBracket();
+    return div;
+}
+
+function makeCard(t1idx, t2idx, label, grand=false) {
+    const card = document.createElement('div');
+    card.className = 'match-card' + (grand?' grand':'');
+
+    const lbl = document.createElement('div');
+    lbl.className   = 'match-lbl';
+    lbl.textContent = label;
+
+    card.appendChild(lbl);
+    card.appendChild(makeSlot(t1idx));
+    card.appendChild(makeSlot(t2idx));
+    return card;
+}
+
+// team index helper: -1 = TBD placeholder
+function makeRound(title, cardsArr, topPad=0) {
+    const col = document.createElement('div');
+    col.className = 'round-col';
+    const lbl = document.createElement('div');
+    lbl.className   = 'round-label';
+    lbl.textContent = title;
+    col.appendChild(lbl);
+    const wrap = document.createElement('div');
+    if (topPad) wrap.style.paddingTop = topPad+'px';
+    cardsArr.forEach(c=>wrap.appendChild(c));
+    col.appendChild(wrap);
+    return col;
+}
+
+function renderWinners() {
+    const c = document.getElementById('winners-rounds');
+    c.innerHTML='';
+    // R1: 16 matches using actual team slots
+    const r1=[]; for(let i=0;i<16;i++) r1.push(makeCard(i*2,i*2+1,`WB R1 · M${i+1}`));
+    c.appendChild(makeRound('Round 1  (32 Teams)',r1,0));
+    const r2=[]; for(let i=0;i<8;i++) r2.push(makeCard(-1,-1,`WB R2 · M${i+1}`));
+    c.appendChild(makeRound('Round 2  (16 Teams)',r2,20));
+    const qf=[]; for(let i=0;i<4;i++) qf.push(makeCard(-1,-1,`WB QF · M${i+1}`));
+    c.appendChild(makeRound('Quarter Finals',qf,58));
+    const sf=[]; for(let i=0;i<2;i++) sf.push(makeCard(-1,-1,`WB SF · M${i+1}`));
+    c.appendChild(makeRound('Semi Finals',sf,134));
+    c.appendChild(makeRound('Winners Final',[makeCard(-1,-1,'WB FINAL')],287));
+}
+
+function renderLosers() {
+    const c=document.getElementById('losers-rounds');
+    c.innerHTML='';
+    const lr1=[]; for(let i=0;i<8;i++) lr1.push(makeCard(-1,-1,`LB R1 · M${i+1}`));
+    c.appendChild(makeRound('LB Round 1',lr1,0));
+    const lr2=[]; for(let i=0;i<8;i++) lr2.push(makeCard(-1,-1,`LB R2 · M${i+1}`));
+    c.appendChild(makeRound('LB Round 2',lr2,20));
+    const lr3=[]; for(let i=0;i<4;i++) lr3.push(makeCard(-1,-1,`LB R3 · M${i+1}`));
+    c.appendChild(makeRound('LB Round 3',lr3,58));
+    const lr4=[]; for(let i=0;i<4;i++) lr4.push(makeCard(-1,-1,`LB R4 · M${i+1}`));
+    c.appendChild(makeRound('LB Round 4',lr4,58));
+    const lr5=[]; for(let i=0;i<2;i++) lr5.push(makeCard(-1,-1,`LB R5 · M${i+1}`));
+    c.appendChild(makeRound('LB Round 5',lr5,134));
+    const lr6=[]; for(let i=0;i<2;i++) lr6.push(makeCard(-1,-1,`LB R6 · M${i+1}`));
+    c.appendChild(makeRound('LB Round 6',lr6,134));
+    c.appendChild(makeRound('LB Semi Final',[makeCard(-1,-1,'LB SEMI')],287));
+    c.appendChild(makeRound('Losers Final',[makeCard(-1,-1,'LB FINAL')],287));
+}
+
+function renderGrand() {
+    const c=document.getElementById('grand-rounds');
+    c.innerHTML='';
+    c.appendChild(makeRound('Grand Final',[makeCard(-1,-1,'GRAND FINAL',true)],0));
+    c.appendChild(makeRound('Bracket Reset',[makeCard(-1,-1,'RESET (if needed)',true)],0));
+}
+
+// ── TEAM PANEL ────────────────────────────────────────────────────────────
+function toggleTeamPanel() {
+    const p = document.getElementById('team-panel');
+    if (!p.style.display||p.style.display==='none') { buildTeamInputs(); p.style.display='block'; }
+    else p.style.display='none';
+}
+
+function buildTeamInputs() {
+    const c = document.getElementById('team-inputs');
+    c.innerHTML='';
+    for (let g=0;g<8;g++) {
+        const grp = document.createElement('div'); grp.className='te-group';
+        const ttl = document.createElement('div'); ttl.className='te-group-title';
+        ttl.textContent=`Seed ${g*4+1}–${g*4+4}`;
+        grp.appendChild(ttl);
+        for (let j=0;j<4;j++) {
+            const idx=g*4+j;
+            const row=document.createElement('div'); row.className='te-row';
+            row.innerHTML=`<span>${idx+1}</span>`;
+            const inp=document.createElement('input');
+            inp.value=teams[idx]; inp.placeholder=`Team ${idx+1}`;
+            inp.addEventListener('input',e=>{ teams[idx]=e.target.value; renderAll(); });
+            row.appendChild(inp); grp.appendChild(row);
+        }
+        c.appendChild(grp);
     }
+}
 
-    function drawBracket() {
-        const area = document.getElementById('bracket-area');
-        const canvas = document.getElementById('bracketCanvas');
-        const ctx = canvas.getContext('2d');
-        ctx.clearRect(0,0,1000,700);
-        ctx.strokeStyle = '#ff003c'; ctx.lineWidth = 2;
-        document.querySelectorAll('.match-box').forEach(m => m.remove());
-
-        const matches = [
-            {x: 50, y: 100, name: "Winners R1-A"}, {x: 50, y: 250, name: "Winners R1-B"},
-            {x: 250, y: 175, name: "Winners Final"}, {x: 250, y: 400, name: "Losers Final"},
-            {x: 550, y: 300, name: "Grand Final"}
-        ];
-
-        matches.forEach(m => {
-            const div = document.createElement('div');
-            div.className = 'match-box';
-            div.style.left = m.x + 'px'; div.style.top = m.y + 'px';
-            div.innerHTML = `<b>${m.name}</b><br><span style="font-size:9px">TBD vs TBD</span>`;
-            area.appendChild(div);
-        });
-
-        line(ctx, 200, 135, 250, 205); line(ctx, 200, 285, 250, 205);
-        line(ctx, 400, 210, 550, 335); line(ctx, 400, 435, 550, 335);
+async function saveTeams() {
+    const msg=document.getElementById('save-msg');
+    msg.textContent='';
+    if (!currentTourneyId) { msg.style.color='var(--neon)'; msg.textContent='No tournament loaded.'; return; }
+    const {error}=await _supabase.from('tournaments').update({teams:JSON.stringify(teams)}).eq('id',currentTourneyId);
+    if (error) { msg.style.color='var(--neon)'; msg.textContent=error.message; }
+    else {
+        msg.style.color='#00ffaa'; msg.textContent='✓ Saved!';
+        renderAll();
+        setTimeout(()=>msg.textContent='',2500);
     }
+}
 
-    function line(ctx, x1, y1, x2, y2) { ctx.beginPath(); ctx.moveTo(x1, y1); ctx.lineTo(x2, y2); ctx.stroke(); }
+// ── INVITE KEYS ───────────────────────────────────────────────────────────
+async function generateNewKey() {
+    const k='DJY-'+Math.random().toString(36).substring(2,8).toUpperCase();
+    const {error}=await _supabase.from('invite_keys').insert([{key:k,used:false}]);
+    if (error) { alert('DB error: '+error.message); return; }
+    document.getElementById('generated-key-wrap').style.display='block';
+    document.getElementById('generated-key-display').value=k;
+    document.getElementById('key-status').innerHTML='⚡ Key is <strong style="color:#00ffaa">LIVE</strong> — burns after one use.';
+    fetchKeys();
+}
 
-    async function addAdminAcc() {
-        const u = document.getElementById('new-adm-u').value;
-        const p = document.getElementById('new-adm-p').value;
-        await _supabase.from('admin_accounts').insert([{ username: u, password: p }]);
+function copyKeyText(text, btn) {
+    navigator.clipboard.writeText(text).catch(()=>{
+        const t=document.createElement('input'); t.value=text;
+        document.body.appendChild(t); t.select(); document.execCommand('copy'); document.body.removeChild(t);
+    });
+    const orig=btn.textContent;
+    btn.textContent='COPIED!'; btn.style.background='#00ffaa'; btn.style.color='#000';
+    setTimeout(()=>{ btn.textContent=orig; btn.style.background=''; btn.style.color='#00ffaa'; },2000);
+}
+
+async function fetchKeys() {
+    const box=document.getElementById('key-list-box');
+    const {data,error}=await _supabase.from('invite_keys').select('*').order('created_at',{ascending:false});
+    if (error||!data||data.length===0) { box.innerHTML='<p style="color:#333;font-size:12px;text-align:center;">No keys yet.</p>'; return; }
+    box.innerHTML=data.map(k=>`
+        <div class="key-item">
+            <span class="key-code">${k.key}</span>
+            <div class="key-item-actions">
+                <span class="key-badge ${k.used?'used':'live'}">${k.used?'✗ USED':'✓ LIVE'}</span>
+                ${!k.used?`
+                    <button class="key-copy-btn" onclick="copyKeyText('${k.key}',this)">COPY</button>
+                    <button class="key-revoke-btn" onclick="revokeKey('${k.id}')">REVOKE</button>
+                `:''}
+            </div>
+        </div>`).join('');
+}
+
+async function revokeKey(id) {
+    await _supabase.from('invite_keys').update({used:true}).eq('id',id);
+    fetchKeys();
+}
+
+async function clearKeyHistory() {
+    showPopup('confirm', 'Clear Key History', 'Delete all used keys from history? Live unused keys will NOT be affected.', async () => {
+        const {error} = await _supabase.from('invite_keys').delete().eq('used', true);
+        if (error) { showPopup('error', 'Error', error.message); return; }
+        fetchKeys();
+    });
+}
+
+// ── ADMIN MANAGEMENT ──────────────────────────────────────────────────────
+async function addAdminAcc() {
+    const u=document.getElementById('new-adm-u').value.trim();
+    const p=document.getElementById('new-adm-p').value;
+    if (!u||!p) return;
+    const {error}=await _supabase.from('admin_accounts').insert([{username:u,password:p}]);
+    if (error) { alert('Error: '+error.message); return; }
+    document.getElementById('new-adm-u').value='';
+    document.getElementById('new-adm-p').value='';
+    fetchAdmins();
+}
+
+async function fetchAdmins() {
+    const box=document.getElementById('admin-list-box');
+    const {data}=await _supabase.from('admin_accounts').select('*');
+    if (!data||data.length===0) { box.innerHTML='<p style="color:#444;font-size:13px;">No sub-admins yet.</p>'; return; }
+    box.innerHTML=data.map(a=>`
+        <div class="manage-item">
+            <span style="font-size:14px;">${a.username}</span>
+            <button onclick="deleteAdmin('${a.id}','${a.username}')" style="color:var(--neon);background:none;border:1px solid #333;border-radius:8px;padding:5px 12px;cursor:pointer;font-size:12px;">Remove</button>
+        </div>`).join('');
+}
+
+async function deleteAdmin(id, username) {
+    showPopup('confirm', 'Remove Admin', `Remove "${username}" from admin accounts? This cannot be undone.`, async () => {
+        const {error} = await _supabase.from('admin_accounts').delete().eq('id', id);
+        if (error) { showPopup('error', 'Failed', error.message); return; }
         fetchAdmins();
-    }
+    });
+}
 
-    async function fetchAdmins() {
-        const box = document.getElementById('admin-list-box');
-        const { data } = await _supabase.from('admin_accounts').select('*');
-        box.innerHTML = "";
-        data?.forEach(adm => {
-            box.innerHTML += `<div class="manage-item"><span>${adm.username}</span><button onclick="deleteAdmin('${adm.id}')" style="color:red; background:none; border:none; cursor:pointer;">Delete</button></div>`;
-        });
-    }
-
-    async function deleteAdmin(id) { await _supabase.from('admin_accounts').delete().eq('id', id); fetchAdmins(); }
-
-    _supabase.channel('any').on('postgres_changes', { event: '*', schema: 'public', table: 'tournaments' }, () => {
-        loadData('upcoming'); loadData('live');
-    }).subscribe();
+// ── REALTIME ──────────────────────────────────────────────────────────────
+_supabase.channel('any').on('postgres_changes',{event:'*',schema:'public',table:'tournaments'},()=>{
+    if (document.getElementById('tournament').classList.contains('active')) loadData('upcoming');
+}).subscribe();
 </script>
 </body>
 </html>
