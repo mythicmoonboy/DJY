@@ -267,6 +267,19 @@
         .admin-accordion-btn.open .accordion-arrow { transform: rotate(180deg); }
         .accordion-arrow { transition: transform 0.25s ease; display: inline-block; font-size: 11px; color: #444; }
         .admin-section { animation: fadeIn 0.25s ease; margin-bottom: 6px; }
+
+/* NEW nav card */
+        .card {
+            background: white;
+            padding: 2rem;
+            border-radius: 15px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+            text-align: center;
+        }
+        #device-icon { font-size: 20px; margin-bottom: 10px; }
+        #result { font-size: 13px; font-weight: bold; color: #aaa; }
+
+
     </style>
 </head>
 <body onload="initApp()">
@@ -321,6 +334,8 @@
         <button id="nav-admin-btn" class="nav-btn" style="display:none;" onclick="tab('admin')">Admin</button>
     </div>
     <div class="nav-right">
+        <span id="device-icon">🔍</span>
+        <span class="nav-btn nav-active" id="result">Undetected..</span>
         <span id="nav-user-label"></span>
         <button id="nav-login-btn" onclick="openLoginModal()">Login</button>
         <button id="nav-logout-btn" onclick="logout()">⏻ Logout</button>
@@ -1158,6 +1173,28 @@ async function handleReg(id, status) {
     fetchRegs();
     if (status === 'accepted') showPopup('success', 'Team Accepted!', 'The squad has been accepted into the tournament.');
 }
+
+/*  NEW script */
+ window.onload = function() {
+            const userAgent = navigator.userAgent;
+            const resultElement = document.getElementById('result');
+            const iconElement = document.getElementById('device-icon');
+
+            // Logic to check for mobile keywords
+            const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(userAgent);
+
+            if (isMobile) {
+                resultElement.innerHTML = "MOBILE PHONE / TABLET";
+                resultElement.style.color = "#AD4323"; // Orange/Red for mobile
+                iconElement.innerHTML = "📱";
+            } else {
+                resultElement.innerHTML = "COMPUTER (DESKTOP/LAPTOP)";
+                resultElement.style.color = "#2328A1"; // Blue for computer
+                iconElement.innerHTML = "💻";
+            }
+            
+            console.log("User Agent details:", userAgent);
+        };
 </script>
 </body>
 </html>
